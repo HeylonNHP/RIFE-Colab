@@ -36,4 +36,4 @@ def chooseFrames(framesFolder, desiredFPS):
     outFile.write(timecodesFileString)
     outFile.close()
 #chooseFrames(r'D:\Videos\test\interpolated_frames',116.90)
-chooseFrames(r'D:\Videos\test\t1\i2',60)
+#chooseFrames(r'D:\Videos\test\t1\i2',60)
