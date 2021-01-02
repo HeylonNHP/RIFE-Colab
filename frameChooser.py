@@ -9,7 +9,6 @@ def chooseFrames(framesFolder, desiredFPS):
     currentTime = desiredFrameSpacing
     count = 1
     currentListIndex = 0
-    print('go')
     while (currentTime-desiredFrameSpacing) <= lastFile:
         currentFrame = int(frameFiles[currentListIndex][:-4])
 
@@ -19,11 +18,11 @@ def chooseFrames(framesFolder, desiredFPS):
             else:
                 break
 
-            print(currentListIndex, 'LI', currentFrame, 'CU', count, 'count')
-            print('sanity Check', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
+            # print(currentListIndex, 'LI', currentFrame, 'CU', count, 'count')
+            # print('sanity Check', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
             currentFrame = int(frameFiles[currentListIndex][:-4])
 
-        print('sanity Check SUCCEEDED', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
+        # print('sanity Check SUCCEEDED', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
         # Build timecodes file
         frameFile = framesFolder + os.path.sep + frameFiles[currentListIndex]
 
@@ -35,5 +34,3 @@ def chooseFrames(framesFolder, desiredFPS):
     outFile = open(framesFolder + os.path.sep + 'framesCFR.txt','w')
     outFile.write(timecodesFileString)
     outFile.close()
-#chooseFrames(r'D:\Videos\test\interpolated_frames',116.90)
-#chooseFrames(r'D:\Videos\test\t1\i2',60)
