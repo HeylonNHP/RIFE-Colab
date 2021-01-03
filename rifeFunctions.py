@@ -1,4 +1,3 @@
-# @title Step 2 - Run to setup RIFE (Mandatory)
 from googleDriveDownloader import *
 import shutil
 import glob
