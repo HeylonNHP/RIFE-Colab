@@ -20,6 +20,6 @@ def downloadRIFE(installPath,onWindows):
     for data in glob.glob("*.pkl"):
         shutil.move(data, installPath + "/arXiv2020-RIFE/train_log/")
     os.chdir(installPath + '/arXiv2020-RIFE/')
-    shutil.rmtree(installPath+"/RIFE_trained_model_new.zip")
+    os.remove(installPath+"/RIFE_trained_model_new.zip")
 
 
