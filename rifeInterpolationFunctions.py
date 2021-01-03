@@ -13,6 +13,8 @@ import gc
 device = None
 model = None
 def setupRIFE(installPath, GPUID):
+    global device
+    global model
     try:
         torch.cuda.set_device(GPUID)
     except:
