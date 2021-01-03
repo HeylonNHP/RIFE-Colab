@@ -1,5 +1,6 @@
-import shutil
 import os
+os.chdir('arXiv2020-RIFE/')
+import shutil
 import cv2
 import torch
 import argparse
