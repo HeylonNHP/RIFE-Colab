@@ -1,6 +1,9 @@
 import re
 import subprocess
-
+ffmpegLocation = 'ffmpeg'
+def setFFmpegLocation(location):
+    global ffmpegLocation
+    ffmpegLocation = location
 
 def getFrameCount(inputPath,mpdecimate):
     '''
@@ -10,9 +13,9 @@ def getFrameCount(inputPath,mpdecimate):
     result = None
     if mpdecimate:
         # ffmpeg -i input.mkv -map 0:v:0 -c copy -f null -
-        result = subprocess.run(['ffmpeg', '-i',inputPath,'-vf','mpdecimate','-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
+        result = subprocess.run([ffmpegLocation, '-i',inputPath,'-vf','mpdecimate','-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
     else:
-        result = subprocess.run(['ffmpeg', '-i',inputPath,'-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
+        result = subprocess.run([ffmpegLocation, '-i',inputPath,'-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
     lines = result.stderr.splitlines()
 
     print("------LINES------")
@@ -39,7 +42,7 @@ def getFPS(inputPath):
     Gets the FPS as a float from a given video path
     '''
     videoFPS = 0
-    result = subprocess.run(['ffmpeg', '-i',inputPath], stderr=subprocess.PIPE)
+    result = subprocess.run([ffmpegLocation, '-i',inputPath], stderr=subprocess.PIPE)
     lines = result.stderr.splitlines()
 
     print("------LINES------")
@@ -60,7 +63,7 @@ def getLength(inputPath):
     Get the duration of a video in seconds as a float
     '''
     lengthSeconds = 0.0
-    result = subprocess.run(['ffmpeg', '-i',inputPath], stderr=subprocess.PIPE)
+    result = subprocess.run([ffmpegLocation, '-i',inputPath], stderr=subprocess.PIPE)
     lines = result.stderr.splitlines()
 
     print("------LINES------")
