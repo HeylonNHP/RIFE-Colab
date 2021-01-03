@@ -12,7 +12,7 @@ def downloadRIFE(installPath,onWindows):
     if onWindows:
         sevenZip = r"C:\Program Files\7-Zip\7z.exe"
 
-    os.system(sevenZip + r' e RIFE_trained_model_new.zip -aoa')
+    os.system('"'+sevenZip+'"' + r' e RIFE_trained_model_new.zip -aoa')
 
     if not os.path.exists(installPath + '/arXiv2020-RIFE/train_log'):
         os.mkdir(installPath + '/arXiv2020-RIFE/train_log')
