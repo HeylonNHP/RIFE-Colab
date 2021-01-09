@@ -1,4 +1,4 @@
 import subprocess
 def runAndPrintOutput(arrayCommand:list):
-    result = subprocess.check_output(arrayCommand, shell=True, text=True, stderr=subprocess.STDOUT)
+    result = subprocess.run(arrayCommand, shell=True, text=True, stderr=subprocess.STDOUT, check=False).stdout
     print(result)
