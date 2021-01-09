@@ -7,6 +7,12 @@ from frameChooser import chooseFrames
 FFMPEG4 = 'ffmpeg'
 GPUID = 0
 nvencPreset = 'p7'
+installPath = os.getcwd()
+onWindows = True
+
+from rifeFunctions import downloadRIFE
+downloadRIFE(installPath,onWindows)
+from rifeInterpolationFunctions import *
 
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
@@ -25,6 +31,121 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
         hi, lo, frac = mpdecimateSensitivity.split(",")
         mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
         runAndPrintOutput([FFMPEG4,'-i',inputFile,'-map_metadata','-1','-pix_fmt','rgb24','-copyts','-r','1000','-vsync','0','-frame_pts','true','-vf', mpdecimate,'-qscale:v','1','original_frames/%15d.png'])
+
+
+def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity):
+    '''
+    Equivalent to DAINAPP Step 2
+    '''
+    os.chdir(installPath + '/arXiv2020-RIFE/')
+    origFramesFolder = projectFolder + '/' + "original_frames"
+    interpFramesFolder = projectFolder + '/' + "interpolated_frames"
+
+    if not os.path.exists(interpFramesFolder):
+        os.mkdir(interpFramesFolder)
+
+    # Get output FPS
+    outputFPS = 0
+    if mode == 1 or mode == 3:
+        outputFPS = getFPS(inputFile) * interpolationFactor
+    elif mode == 4:
+        outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
+
+    # Loopable
+    if loopable:
+        generateLoopContinuityFrame(origFramesFolder)
+
+    files = os.listdir(origFramesFolder)
+    files.sort()
+
+    if mode == 1:
+
+        count = 0
+        shutil.copy(origFramesFolder + '/' + files[0], interpFramesFolder + '/' + '{:015d}.png'.format(count))
+
+        for i in range(0, len(files) - 1):
+            print("Interpolating frame:", i + 1, "Of", len(files), "{:.2f}%".format(((i + 1) / len(files)) * 100))
+            shutil.copy(origFramesFolder + '/' + files[i], interpFramesFolder + '/' + '{:015d}.png'.format(count))
+            shutil.copy(origFramesFolder + '/' + files[i + 1],
+                        interpFramesFolder + '/' + '{:015d}.png'.format(count + interpolationFactor))
+
+            currentFactor = interpolationFactor
+
+            while currentFactor > 1:
+                period = int(interpolationFactor / currentFactor)
+                for j in range(0, period):
+                    offset = int(currentFactor * j)
+                    beginFrame = interpFramesFolder + '/' + '{:015d}.png'.format(count + offset)
+                    endFrame = interpFramesFolder + '/' + '{:015d}.png'.format(count + currentFactor + offset)
+                    middleFrame = interpFramesFolder + '/' + '{:015d}.png'.format(
+                        count + int(currentFactor / 2) + offset)
+                    rifeInterpolate(beginFrame, endFrame, middleFrame, scenechangeSensitivity)
+                currentFactor = int(currentFactor / 2)
+
+            count += interpolationFactor
+
+    elif mode == 3 or mode == 4:
+        count = 0
+        shutil.copy(origFramesFolder + '/' + files[0], interpFramesFolder + '/' + '{:015d}.png'.format(count))
+        # To ensure no duplicates on the output with the new VFR to CFR algorithm, double the interpolation factor. TODO: Investigate
+        modeModOutputFPS = outputFPS
+        if mode == 3:
+            interpolationFactor = interpolationFactor * 2
+            modeModOutputFPS = modeModOutputFPS * 2
+        for i in range(0, len(files) - 1):
+
+            localInterpolationFactor = interpolationFactor
+            # If mode 3, calculate interpolation factor on a per-frame basis to maintain desired FPS
+
+            beginFrameTime = int(files[i][:-4])
+            endFrameTime = int(files[i + 1][:-4])
+            timeDiff = endFrameTime - beginFrameTime
+            if mode == 3:
+                localInterpolationFactor = 2
+
+                while 1 / (((endFrameTime - beginFrameTime) / localInterpolationFactor) / 1000) < modeModOutputFPS:
+                    localInterpolationFactor = int(localInterpolationFactor * 2)
+
+            print("Interpolating frame:", i + 1, "Of", len(files), "{:.2f}%".format(((i + 1) / len(files)) * 100),
+                  "Frame interp. factor", "{}x".format(localInterpolationFactor))
+
+            # Get timecodes of both working frames
+            currentTimecode = int(files[i][:-4])
+            nextTimecode = int(files[i + 1][:-4])
+
+            shutil.copy(origFramesFolder + '/' + files[i],
+                        interpFramesFolder + '/' + '{:015d}.png'.format(currentTimecode))
+            shutil.copy(origFramesFolder + '/' + files[i + 1],
+                        interpFramesFolder + '/' + '{:015d}.png'.format(nextTimecode))
+
+            currentFactor = localInterpolationFactor
+
+            while currentFactor > 1:
+                period = int(round(localInterpolationFactor / currentFactor))
+                for j in range(0, period):
+                    # Get offset from the first frame
+                    offset = (timeDiff / period) * j
+                    # print(currentTimecode,offset, "j ",j)
+                    # Time difference between 'begin' and 'end' frames relative to current interpolation factor (Block size)
+                    currentFactor2 = (currentFactor / localInterpolationFactor) * timeDiff
+                    beginFrameTime = int(currentTimecode + offset)
+                    endFrameTime = int(currentTimecode + currentFactor2 + offset)
+                    middleFrameTime = int(currentTimecode + (currentFactor2 / 2) + offset)
+
+                    beginFrame = interpFramesFolder + '/' + '{:015d}.png'.format(beginFrameTime)
+                    endFrame = interpFramesFolder + '/' + '{:015d}.png'.format(endFrameTime)
+                    middleFrame = interpFramesFolder + '/' + '{:015d}.png'.format(middleFrameTime)
+
+                    # print("times",beginFrameTime,middleFrameTime,endFrameTime)
+                    rifeInterpolate(beginFrame, endFrame, middleFrame, scenechangeSensitivity)
+                currentFactor = int(currentFactor / 2)
+
+            # count += interpolationFactor
+    # Loopable
+    if loopable:
+        removeLoopContinuityFrame(interpFramesFolder)
+
+    return [outputFPS]
 
 
 def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
@@ -77,7 +198,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         command = [FFMPEG4,'-hide_banner','-stats','-loglevel','error','-y','-stream_loop',str(loopCount)]
         command = command + inputFFmpeg
         command = command + ['-pix_fmt','yuv420p','-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2','-f','yuv4mpegpipe','-',
-                             '|',ffmpegSelected,'-i','-']
+                             '|',ffmpegSelected,'-y','-i','-']
         command = command + audioInput + encoderPreset + [str(outputVideo)]
         runAndPrintOutput(command)
         if os.path.exists('loop.flac'):
