@@ -12,6 +12,7 @@ onWindows = True
 
 from rifeFunctions import downloadRIFE
 downloadRIFE(installPath,onWindows)
+os.chdir(installPath)
 from rifeInterpolationFunctions import *
 
 
@@ -263,3 +264,32 @@ def generateTimecodesFile(projectFolder):
     f.write("file '" + projectFolder + "/interpolated_frames/" + lastFrameName + "'\nduration " + "{:.5f}".format(
         float(averageDistance / 1000.0)) + "\n")
     f.close()
+
+
+def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc):
+    projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
+    if nonLocalPNGs:
+        projectFolder = installPath + os.path.sep + "tempFrames"
+        if not os.path.exists(projectFolder):
+            os.mkdir(projectFolder)
+
+    # Clear pngs if they exist
+    if os.path.exists(projectFolder + '/' + 'original_frames'):
+        shutil.rmtree(projectFolder + '/' + 'original_frames')
+
+    if os.path.exists(projectFolder + '/' + 'interpolated_frames'):
+        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
+
+    extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity)
+
+    outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
+    print('---INTERPOLATION DONE---')
+    outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1]
+    outputVideoName += '{:.2f}fps-{}x-mode{}-rife-output.mp4'.format(outParams[0], interpolationFactor, mode)
+
+    createOutput(inputFile, projectFolder, outputVideoName, outParams[0], loopable, mode, crf, useNvenc)
+
+    if clearPNGs:
+        shutil.rmtree(projectFolder + '/' + 'original_frames')
+        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
