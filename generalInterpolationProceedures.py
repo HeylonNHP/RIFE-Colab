@@ -208,7 +208,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         command = [FFMPEG4,'-y','-stream_loop',str(loopCount),'-i',str(inputFile),'-vn','loop.flac']
         runAndPrintOutput(command)
 
-        audioInput = ""
+        audioInput = []
         if os.path.exists('loop.flac'):
             audioInput = ['-i','loop.flac','-map','0','-map','1']
             print("Looped audio exists")
