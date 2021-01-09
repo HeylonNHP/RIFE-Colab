@@ -1,4 +1,4 @@
-from generalInterpolationProceedures import extractFrames
+from generalInterpolationProceedures import extractFrames,generateLoopContinuityFrame
 def test_extract_frames():
     inputFolder = r'D:\Videos\test'
     inputFile = r'D:\Videos\test\2020-08-10 18.38.30.mov'
@@ -6,4 +6,7 @@ def test_extract_frames():
     extractFrames(inputFile,inputFolder,mode)
     mode = 1
     extractFrames(inputFile, inputFolder, mode)
+
+    framesFolder = inputFolder + r'\original_frames'
+    generateLoopContinuityFrame(framesFolder)
     assert True
