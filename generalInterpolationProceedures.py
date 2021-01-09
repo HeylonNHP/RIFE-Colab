@@ -8,6 +8,7 @@ FFMPEG4 = 'ffmpeg'
 GPUID = 0
 nvencPreset = 'p7'
 installPath = os.getcwd()
+print('INSTALL:',installPath)
 onWindows = True
 
 from rifeFunctions import downloadRIFE
@@ -38,7 +39,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     '''
     Equivalent to DAINAPP Step 2
     '''
-    os.chdir(installPath + '/arXiv2020-RIFE/')
+    os.chdir(installPath + '/arXiv2020RIFE/')
     origFramesFolder = projectFolder + '/' + "original_frames"
     interpFramesFolder = projectFolder + '/' + "interpolated_frames"
 

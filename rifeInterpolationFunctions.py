@@ -1,11 +1,11 @@
 import os
-os.chdir('arXiv2020-RIFE/')
+#os.chdir('arXiv2020-RIFE/')
 import shutil
 import cv2
 import torch
 import argparse
 from torch.nn import functional as F
-from model.RIFE_HD import Model
+from arXiv2020RIFE.model.RIFE_HD import Model
 import numpy as np
 from queue import Queue
 import gc
