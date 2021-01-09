@@ -9,13 +9,29 @@ GPUID = 0
 nvencPreset = 'p7'
 installPath = os.getcwd()
 print('INSTALL:',installPath)
-onWindows = True
 
+# Check if running on Windows or not
+onWindows = None
+if os.name == 'nt':
+    onWindows = True
+else:
+    onWindows = False
+
+# Get and initialise RIFE
 from rifeFunctions import downloadRIFE
 downloadRIFE(installPath,onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 
+def setFFmpeg4Path(path):
+    global FFMPEG4
+    FFMPEG4 = path
+
+def setNvencSettings(nvencGpuID,preset):
+    global GPUID
+    global nvencPreset
+    GPUID = nvencGpuID
+    nvencPreset = preset
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
