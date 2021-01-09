@@ -29,7 +29,7 @@ def setupRIFE(installPath, GPUID):
         print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
 
     model = Model()
-    model.load_model('./train_log', -1)
+    model.load_model(installPath + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
     model.eval()
     model.device()
 

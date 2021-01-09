@@ -11,4 +11,6 @@ inputFile = r'D:\Videos\test\2020-08-10 18.38.30.mov'
 from generalInterpolationProceedures import *
 
 def test_interpolation():
+    print('HELLO PYTHON?!?!?!?!?',os.getcwd())
+    setupRIFE(os.getcwd(),1)
     performAllSteps(inputFile,2,False,3,20,True,True,0.2,"64*12,64*8,0.33",True)
