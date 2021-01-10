@@ -213,12 +213,15 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
             audioInput = ['-i','loop.flac','-map','0','-map','1']
             print("Looped audio exists")
 
-        command = [FFMPEG4,'-hide_banner','-stats','-loglevel','error','-y','-stream_loop',str(loopCount)]
+        command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
         command = command + inputFFmpeg
-        command = command + ['-pix_fmt','yuv420p','-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2','-f','yuv4mpegpipe','-',
-                             '|',ffmpegSelected,'-y','-i','-']
-        command = command + audioInput + encoderPreset + [str(outputVideo)]
-        runAndPrintOutput(command)
+        command = command + ['-pix_fmt', 'yuv420p', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f', 'yuv4mpegpipe', '-']
+        command2 = [ffmpegSelected, '-y', '-i', '-']
+        command2 = command2 + audioInput + encoderPreset + [str(outputVideo)]
+
+        pipe1 = subprocess.Popen(command, stdout=subprocess.PIPE)
+        output = subprocess.check_output(command2, stdin=pipe1.stdout)
+        pipe1.wait()
         if os.path.exists('loop.flac'):
             os.remove('loop.flac')
 
