@@ -1,16 +1,19 @@
+from str2bool import *
 import argparse
 parser = argparse.ArgumentParser(description='Interpolation for video input')
 parser.add_argument('-i', dest='inputDirectory', type=str, default=None)
 parser.add_argument('-mode', dest='mode', type=int, default=3)
 parser.add_argument('-fpstarget', dest='fpsTarget', type=float, default=59)
 parser.add_argument('-crf', dest='crf', type=float, default=20)
-parser.add_argument('-clearpngs', dest='clearpngs', type=bool, default=True)
-parser.add_argument('-nonlocalpngs', dest='nonlocalpngs', type=bool, default=True)
+parser.add_argument('-clearpngs', dest='clearpngs', type=str2bool, default=True)
+parser.add_argument('-nonlocalpngs', dest='nonlocalpngs', type=str2bool, default=True)
 parser.add_argument('-scenesens', dest='scenechangeSensitivity', type=float, default=0.2)
 parser.add_argument('-mpdecimate', dest='mpdecimateSensitivity', type=str, default="64*12,64*8,0.33")
-parser.add_argument('-usenvenc', dest='useNvenc', type=bool, default=False)
+parser.add_argument('-usenvenc', dest='useNvenc', type=str2bool, default=False)
 parser.add_argument('-gpuid', dest='gpuid', type=int, default=0)
 args = parser.parse_args()
+
+print("NONLOCALPNGS",args.nonlocalpngs,"CLEARPNGS",args.clearpngs)
 
 import os
 import traceback
@@ -38,7 +41,7 @@ for inputVideoFile in files:
         print(inputVideoFile)
 
         if args.mode == 1 or args.mode == 3:
-            currentFPS = getFPS(inputVideoFile)
+            currentFPS = getFPSaccurate(inputVideoFile)
         elif args.mode == 4 or args.mode == 3:
             currentFPS = getFrameCount(inputVideoFile,True) / getLength(inputVideoFile)
 

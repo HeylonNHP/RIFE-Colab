@@ -21,7 +21,7 @@ def test_createOutput():
     extractFrames(inputFile,inputFolder,mode)
     shutil.move(inputFolder + os.path.sep + 'original_frames',
                 inputFolder + os.path.sep + 'interpolated_frames')
-    createOutput(inputFile,inputFolder,'out-unittest.mp4',getFPS(inputFile),
+    createOutput(inputFile,inputFolder,'out-unittest.mp4',getFPSaccurate(inputFile),
                  False,mode,20,True)
 
     shutil.rmtree(inputFolder + os.path.sep + 'interpolated_frames')
@@ -29,5 +29,5 @@ def test_createOutput():
     extractFrames(inputFile, inputFolder, mode)
     shutil.move(inputFolder + os.path.sep + 'original_frames',
                 inputFolder + os.path.sep + 'interpolated_frames')
-    createOutput(inputFile, inputFolder, 'out-unittest.mp4', getFPS(inputFile),
+    createOutput(inputFile, inputFolder, 'out-unittest.mp4', getFPSaccurate(inputFile),
                  True, mode, 20, True)

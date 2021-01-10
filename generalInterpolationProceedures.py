@@ -65,7 +65,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     # Get output FPS
     outputFPS = 0
     if mode == 1 or mode == 3:
-        outputFPS = getFPS(inputFile) * interpolationFactor
+        outputFPS = getFPSaccurate(inputFile) * interpolationFactor
     elif mode == 4:
         outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
 

@@ -58,6 +58,26 @@ def getFPS(inputPath):
             videoFPS = float(x.group(1))
             return videoFPS
 
+def getFPSaccurate(inputPath):
+    '''
+    Gets the FPS as a float from a given video path - Acquires fractional framerate for accuracy
+    '''
+    videoFPS = 0
+
+    result = subprocess.run(['ffprobe','-v','0','-of','csv=p=0','-select_streams','v:0','-show_entries','stream=r_frame_rate',inputPath], stdout=subprocess.PIPE)
+    lines = result.stdout.splitlines()
+
+    print("------LINES------")
+    for line in lines:
+        decodedLine = ""
+        try:
+            decodedLine = line.decode('UTF-8')
+        except:
+            continue
+        print(decodedLine)
+        num,den = decodedLine.split("/")
+        return float(num)/float(den)
+
 def getLength(inputPath):
     '''
     Get the duration of a video in seconds as a float
