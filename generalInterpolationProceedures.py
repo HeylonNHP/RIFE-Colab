@@ -202,7 +202,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         command = command + inputFFmpeg
         command = command + ['-i', str(inputFile),'-map','0','-map','1:a?','-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2']
         command = command + encoderPreset + [str(outputVideo)]
-        print(" ".join(command))
+
         runAndPrintOutput(command)
     else:
         loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
