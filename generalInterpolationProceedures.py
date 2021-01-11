@@ -1,6 +1,8 @@
 import math
 import os
 import shutil
+import traceback
+
 from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
@@ -314,3 +316,45 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
     if clearPNGs:
         shutil.rmtree(projectFolder + '/' + 'original_frames')
         shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
+
+def batchInterpolateFolder(inputDirectory,mode,crf,fpsTarget,clearpngs,nonlocalpngs,
+                           scenechangeSensitivity,mpdecimateSensitivity,useNvenc):
+    files = []
+    # r=root, d=directories, f = files
+    for r, d, f in os.walk(inputDirectory):
+        for file in f:
+            files.append(os.path.join(r, file))
+
+    files.sort()
+
+    for inputVideoFile in files:
+        try:
+            print(inputVideoFile)
+
+            if mode == 1 or mode == 3:
+                currentFPS = getFPSaccurate(inputVideoFile)
+            elif mode == 4 or mode == 3:
+                currentFPS = getFrameCount(inputVideoFile, True) / getLength(inputVideoFile)
+
+            # Attempt to interpolate everything to above 59fps
+            targetFPS = fpsTarget
+            exponent = 1
+            if currentFPS < targetFPS:
+                while (currentFPS * (2 ** exponent)) < targetFPS:
+                    exponent += 1
+            else:
+                continue
+            # use [l] to denote whether the file is a loopable video
+            print("looping?", '[l]' in inputVideoFile)
+            if '[l]' in inputVideoFile:
+                print("LOOP")
+                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs,
+                                nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
+                                useNvenc)
+            else:
+                print("DON'T LOOP")
+                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs,
+                                nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
+                                useNvenc)
+        except:
+            traceback.print_exc()

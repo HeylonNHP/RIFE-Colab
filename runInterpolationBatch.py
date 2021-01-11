@@ -28,38 +28,5 @@ setupRIFE(os.getcwd(),args.gpuid)
 setNvencSettings(args.gpuid,'p7')
 
 # Batch interpolation code
-files = []
-# r=root, d=directories, f = files
-for r, d, f in os.walk(args.inputDirectory):
-    for file in f:
-        files.append(os.path.join(r, file))
-
-files.sort()
-
-for inputVideoFile in files:
-    try:
-        print(inputVideoFile)
-
-        if args.mode == 1 or args.mode == 3:
-            currentFPS = getFPSaccurate(inputVideoFile)
-        elif args.mode == 4 or args.mode == 3:
-            currentFPS = getFrameCount(inputVideoFile,True) / getLength(inputVideoFile)
-
-        # Attempt to interpolate everything to above 59fps
-        targetFPS = args.fpsTarget
-        exponent = 1
-        if currentFPS < targetFPS:
-            while (currentFPS * (2 ** exponent)) < targetFPS:
-                exponent += 1
-        else:
-            continue
-        # use [l] to denote whether the file is a loopable video
-        print("looping?", '[l]' in inputVideoFile)
-        if '[l]' in inputVideoFile:
-            print("LOOP")
-            performAllSteps(inputVideoFile,(2 ** exponent),True,args.mode,args.crf,args.clearpngs,args.nonlocalpngs,args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc)
-        else:
-            print("DON'T LOOP")
-            performAllSteps(inputVideoFile,(2 ** exponent),False,args.mode,args.crf,args.clearpngs,args.nonlocalpngs,args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc)
-    except:
-        traceback.print_exc()
+batchInterpolateFolder(args.inputDirectory,args.mode,args.crf,args.fpsTarget,args.clearpngs,args.nonlocalpngs,
+                       args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc)
