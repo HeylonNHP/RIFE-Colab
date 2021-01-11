@@ -26,6 +26,7 @@ from rifeInterpolationFunctions import *
 def setFFmpeg4Path(path):
     global FFMPEG4
     FFMPEG4 = path
+    setFFmpegLocation(FFMPEG4)
 
 def setNvencSettings(nvencGpuID,preset):
     global GPUID
