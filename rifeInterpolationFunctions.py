@@ -10,11 +10,9 @@ import numpy as np
 from queue import Queue
 import gc
 
-device = None
-model = None
+
 def setupRIFE(installPath, GPUID):
-    global device
-    global model
+
     try:
         torch.cuda.set_device(GPUID)
     except:
@@ -32,11 +30,12 @@ def setupRIFE(installPath, GPUID):
     model.load_model(installPath + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
     model.eval()
     model.device()
+    return device,model
 
 import time
 
 
-def rifeInterpolate(img0path, img1path, outputPath, scenechangeSensitivity=0.2):
+def rifeInterpolate(device,model,img0path, img1path, outputPath, scenechangeSensitivity=0.2):
     img0 = cv2.imread(img0path)
     img1 = cv2.imread(img1path)
 
@@ -71,6 +70,7 @@ def rifeInterpolate(img0path, img1path, outputPath, scenechangeSensitivity=0.2):
     saved = cv2.imwrite(outputPath, item[:, :, ::1])
     # print("Saved", saved)
 
+'''
 def rifeInterpolatePNGfolder(inputFolder, outputFolder):
     if inputFolder[-1] != '/':
         inputFolder = inputFolder + '/'
@@ -97,4 +97,4 @@ def rifeInterpolatePNGfolder(inputFolder, outputFolder):
         fileCount += 1
     # del model
     # gc.collect()
-    # torch.cuda.empty_cache()
+    # torch.cuda.empty_cache()'''

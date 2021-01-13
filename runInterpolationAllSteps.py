@@ -23,7 +23,7 @@ sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
 
 from generalInterpolationProceedures import *
-setupRIFE(os.getcwd(),args.gpuid)
+#setupRIFE(os.getcwd(),args.gpuid)
 setNvencSettings(args.gpuid,'p7')
 performAllSteps(args.inputFile,args.interpolationFactor,args.loopable,args.mode,args.crfout,args.clearpngs,args.nonlocalpngs,
                 args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc)
