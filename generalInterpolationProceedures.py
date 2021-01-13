@@ -29,6 +29,9 @@ downloadRIFE(installPath,onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 
+gpuBatchSize = 2
+gpuIDsList = [0]
+
 def setFFmpeg4Path(path):
     global FFMPEG4
     FFMPEG4 = path
@@ -39,6 +42,12 @@ def setNvencSettings(nvencGpuID,preset):
     global nvencPreset
     GPUID = nvencGpuID
     nvencPreset = preset
+
+def setGPUinterpolationOptions(batchSize,_gpuIDsList):
+    global gpuIDsList
+    global gpuBatchSize
+    gpuIDsList = _gpuIDsList
+    gpuBatchSize = batchSize
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
@@ -62,6 +71,8 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     '''
     Equivalent to DAINAPP Step 2
     '''
+    global gpuIDsList
+    global gpuBatchSize
     os.chdir(installPath + '/arXiv2020RIFE/')
     origFramesFolder = projectFolder + '/' + "original_frames"
     interpFramesFolder = projectFolder + '/' + "interpolated_frames"
@@ -176,15 +187,15 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
             # count += interpolationFactor
             framesQueue.put(queuedFrameList)
 
-    gpuList:tuple = (0,1)
-    batchSize:int = 3
+    gpuList:list = gpuIDsList
+    batchSize:int = gpuBatchSize
     threads:list = []
     for i in range(0,batchSize):
         for gpuID in gpuList:
             rifeThread = threading.Thread(target=queueThreadInterpolator,args=(framesQueue,gpuID,))
             threads.append(rifeThread)
             rifeThread.start()
-        time.sleep(2)
+        time.sleep(5)
 
     for rifeThread in threads:
         rifeThread.join()
