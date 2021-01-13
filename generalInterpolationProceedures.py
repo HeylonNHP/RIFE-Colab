@@ -2,6 +2,7 @@ import math
 import os
 import shutil
 import traceback
+from queue import Queue
 
 from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
@@ -78,6 +79,8 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 
     files = os.listdir(origFramesFolder)
     files.sort()
+
+    framesQueue = Queue()
 
     if mode == 1:
 
@@ -168,6 +171,8 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 
     return [outputFPS]
 
+def queueThreadInterpolator(framesQueue:Queue):
+    pass
 
 def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
     '''
