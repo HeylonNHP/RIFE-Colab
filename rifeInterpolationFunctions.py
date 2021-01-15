@@ -69,7 +69,8 @@ def rifeInterpolate(device,model,img0path, img1path, outputPath, scenechangeSens
     for i in range(inferences[0].shape[0]):
         buffer.put(inferences[0][i])
     item = buffer.get()
-    saved = cv2.imwrite(outputPath, item[:, :, ::1])
+    saved = cv2.imwrite(outputPath, item[:, :, ::1],[cv2.IMWRITE_PNG_COMPRESSION, 6])
+    #saved = cv2.imwrite(outputPath, item[:, :, ::1])
     # print("Saved", saved)
 
 '''
