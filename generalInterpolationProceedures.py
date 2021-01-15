@@ -43,7 +43,7 @@ def setNvencSettings(nvencGpuID,preset):
     GPUID = nvencGpuID
     nvencPreset = preset
 
-def setGPUinterpolationOptions(batchSize,_gpuIDsList):
+def setGPUinterpolationOptions(batchSize:int,_gpuIDsList:list):
     global gpuIDsList
     global gpuBatchSize
     gpuIDsList = _gpuIDsList
@@ -223,7 +223,13 @@ def queueThreadInterpolator(framesQueue:Queue,gpuid):
 
         for frame in listOfAllFramesInterpolate:
             queuedFrame:QueuedFrame = frame
-            rifeInterpolate(device,model,queuedFrame.beginFrame,queuedFrame.endFrame,queuedFrame.middleFrame,queuedFrame.scenechangeSensitivity)
+            success = False
+            while success == False:
+                try:
+                    rifeInterpolate(device,model,queuedFrame.beginFrame,queuedFrame.endFrame,queuedFrame.middleFrame,queuedFrame.scenechangeSensitivity)
+                    success = True
+                except:
+                    pass
 
 def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
     '''

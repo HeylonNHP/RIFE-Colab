@@ -9,28 +9,30 @@ from arXiv2020RIFE.model.RIFE_HD import Model
 import numpy as np
 from queue import Queue
 import gc
+import threading
 
+setupRifeThreadLock = threading.Lock()
 
 def setupRIFE(installPath, GPUID):
+    with setupRifeThreadLock:
+        try:
+            torch.cuda.set_device(GPUID)
+        except:
+            pass
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    try:
-        torch.cuda.set_device(GPUID)
-    except:
-        pass
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        if torch.cuda.is_available():
+            torch.set_grad_enabled(False)
+            torch.backends.cudnn.enabled = True
+            torch.backends.cudnn.benchmark = True
+        else:
+            print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
 
-    if torch.cuda.is_available():
-        torch.set_grad_enabled(False)
-        torch.backends.cudnn.enabled = True
-        torch.backends.cudnn.benchmark = True
-    else:
-        print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
-
-    model = Model()
-    model.load_model(installPath + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
-    model.eval()
-    model.device()
-    return device,model
+        model = Model()
+        model.load_model(installPath + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
+        model.eval()
+        model.device()
+        return device,model
 
 import time
 
