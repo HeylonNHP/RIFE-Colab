@@ -221,7 +221,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         time.sleep(5)
 
     saveThreads = []
-    for i in range(0, 4):
+    for i in range(0, batchSize):
         saveThread = threading.Thread(target=queueThreadSaveFrame, args=(outFramesQueue,))
         saveThreads.append(saveThread)
         saveThread.start()
@@ -267,13 +267,13 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
 
             # Load begin frame from HDD or RAM
             beginFrame = None
-            with inFrameGetLock:
-                for i in range(0,len(inFramesList)):
-                    check = queuedFrame.beginFrame[queuedFrame.beginFrame.rindex('/'):-1]
-                    check2 = str(inFramesList[i])[str(inFramesList[i]).rindex('/'):-1]
-                    if check == check2:
-                        beginFrame = inFramesList.pop(i)
-                        break
+            # If the current frame pair uses an original_frame - Then grab it from RAM
+            if queuedFrame.beginFrame == currentQueuedFrameList.startFrameDest:
+                with inFrameGetLock:
+                    for i in range(0,len(inFramesList)):
+                        if currentQueuedFrameList.startFrame == str(inFramesList[i]):
+                            beginFrame = inFramesList[i]
+                            break
 
             if beginFrame is None:
                 for i in range(0, len(listOfCompletedFrames)):
@@ -286,14 +286,14 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
 
             # Load end frame from HDD or RAM
             endFrame = None
-            with inFrameGetLock:
-                for i in range(0,len(inFramesList)):
-                    check = queuedFrame.endFrame[queuedFrame.endFrame.rindex('/'):-1]
-                    check2 = str(inFramesList[i])[str(inFramesList[i]).rindex('/'):-1]
-                    if check == check2:
-                        # DON'T POP END FRAME - As it is reused when processing the next frame
-                        endFrame = inFramesList[i]
-                        break
+            # If the current frame pair uses an original_frame - Then grab it from RAM
+            if queuedFrame.endFrame == currentQueuedFrameList.endFrameDest:
+                with inFrameGetLock:
+                    for i in range(0,len(inFramesList)):
+                        if currentQueuedFrameList.endFrame == str(inFramesList[i]):
+                            endFrame = inFramesList[i]
+                            break
+
 
             if endFrame is None:
                 for i in range(0, len(listOfCompletedFrames)):
@@ -317,6 +317,12 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
                     success = True
                 except:
                     pass
+        # Start frame is no-longer needed, remove from RAM
+        with inFrameGetLock:
+            for i in range(0,len(inFramesList)):
+                if str(inFramesList[i]) == currentQueuedFrameList.startFrame:
+                    inFramesList.pop(i)
+                    break
 
 
 def queueThreadSaveFrame(outFramesQueue: Queue):
@@ -339,6 +345,7 @@ def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
         frameFile = FrameFile(origFramesFolder + '/' + frameFilesList[i])
         frameFile.loadImageData()
         inFramesList.append(frameFile)
+    print("LOADED ALL FRAMES - DONE")
 
 
 def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
