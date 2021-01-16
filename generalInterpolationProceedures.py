@@ -6,15 +6,17 @@ from queue import Queue
 import threading
 from QueuedFrames.queuedFrameList import *
 from QueuedFrames.queuedFrame import *
+from QueuedFrames.FrameFile import *
 
 from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
+
 FFMPEG4 = 'ffmpeg'
 GPUID = 0
 nvencPreset = 'p7'
 installPath = os.getcwd()
-print('INSTALL:',installPath)
+print('INSTALL:', installPath)
 
 # Check if running on Windows or not
 onWindows = None
@@ -25,29 +27,34 @@ else:
 
 # Get and initialise RIFE
 from rifeFunctions import downloadRIFE
-downloadRIFE(installPath,onWindows)
+
+downloadRIFE(installPath, onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 
 gpuBatchSize = 2
 gpuIDsList = [0]
 
+
 def setFFmpeg4Path(path):
     global FFMPEG4
     FFMPEG4 = path
     setFFmpegLocation(FFMPEG4)
 
-def setNvencSettings(nvencGpuID,preset):
+
+def setNvencSettings(nvencGpuID, preset):
     global GPUID
     global nvencPreset
     GPUID = nvencGpuID
     nvencPreset = preset
 
-def setGPUinterpolationOptions(batchSize:int,_gpuIDsList:list):
+
+def setGPUinterpolationOptions(batchSize: int, _gpuIDsList: list):
     global gpuIDsList
     global gpuBatchSize
     gpuIDsList = _gpuIDsList
     gpuBatchSize = batchSize
+
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
@@ -60,11 +67,14 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
         os.mkdir("original_frames")
 
     if mode == 1:
-        runAndPrintOutput([FFMPEG4,'-i',inputFile,'-map_metadata','-1','-pix_fmt','rgb24','original_frames/%15d.png'])
+        runAndPrintOutput(
+            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', 'original_frames/%15d.png'])
     elif mode == 3 or mode == 4:
         hi, lo, frac = mpdecimateSensitivity.split(",")
         mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
-        runAndPrintOutput([FFMPEG4,'-i',inputFile,'-map_metadata','-1','-pix_fmt','rgb24','-copyts','-r','1000','-vsync','0','-frame_pts','true','-vf', mpdecimate,'-qscale:v','1','original_frames/%15d.png'])
+        runAndPrintOutput(
+            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', '1000', '-vsync',
+             '0', '-frame_pts', 'true', '-vf', mpdecimate, '-qscale:v', '1', 'original_frames/%15d.png'])
 
 
 def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity):
@@ -102,13 +112,17 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         shutil.copy(origFramesFolder + '/' + files[0], interpFramesFolder + '/' + '{:015d}.png'.format(count))
 
         for i in range(0, len(files) - 1):
-            framesList:list = []
+            framesList: list = []
 
-            progressMessage = "Interpolating frame: {} Of {} {:.2f}%".format(i+1,len(files),((i + 1) / len(files)) * 100)
+            progressMessage = "Interpolating frame: {} Of {} {:.2f}%".format(i + 1, len(files),
+                                                                             ((i + 1) / len(files)) * 100)
 
-            queuedFrameList:QueuedFrameList = QueuedFrameList(framesList,
-                                                              origFramesFolder + '/' + files[i],interpFramesFolder + '/' + '{:015d}.png'.format(count),
-                                                              origFramesFolder + '/' + files[i + 1],interpFramesFolder + '/' + '{:015d}.png'.format(count + interpolationFactor))
+            queuedFrameList: QueuedFrameList = QueuedFrameList(framesList,
+                                                               origFramesFolder + '/' + files[i],
+                                                               interpFramesFolder + '/' + '{:015d}.png'.format(count),
+                                                               origFramesFolder + '/' + files[i + 1],
+                                                               interpFramesFolder + '/' + '{:015d}.png'.format(
+                                                                   count + interpolationFactor))
             queuedFrameList.progressMessage = progressMessage
             currentFactor = interpolationFactor
 
@@ -121,7 +135,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                     middleFrame = interpFramesFolder + '/' + '{:015d}.png'.format(
                         count + int(currentFactor / 2) + offset)
 
-                    framesList.append(QueuedFrame(beginFrame,endFrame,middleFrame,scenechangeSensitivity))
+                    framesList.append(QueuedFrame(beginFrame, endFrame, middleFrame, scenechangeSensitivity))
                 currentFactor = int(currentFactor / 2)
 
             count += interpolationFactor
@@ -135,7 +149,6 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         if mode == 3:
             interpolationFactor = interpolationFactor * 2
             modeModOutputFPS = modeModOutputFPS * 2
-
 
         for i in range(0, len(files) - 1):
             framesList: list = []
@@ -152,16 +165,21 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                 while 1 / (((endFrameTime - beginFrameTime) / localInterpolationFactor) / 1000) < modeModOutputFPS:
                     localInterpolationFactor = int(localInterpolationFactor * 2)
 
-            progressMessage = "Interpolating frame: {} Of {} {:.2f}% Frame interp. factor {}x".format(i+1,len(files),
-                                                                                                      ((i + 1) / len(files)) * 100,
+            progressMessage = "Interpolating frame: {} Of {} {:.2f}% Frame interp. factor {}x".format(i + 1, len(files),
+                                                                                                      ((i + 1) / len(
+                                                                                                          files)) * 100,
                                                                                                       localInterpolationFactor)
             # Get timecodes of both working frames
             currentTimecode = int(files[i][:-4])
             nextTimecode = int(files[i + 1][:-4])
 
-            queuedFrameList:QueuedFrameList = QueuedFrameList(framesList,
-                                                              origFramesFolder + '/' + files[i], interpFramesFolder + '/' + '{:015d}.png'.format(currentTimecode),
-                                                              origFramesFolder + '/' + files[i + 1], interpFramesFolder + '/' + '{:015d}.png'.format(nextTimecode))
+            queuedFrameList: QueuedFrameList = QueuedFrameList(framesList,
+                                                               origFramesFolder + '/' + files[i],
+                                                               interpFramesFolder + '/' + '{:015d}.png'.format(
+                                                                   currentTimecode),
+                                                               origFramesFolder + '/' + files[i + 1],
+                                                               interpFramesFolder + '/' + '{:015d}.png'.format(
+                                                                   nextTimecode))
             queuedFrameList.progressMessage = progressMessage
             currentFactor = localInterpolationFactor
 
@@ -181,24 +199,43 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                     endFrame = interpFramesFolder + '/' + '{:015d}.png'.format(endFrameTime)
                     middleFrame = interpFramesFolder + '/' + '{:015d}.png'.format(middleFrameTime)
 
-                    framesList.append(QueuedFrame(beginFrame,endFrame,middleFrame,scenechangeSensitivity))
+                    framesList.append(QueuedFrame(beginFrame, endFrame, middleFrame, scenechangeSensitivity))
                 currentFactor = int(currentFactor / 2)
 
             # count += interpolationFactor
             framesQueue.put(queuedFrameList)
 
-    gpuList:list = gpuIDsList
-    batchSize:int = gpuBatchSize
-    threads:list = []
-    for i in range(0,batchSize):
+    inFramesList: list = []
+    loadPNGThread = threading.Thread(target=queueThreadLoadFrame,args=(origFramesFolder,inFramesList,))
+    loadPNGThread.start()
+
+    outFramesQueue: Queue = Queue(maxsize=128)
+    gpuList: list = gpuIDsList
+    batchSize: int = gpuBatchSize
+    threads: list = []
+    for i in range(0, batchSize):
         for gpuID in gpuList:
-            rifeThread = threading.Thread(target=queueThreadInterpolator,args=(framesQueue,gpuID,))
+            rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,))
             threads.append(rifeThread)
             rifeThread.start()
         time.sleep(5)
 
+    saveThreads = []
+    for i in range(0, 4):
+        saveThread = threading.Thread(target=queueThreadSaveFrame, args=(outFramesQueue,))
+        saveThreads.append(saveThread)
+        saveThread.start()
+
+    loadPNGThread.join()
+
     for rifeThread in threads:
         rifeThread.join()
+
+    print("Put none")
+    outFramesQueue.put(None)
+
+    for saveThread in saveThreads:
+        saveThread.join()
 
     # Loopable
     if loopable:
@@ -206,30 +243,103 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 
     return [outputFPS]
 
-def queueThreadInterpolator(framesQueue:Queue,gpuid):
-    device, model = setupRIFE(installPath,gpuid)
+inFrameGetLock = threading.Lock()
+
+def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesList:list, gpuid):
+    device, model = setupRIFE(installPath, gpuid)
     while True:
+        listOfCompletedFrames = []
         if framesQueue.empty():
             break
-        currentQueuedFrameList:QueuedFrameList = framesQueue.get()
+        currentQueuedFrameList: QueuedFrameList = framesQueue.get()
         print(currentQueuedFrameList.progressMessage)
-        listOfAllFramesInterpolate:list = currentQueuedFrameList.frameList
+        listOfAllFramesInterpolate: list = currentQueuedFrameList.frameList
 
         # Copy start and end files
         if not os.path.exists(currentQueuedFrameList.startFrameDest):
-            shutil.copy(currentQueuedFrameList.startFrame,currentQueuedFrameList.startFrameDest)
+            shutil.copy(currentQueuedFrameList.startFrame, currentQueuedFrameList.startFrameDest)
         if not os.path.exists(currentQueuedFrameList.endFrameDest):
-            shutil.copy(currentQueuedFrameList.endFrame,currentQueuedFrameList.endFrameDest)
+            shutil.copy(currentQueuedFrameList.endFrame, currentQueuedFrameList.endFrameDest)
 
         for frame in listOfAllFramesInterpolate:
-            queuedFrame:QueuedFrame = frame
+            queuedFrame: QueuedFrame = frame
             success = False
-            while success == False:
+
+            # Load begin frame from HDD or RAM
+            beginFrame = None
+            with inFrameGetLock:
+                for i in range(0,len(inFramesList)):
+                    check = queuedFrame.beginFrame[queuedFrame.beginFrame.rindex('/'):-1]
+                    check2 = str(inFramesList[i])[str(inFramesList[i]).rindex('/'):-1]
+                    if check == check2:
+                        beginFrame = inFramesList.pop(i)
+                        break
+
+            if beginFrame is None:
+                for i in range(0, len(listOfCompletedFrames)):
+                    if str(listOfCompletedFrames[i]) == queuedFrame.beginFrame:
+                        beginFrame = listOfCompletedFrames[i]
+                        break
+            if beginFrame is None:
+                beginFrame = FrameFile(queuedFrame.beginFrame)
+                beginFrame.loadImageData()
+
+            # Load end frame from HDD or RAM
+            endFrame = None
+            with inFrameGetLock:
+                for i in range(0,len(inFramesList)):
+                    check = queuedFrame.endFrame[queuedFrame.endFrame.rindex('/'):-1]
+                    check2 = str(inFramesList[i])[str(inFramesList[i]).rindex('/'):-1]
+                    if check == check2:
+                        # DON'T POP END FRAME - As it is reused when processing the next frame
+                        endFrame = inFramesList[i]
+                        break
+
+            if endFrame is None:
+                for i in range(0, len(listOfCompletedFrames)):
+                    if str(listOfCompletedFrames[i]) == queuedFrame.endFrame:
+                        endFrame = listOfCompletedFrames[i]
+                        break
+            if endFrame is None:
+                endFrame = FrameFile(queuedFrame.endFrame)
+                endFrame.loadImageData()
+
+            # Initialise the mid frame with the output path
+            midFrame = FrameFile(queuedFrame.middleFrame)
+
+            # A race condition while saving and loading pngs used to cause errors here - likely not anymore due to keeping frames in RAM
+            while not success:
                 try:
-                    rifeInterpolate(device,model,queuedFrame.beginFrame,queuedFrame.endFrame,queuedFrame.middleFrame,queuedFrame.scenechangeSensitivity)
+                    midFrame = rifeInterpolate2(device, model, beginFrame, endFrame, midFrame,
+                                                queuedFrame.scenechangeSensitivity)
+                    listOfCompletedFrames.append(midFrame)
+                    outFramesQueue.put(midFrame)
                     success = True
                 except:
                     pass
+
+
+def queueThreadSaveFrame(outFramesQueue: Queue):
+    while True:
+        item: FrameFile = outFramesQueue.get()
+        if item is None:
+            print("Got none")
+            outFramesQueue.put(None)
+            break
+
+        item.saveImageData()
+
+def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
+    maxListLength = 128
+    frameFilesList = os.listdir(origFramesFolder)
+    frameFilesList.sort()
+    for i in range(0,len(frameFilesList)):
+        while len(inFramesList) > maxListLength:
+            time.sleep(0.01)
+        frameFile = FrameFile(origFramesFolder + '/' + frameFilesList[i])
+        frameFile.loadImageData()
+        inFramesList.append(frameFile)
+
 
 def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
     '''
@@ -242,27 +352,29 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
     inputFFmpeg = ""
 
-    encoderPreset = ['-pix_fmt','yuv420p','-c:v','libx264','-preset','veryslow',
-                     '-crf','{}'.format(crfout)]
+    encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow',
+                     '-crf', '{}'.format(crfout)]
     ffmpegSelected = FFMPEG4
     if useNvenc:
-        encoderPreset = ['-pix_fmt','yuv420p','-c:v','h264_nvenc','-gpu',str(GPUID),'-preset',str(nvencPreset),'-profile','high','-rc','vbr','-b:v','0','-cq',str(crfout + 10)]
+        encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu', str(GPUID), '-preset', str(nvencPreset),
+                         '-profile', 'high', '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
         ffmpegSelected = 'ffmpeg'
 
     if mode == 1:
-        inputFFmpeg = ['-r',str(outputFPS),'-i','interpolated_frames/%15d.png']
+        inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']
     if mode == 3 or mode == 4:
         # generateTimecodesFile(projectFolder)
         chooseFrames(projectFolder + os.path.sep + "interpolated_frames", outputFPS)
-        inputFFmpeg = ['-vsync','1','-r',str(outputFPS),'-f','concat','-safe','0','-i','interpolated_frames/framesCFR.txt']
+        inputFFmpeg = ['-vsync', '1', '-r', str(outputFPS), '-f', 'concat', '-safe', '0', '-i',
+                       'interpolated_frames/framesCFR.txt']
 
     if loopable == False or (maxLoopLength / float(inputLength) < 2):
         # Don't loop, too long input
         print('Dont loop', maxLoopLength / float(inputLength))
 
-        command = [ffmpegSelected,'-hide_banner','-stats','-loglevel','error','-y']
+        command = [ffmpegSelected, '-hide_banner', '-stats', '-loglevel', 'error', '-y']
         command = command + inputFFmpeg
-        command = command + ['-i', str(inputFile),'-map','0','-map','1:a?','-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2']
+        command = command + ['-i', str(inputFile), '-map', '0', '-map', '1:a?', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2']
         command = command + encoderPreset + [str(outputVideo)]
 
         runAndPrintOutput(command)
@@ -271,12 +383,12 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         loopCount = str(loopCount)
         print('Loop', loopCount)
 
-        command = [FFMPEG4,'-y','-stream_loop',str(loopCount),'-i',str(inputFile),'-vn','loop.flac']
+        command = [FFMPEG4, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
         runAndPrintOutput(command)
 
         audioInput = []
         if os.path.exists('loop.flac'):
-            audioInput = ['-i','loop.flac','-map','0','-map','1']
+            audioInput = ['-i', 'loop.flac', '-map', '0', '-map', '1']
             print("Looped audio exists")
 
         command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
@@ -304,11 +416,12 @@ def generateLoopContinuityFrame(framesFolder):
     beginLast = int(files[-2][:-4])
     endLast = int(files[-1][:-4])
 
-    averageDistance = int(((endFirst-beginFirst) + (endLast-beginLast)) / 2)
+    averageDistance = int(((endFirst - beginFirst) + (endLast - beginLast)) / 2)
 
     # Create frame
     shutil.copy(framesFolder + '/' + files[0], framesFolder + '/' + '{:015d}.png'.format(endLast + averageDistance))
-    print("Made loop continuity frame:",framesFolder + '/' + '{:015d}.png'.format(endLast + averageDistance))
+    print("Made loop continuity frame:", framesFolder + '/' + '{:015d}.png'.format(endLast + averageDistance))
+
 
 def removeLoopContinuityFrame(framesFolder):
     files = os.listdir(framesFolder)
@@ -380,8 +493,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
         shutil.rmtree(projectFolder + '/' + 'original_frames')
         shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
-def batchInterpolateFolder(inputDirectory,mode,crf,fpsTarget,clearpngs,nonlocalpngs,
-                           scenechangeSensitivity,mpdecimateSensitivity,useNvenc):
+
+def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,
+                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc):
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
