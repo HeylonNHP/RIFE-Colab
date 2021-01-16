@@ -12,6 +12,9 @@ from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
 
+import warnings
+warnings.filterwarnings("ignore")
+
 FFMPEG4 = 'ffmpeg'
 GPUID = 0
 nvencPreset = 'p7'
