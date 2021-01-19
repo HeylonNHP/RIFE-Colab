@@ -310,16 +310,11 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
             # Initialise the mid frame with the output path
             midFrame = FrameFile(queuedFrame.middleFrame)
 
-            # A race condition while saving and loading pngs used to cause errors here - likely not anymore due to keeping frames in RAM
-            while not success:
-                try:
-                    midFrame = rifeInterpolate2(device, model, beginFrame, endFrame, midFrame,
-                                                queuedFrame.scenechangeSensitivity)
-                    listOfCompletedFrames.append(midFrame)
-                    outFramesQueue.put(midFrame)
-                    success = True
-                except:
-                    pass
+            midFrame = rifeInterpolate2(device, model, beginFrame, endFrame, midFrame,
+                                        queuedFrame.scenechangeSensitivity)
+            listOfCompletedFrames.append(midFrame)
+            outFramesQueue.put(midFrame)
+
         # Start frame is no-longer needed, remove from RAM
         with inFrameGetLock:
             for i in range(0,len(inFramesList)):

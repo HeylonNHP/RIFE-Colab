@@ -100,15 +100,8 @@ def rifeInterpolate2(device, model, img0frame:FrameFile, img1frame:FrameFile, ou
     else:
         mid = model.inference(img0, img1, True)
 
-    inferences = [mid]
-    inferences = list(
-        map(lambda x: ((x[:, :, :h, :w] * 255.).byte().cpu().detach().numpy().transpose(0, 2, 3, 1)), inferences))
-    buffer = Queue()
-    for i in range(inferences[0].shape[0]):
-        buffer.put(inferences[0][i])
-    item = buffer.get()
-
-    outputFrame.setImageData(item[:, :, ::1])
+    item = (mid[:, :, :h, :w] * 255.).byte().cpu().detach().numpy().transpose(0, 2, 3, 1)[0]
+    outputFrame.setImageData(item)
     return outputFrame
     # print("Saved", saved)
 

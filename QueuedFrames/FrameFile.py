@@ -1,5 +1,5 @@
 import cv2
-
+import numpy
 
 class FrameFile:
     filePath: str = None
@@ -21,4 +21,8 @@ class FrameFile:
         cv2.imwrite(self.filePath, self.imageData)
 
     def loadImageData(self):
-        self.imageData = cv2.imread(self.filePath)
+        self.imageData = cv2.imread(self.filePath,cv2.IMREAD_UNCHANGED)
+        #print(self.imageData.dtype)
+        #print(self.imageData)
+        #self.imageData = self.imageData.astype(numpy.uint8)
+
