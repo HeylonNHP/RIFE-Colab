@@ -34,7 +34,7 @@ def test_hbd():
     ff3.loadImageData()
 
     device,model = setupRIFE(os.getcwd(),0)
-    ff2 = rifeInterpolate2(device,model,ff1,ff3,ff2)
+    ff2 = rifeInterpolate(device, model, ff1, ff3, ff2)
     ff2.saveImageData()
 
 

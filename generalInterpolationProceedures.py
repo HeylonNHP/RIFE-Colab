@@ -310,8 +310,8 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
             # Initialise the mid frame with the output path
             midFrame = FrameFile(queuedFrame.middleFrame)
 
-            midFrame = rifeInterpolate2(device, model, beginFrame, endFrame, midFrame,
-                                        queuedFrame.scenechangeSensitivity)
+            midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
+                                       queuedFrame.scenechangeSensitivity)
             listOfCompletedFrames.append(midFrame)
             outFramesQueue.put(midFrame)
 
