@@ -1,19 +1,21 @@
 import os
 
+
 def chooseFrames(framesFolder, desiredFPS):
     frameFiles = os.listdir(framesFolder)
     frameFiles.sort()
     lastFile = int(frameFiles[-1][:-4])
-    desiredFrameSpacing = (1/desiredFPS)*1000
+    desiredFrameSpacing = (1 / desiredFPS) * 1000
     timecodesFileString = ""
     currentTime = desiredFrameSpacing
     count = 1
     currentListIndex = 0
-    while (currentTime-desiredFrameSpacing) <= lastFile:
+    while (currentTime - desiredFrameSpacing) <= lastFile:
         currentFrame = int(frameFiles[currentListIndex][:-4])
 
-        while not (currentFrame >= round(currentTime-desiredFrameSpacing) ): #and currentFrame <= round(currentTime)):
-            if not currentListIndex >= len(frameFiles)-1:
+        while not (
+                currentFrame >= round(currentTime - desiredFrameSpacing)):  # and currentFrame <= round(currentTime)):
+            if not currentListIndex >= len(frameFiles) - 1:
                 currentListIndex += 1
             else:
                 break
@@ -29,8 +31,37 @@ def chooseFrames(framesFolder, desiredFPS):
         timecodesFileString += ("file '" + frameFile + "'\n")
 
         count += 1
-        currentTime = ((1/desiredFPS)*count)*1000
+        currentTime = ((1 / desiredFPS) * count) * 1000
     print(timecodesFileString)
-    outFile = open(framesFolder + os.path.sep + 'framesCFR.txt','w')
+    outFile = open(framesFolder + os.path.sep + 'framesCFR.txt', 'w')
     outFile.write(timecodesFileString)
     outFile.close()
+
+
+def chooseFramesList(framesFolder, desiredFPS):
+    chosenFrameList: list = []
+
+    frameFiles = os.listdir(framesFolder)
+    frameFiles.sort()
+
+    lastFileNumber = int(frameFiles[-1][:-4])
+    desiredFrameSpacing = (1 / desiredFPS) * 1000
+
+    currentTime = desiredFrameSpacing
+    count = 1
+    currentListIndex = 0
+
+    while (currentTime - desiredFrameSpacing) <= lastFileNumber:
+        currentFrame = int(frameFiles[currentListIndex][:-4])
+        while currentFrame < round(currentTime - desiredFrameSpacing):
+            if currentListIndex < len(frameFiles) - 1:
+                currentListIndex += 1
+            else:
+                break
+            currentFrame = int(frameFiles[currentListIndex][:-4])
+        frameFile = framesFolder + os.path.sep + frameFiles[currentListIndex]
+        chosenFrameList.append(frameFile)
+
+        count += 1
+        currentTime = ((1 / desiredFPS) * count) * 1000
+    return chosenFrameList
