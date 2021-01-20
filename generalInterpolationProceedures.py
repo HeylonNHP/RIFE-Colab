@@ -501,8 +501,13 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
     #Auto encoding
     interpolationDone = [False]
     import autoEncoding
-    if mode == 1 and useAutoEncode:
-        autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
+    if useAutoEncode:
+        autoEncodeThread = None
+        if mode == 1:
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
+        elif mode == 3 or mode == 4:
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(
+            projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,))
         autoEncodeThread.start()
         time.sleep(5)
 

@@ -38,10 +38,21 @@ def chooseFrames(framesFolder, desiredFPS):
     outFile.close()
 
 
-def chooseFramesList(framesFolder, desiredFPS):
+def chooseFramesList(frameFiles, desiredFPS):
+    '''testFilePath = 'test.txt'
+    testFileString = ""
+    try:
+        testFile = open(testFilePath,'r')
+        testFileString = testFile.read()
+        testFile.close()
+    except:
+        pass
+
+    testFile = open(testFilePath,'w')'''
+
     chosenFrameList: list = []
 
-    frameFiles = os.listdir(framesFolder)
+    #frameFiles = os.listdir(framesFolder)
     frameFiles.sort()
 
     lastFileNumber = int(frameFiles[-1][:-4])
@@ -51,6 +62,16 @@ def chooseFramesList(framesFolder, desiredFPS):
     count = 1
     currentListIndex = 0
 
+    #testFileString += 'Video clip: '
+
+    # For when the first frame doesn't start from 0ms
+    # Advance current time to the first frame's timecode
+    while currentTime < int(frameFiles[0][:-4]):
+        count += 1
+        currentTime = ((1 / desiredFPS) * count) * 1000
+
+    #testFileString += 'Start time: ' + str(currentTime)
+
     while (currentTime - desiredFrameSpacing) <= lastFileNumber:
         currentFrame = int(frameFiles[currentListIndex][:-4])
         while currentFrame < round(currentTime - desiredFrameSpacing):
@@ -59,9 +80,15 @@ def chooseFramesList(framesFolder, desiredFPS):
             else:
                 break
             currentFrame = int(frameFiles[currentListIndex][:-4])
-        frameFile = framesFolder + os.path.sep + frameFiles[currentListIndex]
+        frameFile = frameFiles[currentListIndex]
         chosenFrameList.append(frameFile)
 
         count += 1
         currentTime = ((1 / desiredFPS) * count) * 1000
-    return chosenFrameList
+    #testFileString += ' End time: ' + str(currentTime)
+    #testFileString += ' Start frame: ' + chosenFrameList[0] + ' End frame: ' + chosenFrameList[-1]
+    #testFileString += ' Duration: ' + str((int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])))
+    #testFileString += '\n'
+    #testFile.write(testFileString)
+    #testFile.close()
+    return chosenFrameList, (int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4]))
