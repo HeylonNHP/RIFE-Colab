@@ -6,7 +6,7 @@ import threading
 
 
 def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,blockSize=100):
+                             crfout,useNvenc,blockSize=1000):
     '''
 
     :param projectFolder: Interpolation project folder
@@ -82,7 +82,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     os.remove(concatFilePath)
 
 def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,blockSize=100):
+                             crfout,useNvenc,blockSize=1000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
     blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'

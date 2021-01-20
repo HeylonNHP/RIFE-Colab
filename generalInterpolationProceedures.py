@@ -471,7 +471,7 @@ def generateTimecodesFile(projectFolder):
 
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=1000):
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
         projectFolder = installPath + os.path.sep + "tempFrames"
@@ -507,9 +507,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
         if the interpolator manages to start first'''
         waitForThreadStart = [False]
         if mode == 1:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,autoEncodeBlockSize,))
         elif mode == 3 or mode == 4:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,))
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,autoEncodeBlockSize,))
         autoEncodeThread.start()
         while waitForThreadStart[0] == False:
             time.sleep(1)
@@ -531,7 +531,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
 
 def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,
-                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False):
+                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=1000):
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
@@ -563,11 +563,11 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
                 print("LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs,
                                 nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc,useAutoEncode)
+                                useNvenc,useAutoEncode,autoEncodeBlockSize)
             else:
                 print("DON'T LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs,
                                 nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc,useAutoEncode)
+                                useNvenc,useAutoEncode,autoEncodeBlockSize)
         except:
             traceback.print_exc()
