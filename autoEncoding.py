@@ -140,7 +140,11 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         blockCount += 1
         #Remove auto-encoded frames
         for file in filesInBlock:
-            os.remove(interpolatedFramesFolder + os.path.sep + file)
+            deleteFile = interpolatedFramesFolder + os.path.sep + file
+            os.remove(deleteFile)
+            while os.path.exists(deleteFile):
+                os.remove(deleteFile)
+                time.sleep(0.1)
         os.remove(blockFramesFilePath)
 
     #Interpolation finished, combine blocks
