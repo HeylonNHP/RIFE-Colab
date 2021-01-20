@@ -25,7 +25,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
             continue
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
         # Add 128 to wait for the save queue to finish
-        if len(interpolatedFrames) < blockSize+128:
+        if len(interpolatedFrames) < blockSize+(128*8):
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
@@ -98,7 +98,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
 
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
         # Add 128 to wait for the save queue to finish
-        if len(interpolatedFrames) < blockSize+128:
+        if len(interpolatedFrames) < blockSize+(128*8):
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
@@ -143,7 +143,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         for file in filesInBlock:
             deleteFile = interpolatedFramesFolder + os.path.sep + file
             os.remove(deleteFile)
-        #os.remove(blockFramesFilePath)
+        os.remove(blockFramesFilePath)
 
     #Interpolation finished, combine blocks
     concatFileLines = ""
