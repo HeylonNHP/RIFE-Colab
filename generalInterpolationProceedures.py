@@ -471,7 +471,7 @@ def generateTimecodesFile(projectFolder):
 
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=True):
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
         projectFolder = installPath + os.path.sep + "tempFrames"
@@ -487,12 +487,33 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
     extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity)
 
+    # Get outputFPS
+    outputFPS = None
+    if mode == 1 or mode == 3:
+        outputFPS = getFPSaccurate(inputFile) * interpolationFactor
+    elif mode == 4:
+        outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
+
+    # Generate output name
+    outputVideoNameSegments = ['{:.2f}'.format(outputFPS),'fps-',str(interpolationFactor),'x-mode',str(mode),'-rife-output.mp4']
+    outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
+
+    #Auto encoding
+    interpolationDone = [False]
+    import autoEncoding
+    if mode == 1 and useAutoEncode:
+        autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
+        autoEncodeThread.start()
+        time.sleep(5)
+
+
     outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
     print('---INTERPOLATION DONE---')
-    outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1]
-    outputVideoName += '{:.2f}fps-{}x-mode{}-rife-output.mp4'.format(outParams[0], interpolationFactor, mode)
+    interpolationDone[0] = True
 
-    createOutput(inputFile, projectFolder, outputVideoName, outParams[0], loopable, mode, crf, useNvenc)
+    #Auto encoding
+    if not useAutoEncode:
+        createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, crf, useNvenc)
 
     if clearPNGs:
         shutil.rmtree(projectFolder + '/' + 'original_frames')
