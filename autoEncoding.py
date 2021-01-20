@@ -2,9 +2,10 @@ from frameChooser import chooseFramesList
 from runAndPrintOutput import *
 import os
 import time
+import threading
 
 
-def mode1AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
+def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
                              crfout,useNvenc,blockSize=100):
     '''
 
@@ -18,6 +19,7 @@ def mode1AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolationD
     blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'
     blockCount = 1
     while True:
+        threadStart[0] = True
         if not os.path.exists(interpolatedFramesFolder):
             time.sleep(1)
             continue
@@ -56,8 +58,8 @@ def mode1AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolationD
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
-        p1 = Popen(ffmpegCommand)
-        p1.wait()
+        p1 = run(ffmpegCommand)
+        #p1.wait()
         blockCount += 1
         #Remove auto-encoded frames
         for file in filesInBlock:
@@ -73,20 +75,22 @@ def mode1AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolationD
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = Popen(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
-    p2.wait()
+    p2 = run(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
+    #p2.wait()
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
-def mode34AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
+def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
                              crfout,useNvenc,blockSize=100):
+    print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
     blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'
     blockCount = 1
     blockDurations = []
 
     while True:
+        threadStart[0] = True
         if not os.path.exists(interpolatedFramesFolder):
             time.sleep(1)
             continue
@@ -129,8 +133,8 @@ def mode34AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolation
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
-        p1 = Popen(ffmpegCommand)
-        p1.wait()
+        p1 = run(ffmpegCommand)
+        #p1.wait()
         blockCount += 1
         #Remove auto-encoded frames
         for file in filesInBlock:
@@ -147,8 +151,8 @@ def mode34AutoEncoding_Thread(projectFolder, inputFile,outputFile, interpolation
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = Popen(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
-    p2.wait()
+    p2 = run(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
+    #p2.wait()
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)

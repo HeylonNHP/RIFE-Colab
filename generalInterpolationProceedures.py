@@ -503,13 +503,16 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
     import autoEncoding
     autoEncodeThread = None
     if useAutoEncode:
+        ''' Wait for the thread to start, because python is stupid, and will not start it
+        if the interpolator manages to start first'''
+        waitForThreadStart = [False]
         if mode == 1:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
         elif mode == 3 or mode == 4:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(
-            projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,))
+            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,))
         autoEncodeThread.start()
-        time.sleep(5)
+        while waitForThreadStart[0] == False:
+            time.sleep(1)
 
 
     outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
