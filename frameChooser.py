@@ -39,7 +39,7 @@ def chooseFrames(framesFolder, desiredFPS):
 
 
 def chooseFramesList(frameFiles, desiredFPS):
-    '''testFilePath = 'test.txt'
+    """testFilePath = 'test.txt'
     testFileString = ""
     try:
         testFile = open(testFilePath,'r')
@@ -48,7 +48,7 @@ def chooseFramesList(frameFiles, desiredFPS):
     except:
         pass
 
-    testFile = open(testFilePath,'w')'''
+    testFile = open(testFilePath,'w')"""
 
     chosenFrameList: list = []
 
@@ -62,7 +62,7 @@ def chooseFramesList(frameFiles, desiredFPS):
     count = 1
     currentListIndex = 0
 
-    #testFileString += 'Video clip: '
+    """testFileString += 'Video clip: '"""
 
     # For when the first frame doesn't start from 0ms
     # Advance current time to the first frame's timecode
@@ -70,7 +70,7 @@ def chooseFramesList(frameFiles, desiredFPS):
         count += 1
         currentTime = ((1 / desiredFPS) * count) * 1000
 
-    #testFileString += 'Start time: ' + str(currentTime)
+    """testFileString += 'Start time: ' + str(currentTime)"""
 
     while (currentTime - desiredFrameSpacing) <= lastFileNumber:
         currentFrame = int(frameFiles[currentListIndex][:-4])
@@ -85,10 +85,10 @@ def chooseFramesList(frameFiles, desiredFPS):
 
         count += 1
         currentTime = ((1 / desiredFPS) * count) * 1000
-    #testFileString += ' End time: ' + str(currentTime)
-    #testFileString += ' Start frame: ' + chosenFrameList[0] + ' End frame: ' + chosenFrameList[-1]
-    #testFileString += ' Duration: ' + str((int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])))
-    #testFileString += '\n'
-    #testFile.write(testFileString)
-    #testFile.close()
+    """testFileString += ' End time: ' + str(currentTime)
+    testFileString += ' Start frame: ' + chosenFrameList[0] + ' End frame: ' + chosenFrameList[-1]
+    testFileString += ' Duration: ' + str((int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])))
+    testFileString += '\n'
+    testFile.write(testFileString)
+    testFile.close()"""
     return chosenFrameList, (int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4]))

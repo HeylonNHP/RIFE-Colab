@@ -24,7 +24,8 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
             time.sleep(1)
             continue
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
-        if len(interpolatedFrames) < blockSize:
+        # Add 128 to wait for the save queue to finish
+        if len(interpolatedFrames) < blockSize+128:
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
@@ -96,7 +97,8 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
             continue
 
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
-        if len(interpolatedFrames) < blockSize:
+        # Add 128 to wait for the save queue to finish
+        if len(interpolatedFrames) < blockSize+128:
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
