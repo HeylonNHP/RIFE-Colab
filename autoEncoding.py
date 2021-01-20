@@ -86,7 +86,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
                              crfout,useNvenc,blockSize=1000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
-    blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'
+
     blockCount = 1
     blockDurations = []
 
@@ -121,6 +121,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
             line = "file '" + interpolatedFramesFolder + os.path.sep + file + "'\n"
             framesFileString += line
 
+        blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames{}.txt'.format(blockCount)
         blockFramesFile = open(blockFramesFilePath, 'w')
         blockFramesFile.write(framesFileString)
         blockFramesFile.close()
@@ -142,10 +143,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         for file in filesInBlock:
             deleteFile = interpolatedFramesFolder + os.path.sep + file
             os.remove(deleteFile)
-            while os.path.exists(deleteFile):
-                os.remove(deleteFile)
-                time.sleep(0.1)
-        os.remove(blockFramesFilePath)
+        #os.remove(blockFramesFilePath)
 
     #Interpolation finished, combine blocks
     concatFileLines = ""
