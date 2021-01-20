@@ -7,6 +7,7 @@ import threading
 from QueuedFrames.queuedFrameList import *
 from QueuedFrames.queuedFrame import *
 from QueuedFrames.FrameFile import *
+import autoEncoding
 
 from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
@@ -500,7 +501,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
     #Auto encoding
     interpolationDone = [False]
-    import autoEncoding
+
     autoEncodeThread = None
     if useAutoEncode:
         ''' Wait for the thread to start, because python is stupid, and will not start it
