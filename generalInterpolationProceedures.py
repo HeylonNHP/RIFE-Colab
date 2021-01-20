@@ -471,7 +471,7 @@ def generateTimecodesFile(projectFolder):
 
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=True):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False):
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
         projectFolder = installPath + os.path.sep + "tempFrames"
@@ -501,8 +501,8 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
     #Auto encoding
     interpolationDone = [False]
     import autoEncoding
+    autoEncodeThread = None
     if useAutoEncode:
-        autoEncodeThread = None
         if mode == 1:
             autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,))
         elif mode == 3 or mode == 4:
@@ -519,6 +519,8 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
     #Auto encoding
     if not useAutoEncode:
         createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, crf, useNvenc)
+    else:
+        autoEncodeThread.join()
 
     if clearPNGs:
         shutil.rmtree(projectFolder + '/' + 'original_frames')
@@ -526,7 +528,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
 
 def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,
-                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc):
+                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False):
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
@@ -558,11 +560,11 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
                 print("LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs,
                                 nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc)
+                                useNvenc,useAutoEncode)
             else:
                 print("DON'T LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs,
                                 nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc)
+                                useNvenc,useAutoEncode)
         except:
             traceback.print_exc()

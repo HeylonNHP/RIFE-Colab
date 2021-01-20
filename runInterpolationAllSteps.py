@@ -13,6 +13,7 @@ parser.add_argument('-mpdecimate', dest='mpdecimateSensitivity', type=str, defau
 parser.add_argument('-usenvenc', dest='useNvenc', type=str2bool, default=False)
 parser.add_argument('-gpuids', dest='gpuid', type=str, default="0")
 parser.add_argument('-batch', dest='batchSize', type=int, default=1)
+parser.add_argument('-autoencode', dest='autoencode', type=str2bool, default=False)
 args = parser.parse_args()
 
 import os
@@ -32,4 +33,4 @@ setNvencSettings(selectedGPUs[0],'p7')
 setGPUinterpolationOptions(args.batchSize,selectedGPUs)
 
 performAllSteps(args.inputFile,args.interpolationFactor,args.loopable,args.mode,args.crfout,args.clearpngs,args.nonlocalpngs,
-                args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc)
+                args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc,args.autoencode)
