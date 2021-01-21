@@ -55,7 +55,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
         else:
             encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
 
-        ffmpegCommand = ['ffmpeg','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
+        ffmpegCommand = ['ffmpeg','-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
@@ -76,7 +76,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = run(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
+    p2 = run(['ffmpeg','-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
     #p2.wait()
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
@@ -132,7 +132,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         else:
             encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
 
-        ffmpegCommand = ['ffmpeg','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
+        ffmpegCommand = ['ffmpeg','-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
@@ -155,7 +155,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = run(['ffmpeg','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
+    p2 = run(['ffmpeg','-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
     #p2.wait()
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
