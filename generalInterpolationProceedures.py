@@ -332,6 +332,13 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
             outFramesQueue.put(None)
             break
 
+        total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
+        freeSpaceInMB = free / (2**20)
+        while freeSpaceInMB < 100:
+            print("Running out of space on device")
+            time.sleep(5)
+            total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
+            freeSpaceInMB = free / (2 ** 20)
         item.saveImageData()
 
 def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
