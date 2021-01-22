@@ -96,4 +96,4 @@ def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
     testFileString += '\n'
     testFile.write(testFileString)
     testFile.close()"""
-    return chosenFrameList, (int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])), currentTime, count
+    return chosenFrameList, (int(frameFiles[-1][:-4]) - int(frameFiles[0][:-4])), currentTime, count

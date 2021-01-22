@@ -92,7 +92,9 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
 
     currentTime = 0
     currentCount = 0
-    lastchosenFrameFile = None
+    lastFrameFile = None
+
+    totalLength = 0
 
     while True:
         threadStart[0] = True
@@ -101,7 +103,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
             continue
 
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
-        # Add 128 to wait for the save queue to finish
+        # Add 1024 to wait for the save queue to finish
         if len(interpolatedFrames) < blockSize+(128*8):
             if interpolationDone[0] == False:
                 time.sleep(1)
@@ -110,18 +112,41 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
                 blockSize = len(interpolatedFrames)
                 if len(interpolatedFrames) == 0:
                     break
+
         interpolatedFrames.sort()
-        if interpolatedFrames[0] == lastchosenFrameFile and len(interpolatedFrames) == 1:
+
+        '''Last frame from last block is kept for use by chooseFramesList
+        If the only frame left is the frame kept from the last block
+        Then we are finished encoding autoencode blocks'''
+        if interpolatedFrames[0] == lastFrameFile and len(interpolatedFrames) == 1:
             break
 
+        # Make list of frames in current block
         filesInBlock = []
         for i in range(0, blockSize):
             filesInBlock.append(interpolatedFrames[i])
 
-        # Keep duration of each block to use for maintaining correct timing when concatenating all blocks
-        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock,outputFPS,currentTime,currentCount)
-        blockDurations.append(blockDuration)
+        # Get the length in ms of the current block, including the next block start time to get the length of the last frame in the current block
+        # Used to keep duration of each block to use for maintaining correct timing when concatenating all blocks
+        nextBlockStartTime = None
+        try:
+            nextBlockStartTime = int(interpolatedFrames[blockSize][:-4])
+        except:
+            # If frame from next block doesn't exist (I.E. this is the last block) generate time from last frame pair in current block
+            nextBlockStartTime = int(interpolatedFrames[blockSize-1][:-4]) + (int(interpolatedFrames[blockSize-1][:-4])-int(interpolatedFrames[blockSize-2][:-4]))
 
+        currentLength = nextBlockStartTime-int(filesInBlock[1][:-4])
+        totalLength += currentLength
+        print('Auto encode block',blockCount,len(filesInBlock), str(nextBlockStartTime-int(filesInBlock[1][:-4]))+'ms',
+              "Before",filesInBlock[0],"Start",filesInBlock[1],'End',filesInBlock[-1])
+
+        # Chose frames for use in output (Downsampling to target FPS)
+        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock,outputFPS,currentTime,currentCount)
+
+        # blockDurations.append(blockDuration)
+        blockDurations.append(currentLength)
+
+        # Save concat file containing all the chosen frames
         framesFileString = ""
         for file in chosenFrames:
             line = "file '" + interpolatedFramesFolder + os.path.sep + file + "'\n"
@@ -132,6 +157,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         blockFramesFile.write(framesFileString)
         blockFramesFile.close()
 
+        # Build ffmpeg command and run ffmpeg
         encodingPreset = []
         if useNvenc:
             encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu','0','-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
@@ -143,14 +169,15 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
         p1 = run(ffmpegCommand)
-        #p1.wait()
+
         blockCount += 1
-        #Remove auto-encoded frames
-        lastchosenFrameFile = chosenFrames[-1]
+        #Remove auto-encoded frames in current block
+        lastFrameFile = filesInBlock[-1]
         for file in filesInBlock:
-            # Don't delete last chosen frame file, as it is used by chooseFramesList in next block
-            if file == lastchosenFrameFile:
-                break
+            # Don't delete last frame file in block, as it is used by chooseFramesList in next block
+            if file == lastFrameFile:
+                print("KEEP THIS FRAME",file)
+                continue
             deleteFile = interpolatedFramesFolder + os.path.sep + file
             os.remove(deleteFile)
         os.remove(blockFramesFilePath)
@@ -167,6 +194,15 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     concatFile.close()
     p2 = run(['ffmpeg','-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c','copy', outputFile])
     #p2.wait()
+
+    totalDuration = 0
+    for duration in blockDurations:
+        totalDuration += duration
+
+    print(str(totalDuration))
+    print('Test length',totalLength)
+
+    # Remove blocks and concat file - Output is already created, don't need these anymore
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
