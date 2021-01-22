@@ -90,6 +90,10 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     blockCount = 1
     blockDurations = []
 
+    currentTime = 0
+    currentCount = 0
+    lastchosenFrameFile = None
+
     while True:
         threadStart[0] = True
         if not os.path.exists(interpolatedFramesFolder):
@@ -107,13 +111,15 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
                 if len(interpolatedFrames) == 0:
                     break
         interpolatedFrames.sort()
+        if interpolatedFrames[0] == lastchosenFrameFile and len(interpolatedFrames) == 1:
+            break
 
         filesInBlock = []
         for i in range(0, blockSize):
             filesInBlock.append(interpolatedFrames[i])
 
         # Keep duration of each block to use for maintaining correct timing when concatenating all blocks
-        chosenFrames, blockDuration = chooseFramesList(filesInBlock,outputFPS)
+        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock,outputFPS,currentTime,currentCount)
         blockDurations.append(blockDuration)
 
         framesFileString = ""
@@ -140,7 +146,11 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         #p1.wait()
         blockCount += 1
         #Remove auto-encoded frames
+        lastchosenFrameFile = chosenFrames[-1]
         for file in filesInBlock:
+            # Don't delete last chosen frame file, as it is used by chooseFramesList in next block
+            if file == lastchosenFrameFile:
+                break
             deleteFile = interpolatedFramesFolder + os.path.sep + file
             os.remove(deleteFile)
         os.remove(blockFramesFilePath)

@@ -38,7 +38,7 @@ def chooseFrames(framesFolder, desiredFPS):
     outFile.close()
 
 
-def chooseFramesList(frameFiles, desiredFPS):
+def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
     """testFilePath = 'test.txt'
     testFileString = ""
     try:
@@ -60,6 +60,11 @@ def chooseFramesList(frameFiles, desiredFPS):
 
     currentTime = desiredFrameSpacing
     count = 1
+    if not startTime == 0:
+        currentTime = startTime
+    if not startCount == 0:
+        count = startCount
+
     currentListIndex = 0
 
     """testFileString += 'Video clip: '"""
@@ -91,4 +96,4 @@ def chooseFramesList(frameFiles, desiredFPS):
     testFileString += '\n'
     testFile.write(testFileString)
     testFile.close()"""
-    return chosenFrameList, (int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4]))
+    return chosenFrameList, (int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])), currentTime, count
