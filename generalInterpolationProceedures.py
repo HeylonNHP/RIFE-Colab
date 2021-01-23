@@ -479,7 +479,7 @@ def generateTimecodesFile(projectFolder):
 
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=1000):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000):
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
         projectFolder = installPath + os.path.sep + "tempFrames"
@@ -539,7 +539,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
 
 def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,
-                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=1000):
+                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000):
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):

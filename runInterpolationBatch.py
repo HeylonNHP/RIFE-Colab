@@ -13,7 +13,7 @@ parser.add_argument('-usenvenc', dest='useNvenc', type=str2bool, default=False)
 parser.add_argument('-gpuids', dest='gpuid', type=str, default="0")
 parser.add_argument('-batch', dest='batchSize', type=int, default=1)
 parser.add_argument('-autoencode', dest='autoencode', type=str2bool, default=False)
-parser.add_argument('-blocksize', dest='blocksize', type=int, default=1000)
+parser.add_argument('-blocksize', dest='blocksize', type=int, default=3000)
 args = parser.parse_args()
 
 print("NONLOCALPNGS",args.nonlocalpngs,"CLEARPNGS",args.clearpngs)

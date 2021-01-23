@@ -83,7 +83,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     os.remove(concatFilePath)
 
 def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,blockSize=1000):
+                             crfout,useNvenc,blockSize=3000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
 
