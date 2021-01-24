@@ -34,7 +34,7 @@ from generalInterpolationProceedures import *
 selectedGPUs = str(args.gpuid).split(",")
 selectedGPUs = [int(i) for i in selectedGPUs]
 
-setNvencSettings(selectedGPUs[0],'p7')
+setNvencSettings(selectedGPUs[0],'slow')
 setGPUinterpolationOptions(args.batchSize,selectedGPUs)
 
 print('Step1',args.step1,'Step2',args.step2,'Step3',args.step3)
