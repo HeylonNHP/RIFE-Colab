@@ -22,7 +22,6 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.runAllStepsButton.clicked.connect(self.runAllInterpolationSteps)
 
     def browseInputFile(self):
-        print("TEST")
         file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
         print(str(file))
         self.inputFilePathText.setText(file)
@@ -37,7 +36,7 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         print("READING GUI")
         inputFile = str(self.inputFilePathText.text())
         inputFile = inputFile.replace('/','\\')
-        print(inputFile)
+
         interpolationFactor = int(self.interpolationFactorSelect.currentText())
         loopable = bool(self.loopoutputCheck.isChecked())
         mode = int(self.modeSelect.currentText())
@@ -51,12 +50,12 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         blocksize = int(self.autoencodeBlocksizeNumber.value())
         print("FINISHED READING")
 
+        # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=performAllSteps,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
                         scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,))
 
         interpolateThread.start()
-        '''performAllSteps(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize)'''
+        interpolateThread.join()
 
 def main():
     app = QApplication(sys.argv)
