@@ -21,6 +21,7 @@ print("NONLOCALPNGS",args.nonlocalpngs,"CLEARPNGS",args.clearpngs)
 import os
 import traceback
 import sys
+import addInstalldirToPath
 
 # Why should we need to add the submodule to the path, just for the RIFE import to work
 # Thanks for being consistently terrible, python
