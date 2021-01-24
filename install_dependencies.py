@@ -3,7 +3,7 @@ import subprocess
 import sys
 import addInstalldirToPath
 
-REQUIRED_PACKAGES = ['numpy>=1.16', 'tqdm>=4.35.0', 'opencv-python>=4.1.2', 'pyqt5','requests']
+REQUIRED_PACKAGES = ['numpy>=1.16', 'tqdm>=4.35.0', 'opencv-python>=4.1.2', 'pyqt5', 'requests']
 
 
 def install(package):

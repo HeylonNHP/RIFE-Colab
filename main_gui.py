@@ -7,6 +7,7 @@ from PyQt5.QtCore import *
 import mainGuiUi
 import os
 import threading
+import addInstalldirToPath
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
