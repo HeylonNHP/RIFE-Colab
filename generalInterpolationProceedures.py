@@ -254,6 +254,7 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
     while True:
         listOfCompletedFrames = []
         if framesQueue.empty():
+            freeVRAM(model,device)
             break
         currentQueuedFrameList: QueuedFrameList = framesQueue.get()
         print(currentQueuedFrameList.progressMessage)
@@ -323,6 +324,11 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
                     inFramesList.pop(i)
                     break
 
+def freeVRAM(model, device):
+    del model
+    del device
+    gc.collect()
+    torch.cuda.empty_cache()
 
 def queueThreadSaveFrame(outFramesQueue: Queue):
     while True:
