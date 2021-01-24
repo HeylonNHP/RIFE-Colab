@@ -18,13 +18,20 @@ def extractArchive(archiveFile,exclusions:list = []):
     sevenZip = "7z"
     if os.name == 'nt':
         sevenZip = r"C:\Program Files\7-Zip\7z.exe"
-    #os.system('"' + sevenZip + '"' + r' e '+'"'+ archiveFile +'"'+' -aoa')
 
     sevenZipExclusions = []
     for exclusion in exclusions:
         sevenZipExclusions.append('-xr!' + exclusion)
 
-    subprocess.run([sevenZip,'e',archiveFile,'-aoa'] + sevenZipExclusions)
+    success = False
+    while not success:
+        try:
+            subprocess.run([sevenZip,'e',archiveFile,'-aoa'] + sevenZipExclusions)
+            success = True
+        except:
+            print('Cannot execute 7-zip to extract archive. Do you have x64 7-zip installed?')
+            print('If not, please do so now before hitting enter: https://www.7-zip.org/a/7z1900-x64.exe')
+            input('...')
 
 def mainInstall():
     for package in REQUIRED_PACKAGES:
@@ -69,9 +76,10 @@ def mainInstall():
             subprocess.run(['ffprobe'])
             ffprobeExists = True
         except:
-            print("Can't find ffmpeg")
+            print("Can't find ffmpeg/ffprobe - Downloading")
             downloadFile(r'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-01-23-12-48/ffmpeg-n4.3.1-29-g89daac5fe2-win64-gpl-4.3.zip','ffmpeg.zip')
             extractArchive('ffmpeg.zip',['doc'])
 
+    print('----DEPENDENCY INSTALLATION COMPLETE----')
 
 mainInstall()
