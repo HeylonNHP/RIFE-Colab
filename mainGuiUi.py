@@ -210,9 +210,9 @@ class Ui_MainWindow(object):
         self.clearpngsCheck.setText(_translate("MainWindow", "Enable"))
         self.groupBox.setTitle(_translate("MainWindow", "Interpolation options"))
         self.label_7.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Batch processing threads -</span></p><p>If not seeing 100% CUDA use on GPU<br/>Increase batch threads<br/>If using too much VRAM<br/>Decrease batch threads</p></body></html>"))
-        self.label_5.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Scene change sensitivity -</span></p><p>Lower is more sensitivity<br/>Highest is less sensitivity</p></body></html>"))
+        self.label_5.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Scene change sensitivity -</span></p><p>Lower is more sensitivity<br/>Higher is less sensitivity</p></body></html>"))
         self.label_6.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">GPU ID\'s -</span></p><p>Separate ID numbers using commas for multi-gpu processing</p></body></html>"))
-        self.modeSelect.setCurrentText(_translate("MainWindow", "3"))
+        self.modeSelect.setCurrentText(_translate("MainWindow", "1"))
         self.modeSelect.setItemText(0, _translate("MainWindow", "1"))
         self.modeSelect.setItemText(1, _translate("MainWindow", "3"))
         self.modeSelect.setItemText(2, _translate("MainWindow", "4"))
@@ -221,7 +221,7 @@ class Ui_MainWindow(object):
 "Mode 3 - duplicate frame handling with adaptive interpolation factor (Slowest, works best)<br>\n"
 "Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works well)\n"
 "</body></html>"))
-        self.label_3.setText(_translate("MainWindow", "Interpolation factor"))
+        self.label_3.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Interpolation factor</span></p></body></html>"))
         self.interpolationFactorSelect.setItemText(0, _translate("MainWindow", "2"))
         self.interpolationFactorSelect.setItemText(1, _translate("MainWindow", "4"))
         self.interpolationFactorSelect.setItemText(2, _translate("MainWindow", "8"))

@@ -157,7 +157,7 @@
        <item row="2" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Scene change sensitivity -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lower is more sensitivity&lt;br/&gt;Highest is less sensitivity&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Scene change sensitivity -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lower is more sensitivity&lt;br/&gt;Higher is less sensitivity&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
@@ -171,7 +171,7 @@
        <item row="1" column="1">
         <widget class="QComboBox" name="modeSelect">
          <property name="currentText">
-          <string>3</string>
+          <string>1</string>
          </property>
          <item>
           <property name="text">
@@ -217,7 +217,7 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
        <item row="0" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
-          <string>Interpolation factor</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Interpolation factor&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
