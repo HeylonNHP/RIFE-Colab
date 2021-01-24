@@ -36,7 +36,8 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         setGPUinterpolationOptions(int(self.batchthreadsNumber.value()), selectedGPUs)
         print("READING GUI")
         inputFile = str(self.inputFilePathText.text())
-        inputFile = inputFile.replace('/','\\')
+        if os.name == 'nt':
+            inputFile = inputFile.replace('/','\\')
 
         interpolationFactor = int(self.interpolationFactorSelect.currentText())
         loopable = bool(self.loopoutputCheck.isChecked())
