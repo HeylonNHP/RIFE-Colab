@@ -4,6 +4,8 @@ from QueuedFrames import *
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 from rifeInterpolationFunctions import *
 
+from Globals.GlobalValues import GlobalValues
+
 # Why should we need to add the submodule to the path, just for the RIFE import to work
 # Thanks for being consistently terrible, python
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
@@ -19,6 +21,7 @@ def test_interpolation():
     setNvencSettings(1,'p7')
     performAllSteps(inputFile,2,False,3,20,True,True,0.2,"64*12,64*8,0.33",True)
 '''
+r"""
 def test_hbd():
     ff = FrameFile(r'C:\Users\Heylon\Desktop\hbdTest\1_f32.png')
     ff.loadImageData()
@@ -36,5 +39,8 @@ def test_hbd():
     device,model = setupRIFE(os.getcwd(),0)
     ff2 = rifeInterpolate(device, model, ff1, ff3, ff2)
     ff2.saveImageData()
+"""
+def test_ffmpegLocation():
 
-
+    print('FOUND PATH',GlobalValues().getFFmpegPath())
+    print(os.getcwd())
