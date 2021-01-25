@@ -19,6 +19,9 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
     blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'
     blockCount = 1
+
+    blockDurationsList = []
+
     while True:
         threadStart[0] = True
         if not os.path.exists(interpolatedFramesFolder):
@@ -39,6 +42,10 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
         filesInBlock = []
         for i in range(0,blockSize):
             filesInBlock.append(interpolatedFrames[i])
+
+        # Get duration of current block to maintain timing
+        blockDuration = ((1.0 / outputFPS) * len(filesInBlock))
+        blockDurationsList.append(blockDuration)
 
         blockFramesFile = open(blockFramesFilePath,'w')
 
@@ -72,6 +79,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     concatFileLines = ""
     for i in range(1,blockCount):
         line = "file '" + projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv' + "'\n"
+        line += 'duration ' + str(blockDurationsList[i-1]) + '\n'
         concatFileLines += line
     concatFilePath = 'autoConcat.txt'
     concatFile = open(concatFilePath,'w')
