@@ -17,7 +17,7 @@ from Globals.GlobalValues import GlobalValues
 import warnings
 warnings.filterwarnings("ignore")
 
-FFMPEG4 = 'ffmpeg'
+FFMPEG4 = GlobalValues().getFFmpegPath()
 GPUID = 0
 nvencPreset = 'p7'
 installPath = os.getcwd()
@@ -406,7 +406,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     if useNvenc:
         encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu', str(GPUID), '-preset', str(nvencPreset),
                          '-profile', 'high', '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
-        ffmpegSelected = 'ffmpeg'
+        ffmpegSelected = GlobalValues().getFFmpegPath()
 
     if mode == 1:
         inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']

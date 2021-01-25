@@ -1,6 +1,9 @@
 import re
 import subprocess
-ffmpegLocation = 'ffmpeg'
+from Globals.GlobalValues import GlobalValues
+
+ffmpegLocation = GlobalValues().getFFmpegPath()
+ffprobeLocation = GlobalValues().getFFmpegPath(ffprobe=True)
 def setFFmpegLocation(location):
     global ffmpegLocation
     ffmpegLocation = location
@@ -64,7 +67,7 @@ def getFPSaccurate(inputPath):
     '''
     videoFPS = 0
 
-    result = subprocess.run(['ffprobe','-v','0','-of','csv=p=0','-select_streams','v:0','-show_entries','stream=r_frame_rate',inputPath], stdout=subprocess.PIPE)
+    result = subprocess.run([ffprobeLocation,'-v','0','-of','csv=p=0','-select_streams','v:0','-show_entries','stream=r_frame_rate',inputPath], stdout=subprocess.PIPE)
     lines = result.stdout.splitlines()
 
     print("------LINES------")

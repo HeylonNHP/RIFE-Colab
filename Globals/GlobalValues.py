@@ -4,7 +4,11 @@ import subprocess
 class GlobalValues:
     timebase = 100000
 
-    def getFFmpegPath(self):
+    def getFFmpegPath(self,ffprobe=False):
+        executableName = 'ffmpeg'
+        if ffprobe:
+            executableName = 'ffprobe'
+
         path = os.path.realpath(__file__)
         path = path[:path.rindex(os.path.sep)]
 
@@ -13,18 +17,18 @@ class GlobalValues:
         os.chdir(path)
 
         try:
-            subprocess.run(['ffmpeg'])
+            subprocess.run([executableName],stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             os.chdir(orig_path)
-            return 'ffmpeg'
+            return executableName
         except:
             print("Global ffmpeg doesn't exist")
 
         path = path[:path.rindex(os.path.sep)]
 
-        path = path + os.path.sep + 'ffmpeg.exe'
+        path = path + os.path.sep + executableName + '.exe'
 
         try:
-            subprocess.run([path])
+            subprocess.run([path],stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
             os.chdir(orig_path)
             return path
         except:
