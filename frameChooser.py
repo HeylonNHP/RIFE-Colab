@@ -1,11 +1,11 @@
 import os
-
+from Globals.GlobalValues import GlobalValues
 
 def chooseFrames(framesFolder, desiredFPS):
     frameFiles = os.listdir(framesFolder)
     frameFiles.sort()
     lastFile = int(frameFiles[-1][:-4])
-    desiredFrameSpacing = (1 / desiredFPS) * 1000
+    desiredFrameSpacing = (1 / desiredFPS) * GlobalValues.timebase
     timecodesFileString = ""
     currentTime = desiredFrameSpacing
     count = 1
@@ -31,7 +31,7 @@ def chooseFrames(framesFolder, desiredFPS):
         timecodesFileString += ("file '" + frameFile + "'\n")
 
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * 1000
+        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
     print(timecodesFileString)
     outFile = open(framesFolder + os.path.sep + 'framesCFR.txt', 'w')
     outFile.write(timecodesFileString)
@@ -56,7 +56,7 @@ def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
     frameFiles.sort()
 
     lastFileNumber = int(frameFiles[-1][:-4])
-    desiredFrameSpacing = (1 / desiredFPS) * 1000
+    desiredFrameSpacing = (1 / desiredFPS) * GlobalValues.timebase
 
     currentTime = desiredFrameSpacing
     count = 1
@@ -73,7 +73,7 @@ def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
     # Advance current time to the first frame's timecode
     while currentTime < int(frameFiles[0][:-4]):
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * 1000
+        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
 
     """testFileString += 'Start time: ' + str(currentTime)"""
 
@@ -89,7 +89,7 @@ def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
         chosenFrameList.append(frameFile)
 
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * 1000
+        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
     """testFileString += ' End time: ' + str(currentTime)
     testFileString += ' Start frame: ' + chosenFrameList[0] + ' End frame: ' + chosenFrameList[-1]
     testFileString += ' Duration: ' + str((int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])))

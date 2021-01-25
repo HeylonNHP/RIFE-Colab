@@ -12,6 +12,7 @@ import autoEncoding
 from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
+from Globals.GlobalValues import GlobalValues
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -77,7 +78,7 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
         hi, lo, frac = mpdecimateSensitivity.split(",")
         mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
         runAndPrintOutput(
-            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', '1000', '-vsync',
+            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', str(GlobalValues.timebase), '-vsync',
              '0', '-frame_pts', 'true', '-vf', mpdecimate, '-qscale:v', '1', 'original_frames/%15d.png'])
 
 
@@ -150,9 +151,9 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         shutil.copy(origFramesFolder + '/' + files[0], interpFramesFolder + '/' + '{:015d}.png'.format(count))
         # To ensure no duplicates on the output with the new VFR to CFR algorithm, double the interpolation factor. TODO: Investigate
         modeModOutputFPS = outputFPS
-        if mode == 3:
-            interpolationFactor = interpolationFactor * 2
-            modeModOutputFPS = modeModOutputFPS * 2
+        #if mode == 3:
+        interpolationFactor = interpolationFactor * 2
+        modeModOutputFPS = modeModOutputFPS * 2
 
         for i in range(0, len(files) - 1):
             framesList: list = []
@@ -166,7 +167,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
             if mode == 3:
                 localInterpolationFactor = 2
 
-                while 1 / (((endFrameTime - beginFrameTime) / localInterpolationFactor) / 1000) < modeModOutputFPS:
+                while 1 / (((endFrameTime - beginFrameTime) / localInterpolationFactor) / GlobalValues.timebase) < modeModOutputFPS:
                     localInterpolationFactor = int(localInterpolationFactor * 2)
 
             progressMessage = "Interpolating frame: {} Of {} {:.2f}% Frame interp. factor {}x".format(i + 1, len(files),
@@ -316,6 +317,9 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
                                        queuedFrame.scenechangeSensitivity)
             listOfCompletedFrames.append(midFrame)
             outFramesQueue.put(midFrame)
+
+        '''for midFrame1 in listOfCompletedFrames:
+            outFramesQueue.put(midFrame)'''
 
         # Start frame is no-longer needed, remove from RAM
         with inFrameGetLock:
@@ -475,14 +479,13 @@ def generateTimecodesFile(projectFolder):
         # Write line
         f.write(
             "file '" + projectFolder + "/interpolated_frames/" + currentFrameFile + "'\nduration " + "{:.5f}".format(
-                float(frameDuration / 1000.0)) + "\n")
+                float(frameDuration / float(GlobalValues.timebase))) + "\n")
 
     # Generate last frame
     lastFrameName = "{:015d}.png".format(endLast)
     f.write("file '" + projectFolder + "/interpolated_frames/" + lastFrameName + "'\nduration " + "{:.5f}".format(
-        float(averageDistance / 1000.0)) + "\n")
+        float(averageDistance / float(GlobalValues.timebase))) + "\n")
     f.close()
-
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
                     scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000):

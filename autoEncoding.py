@@ -3,6 +3,7 @@ from runAndPrintOutput import *
 import os
 import time
 import threading
+from Globals.GlobalValues import GlobalValues
 
 
 def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
@@ -186,7 +187,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     concatFileLines = ""
     for i in range(1,blockCount):
         line = "file '" + projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv' + "'\n"
-        line += 'duration ' + str((blockDurations[i-1])/1000.0) + '\n'
+        line += 'duration ' + str((blockDurations[i-1])/float(GlobalValues.timebase)) + '\n'
         concatFileLines += line
     concatFilePath = projectFolder + os.path.sep + 'autoConcat.txt'
     concatFile = open(concatFilePath,'w')

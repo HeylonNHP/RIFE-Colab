@@ -1,5 +1,6 @@
 import cv2
 import numpy
+import os
 
 class FrameFile:
     filePath: str = None
@@ -18,7 +19,8 @@ class FrameFile:
         return self.imageData
 
     def saveImageData(self):
-        cv2.imwrite(self.filePath, self.imageData)
+        if not os.path.exists(self.filePath):
+            cv2.imwrite(self.filePath, self.imageData)
 
     def loadImageData(self):
         self.imageData = cv2.imread(self.filePath,cv2.IMREAD_UNCHANGED)
