@@ -231,12 +231,23 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         saveThreads.append(saveThread)
         saveThread.start()
 
-    loadPNGThread.join()
-
+    # Wait for interpolation threads to exit
     for rifeThread in threads:
         rifeThread.join()
 
-    print("Put none")
+    # If all threads crashed before the end of interpolation - TODO: Cycle through all GPUs
+    while not framesQueue.empty():
+        print("Starting backup thread")
+        rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,))
+        rifeThread.start()
+        time.sleep(5)
+        rifeThread.join()
+
+    # Wait for loading thread to exit
+    loadPNGThread.join()
+
+    # Interpolation done, ask save threads to exit and wait for them
+    print("Put none - ask save thread to quit")
     outFramesQueue.put(None)
 
     for saveThread in saveThreads:
@@ -266,60 +277,73 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
             shutil.copy(currentQueuedFrameList.startFrame, currentQueuedFrameList.startFrameDest)
         if not os.path.exists(currentQueuedFrameList.endFrameDest):
             shutil.copy(currentQueuedFrameList.endFrame, currentQueuedFrameList.endFrameDest)
+        try:
+            for frame in listOfAllFramesInterpolate:
+                queuedFrame: QueuedFrame = frame
+                success = False
 
-        for frame in listOfAllFramesInterpolate:
-            queuedFrame: QueuedFrame = frame
-            success = False
+                # Load begin frame from HDD or RAM
+                beginFrame = None
+                # If the current frame pair uses an original_frame - Then grab it from RAM
+                if queuedFrame.beginFrame == currentQueuedFrameList.startFrameDest:
+                    with inFrameGetLock:
+                        for i in range(0,len(inFramesList)):
+                            if currentQueuedFrameList.startFrame == str(inFramesList[i]):
+                                beginFrame = inFramesList[i]
+                                break
 
-            # Load begin frame from HDD or RAM
-            beginFrame = None
-            # If the current frame pair uses an original_frame - Then grab it from RAM
-            if queuedFrame.beginFrame == currentQueuedFrameList.startFrameDest:
-                with inFrameGetLock:
-                    for i in range(0,len(inFramesList)):
-                        if currentQueuedFrameList.startFrame == str(inFramesList[i]):
-                            beginFrame = inFramesList[i]
+                if beginFrame is None:
+                    for i in range(0, len(listOfCompletedFrames)):
+                        if str(listOfCompletedFrames[i]) == queuedFrame.beginFrame:
+                            beginFrame = listOfCompletedFrames[i]
                             break
+                if beginFrame is None:
+                    beginFrame = FrameFile(queuedFrame.beginFrame)
+                    beginFrame.loadImageData()
 
-            if beginFrame is None:
-                for i in range(0, len(listOfCompletedFrames)):
-                    if str(listOfCompletedFrames[i]) == queuedFrame.beginFrame:
-                        beginFrame = listOfCompletedFrames[i]
-                        break
-            if beginFrame is None:
-                beginFrame = FrameFile(queuedFrame.beginFrame)
-                beginFrame.loadImageData()
+                # Load end frame from HDD or RAM
+                endFrame = None
+                # If the current frame pair uses an original_frame - Then grab it from RAM
+                if queuedFrame.endFrame == currentQueuedFrameList.endFrameDest:
+                    with inFrameGetLock:
+                        for i in range(0,len(inFramesList)):
+                            if currentQueuedFrameList.endFrame == str(inFramesList[i]):
+                                endFrame = inFramesList[i]
+                                break
 
-            # Load end frame from HDD or RAM
-            endFrame = None
-            # If the current frame pair uses an original_frame - Then grab it from RAM
-            if queuedFrame.endFrame == currentQueuedFrameList.endFrameDest:
-                with inFrameGetLock:
-                    for i in range(0,len(inFramesList)):
-                        if currentQueuedFrameList.endFrame == str(inFramesList[i]):
-                            endFrame = inFramesList[i]
+
+                if endFrame is None:
+                    for i in range(0, len(listOfCompletedFrames)):
+                        if str(listOfCompletedFrames[i]) == queuedFrame.endFrame:
+                            endFrame = listOfCompletedFrames[i]
                             break
+                if endFrame is None:
+                    endFrame = FrameFile(queuedFrame.endFrame)
+                    endFrame.loadImageData()
 
+                # Initialise the mid frame with the output path
+                midFrame = FrameFile(queuedFrame.middleFrame)
 
-            if endFrame is None:
-                for i in range(0, len(listOfCompletedFrames)):
-                    if str(listOfCompletedFrames[i]) == queuedFrame.endFrame:
-                        endFrame = listOfCompletedFrames[i]
-                        break
-            if endFrame is None:
-                endFrame = FrameFile(queuedFrame.endFrame)
-                endFrame.loadImageData()
+                midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
+                                           queuedFrame.scenechangeSensitivity)
+                listOfCompletedFrames.append(midFrame)
+                # outFramesQueue.put(midFrame)
+        except Exception as e:
+            # Put current frame back into queue for another batch thread to process
+            framesQueue.put(currentQueuedFrameList)
+            if hasattr(e, 'message'):
+                print(e.message)
+            else:
+                print(e)
 
-            # Initialise the mid frame with the output path
-            midFrame = FrameFile(queuedFrame.middleFrame)
+            # Kill batch thread
+            freeVRAM(model,device)
+            print("Freed VRAM from dead thread")
+            break
 
-            midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
-                                       queuedFrame.scenechangeSensitivity)
-            listOfCompletedFrames.append(midFrame)
-            outFramesQueue.put(midFrame)
-
-        '''for midFrame1 in listOfCompletedFrames:
-            outFramesQueue.put(midFrame)'''
+        # Add interpolated frames to png save queue
+        for midFrame1 in listOfCompletedFrames:
+            outFramesQueue.put(midFrame1)
 
         # Start frame is no-longer needed, remove from RAM
         with inFrameGetLock:
@@ -327,6 +351,7 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
                 if str(inFramesList[i]) == currentQueuedFrameList.startFrame:
                     inFramesList.pop(i)
                     break
+    print("END")
 
 def freeVRAM(model, device):
     del model
@@ -338,7 +363,7 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
     while True:
         item: FrameFile = outFramesQueue.get()
         if item is None:
-            print("Got none")
+            print("Got none - save thread")
             outFramesQueue.put(None)
             break
 
