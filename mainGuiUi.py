@@ -272,7 +272,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "RIFE Colab GUI"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.1</p></body></html>"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.11</p></body></html>"))
         self.label_2.setText(_translate("MainWindow", "Input file"))
         self.browseInputButton.setText(_translate("MainWindow", "Browse"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Frame extraction options"))
