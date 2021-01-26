@@ -26,12 +26,26 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.browseInputButton.clicked.connect(self.browseInputFile)
         self.runAllStepsButton.clicked.connect(self.runAllInterpolationSteps)
 
+        self.interpolationFactorSelect.currentTextChanged.connect(self.updateVideoFPSstats)
+
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
 
     def browseInputFile(self):
         file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
         print(str(file))
         self.inputFilePathText.setText(file)
+        
+        self.updateVideoFPSstats()
+
+    def updateVideoFPSstats(self):
+        file = str(self.inputFilePathText.text())
+        if not os.path.exists(file):
+            return
+
+        videoFPS = getFPSaccurate(str(file))
+        self.VideostatsInputFPStext.setText(str(videoFPS))
+        videoFPS = videoFPS * float(self.interpolationFactorSelect.currentText())
+        self.VideostatsOutputFPStext.setText(str(videoFPS))
 
     def runAllInterpolationSteps(self):
         print(1)
