@@ -542,21 +542,24 @@ def generateTimecodesFile(projectFolder):
     f.close()
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000,step1=True,step2=True,step3=True):
+    # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
         projectFolder = installPath + os.path.sep + "tempFrames"
         if not os.path.exists(projectFolder):
             os.mkdir(projectFolder)
+    if step1:
+        # Clear pngs if they exist
+        if os.path.exists(projectFolder + '/' + 'original_frames'):
+            shutil.rmtree(projectFolder + '/' + 'original_frames')
 
-    # Clear pngs if they exist
-    if os.path.exists(projectFolder + '/' + 'original_frames'):
-        shutil.rmtree(projectFolder + '/' + 'original_frames')
+        if os.path.exists(projectFolder + '/' + 'interpolated_frames'):
+            shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
-    if os.path.exists(projectFolder + '/' + 'interpolated_frames'):
-        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
-
-    extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity)
+        extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity)
+        if not step2 and not step3:
+            return
 
     # Get outputFPS
     outputFPS = None
@@ -566,39 +569,41 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
         outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
 
     # Generate output name
-    outputVideoNameSegments = ['{:.2f}'.format(outputFPS),'fps-',str(interpolationFactor),'x-mode',str(mode),'-rife-output.mp4']
+    outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-', str(interpolationFactor), 'x-mode', str(mode),
+                               '-rife-output.mp4']
     outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
 
-    #Auto encoding
-    interpolationDone = [False]
+    if step2:
+        #Auto encoding
+        interpolationDone = [False]
 
-    autoEncodeThread = None
-    if useAutoEncode:
-        ''' Wait for the thread to start, because python is stupid, and will not start it
-        if the interpolator manages to start first'''
-        waitForThreadStart = [False]
-        if mode == 1:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,autoEncodeBlockSize,))
-        elif mode == 3 or mode == 4:
-            autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,autoEncodeBlockSize,))
-        autoEncodeThread.start()
-        while waitForThreadStart[0] == False:
-            time.sleep(1)
+        autoEncodeThread = None
+        if useAutoEncode:
+            ''' Wait for the thread to start, because python is stupid, and will not start it
+            if the interpolator manages to start first'''
+            waitForThreadStart = [False]
+            if mode == 1:
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,autoEncodeBlockSize,))
+            elif mode == 3 or mode == 4:
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,autoEncodeBlockSize,))
+            autoEncodeThread.start()
+            while waitForThreadStart[0] == False:
+                time.sleep(1)
 
 
-    outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
-    print('---INTERPOLATION DONE---')
-    interpolationDone[0] = True
+        outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
+        print('---INTERPOLATION DONE---')
+        interpolationDone[0] = True
+        if useAutoEncode:
+            autoEncodeThread.join()
 
-    #Auto encoding
-    if not useAutoEncode:
-        createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, crf, useNvenc)
-    else:
-        autoEncodeThread.join()
+    if step3:
+        if not useAutoEncode:
+            createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, crf, useNvenc)
 
-    if clearPNGs:
-        shutil.rmtree(projectFolder + '/' + 'original_frames')
-        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
+        if clearPNGs:
+            shutil.rmtree(projectFolder + '/' + 'original_frames')
+            shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
 
 def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,

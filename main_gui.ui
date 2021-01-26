@@ -37,7 +37,7 @@
          </font>
         </property>
         <property name="text">
-         <string>RIFE Colab GUI</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -540,6 +540,31 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
        <number>0</number>
       </property>
      </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="extractFramesButton">
+        <property name="text">
+         <string>Step 1: Extract frames</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="interpolateFramesButton">
+        <property name="text">
+         <string>Step 2: Interpolate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="encodeOutputButton">
+        <property name="text">
+         <string>Step 3: Encode output</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">

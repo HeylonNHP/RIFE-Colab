@@ -25,6 +25,9 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         self.browseInputButton.clicked.connect(self.browseInputFile)
         self.runAllStepsButton.clicked.connect(self.runAllInterpolationSteps)
+        self.extractFramesButton.clicked.connect(self.runStep1)
+        self.interpolateFramesButton.clicked.connect(self.runStep2)
+        self.encodeOutputButton.clicked.connect(self.runStep3)
 
         self.interpolationFactorSelect.currentTextChanged.connect(self.updateVideoFPSstats)
 
@@ -47,7 +50,16 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         videoFPS = videoFPS * float(self.interpolationFactorSelect.currentText())
         self.VideostatsOutputFPStext.setText(str(videoFPS))
 
-    def runAllInterpolationSteps(self):
+    def runStep1(self):
+        self.runAllInterpolationSteps(step1=True,step2=False,step3=False)
+
+    def runStep2(self):
+        self.runAllInterpolationSteps(step1=False,step2=True,step3=False)
+
+    def runStep3(self):
+        self.runAllInterpolationSteps(step1=False,step2=False,step3=True)
+
+    def runAllInterpolationSteps(self,step1=True,step2=True,step3=True):
         print(1)
         selectedGPUs = str(self.gpuidsSelect.currentText()).split(",")
         print(2)
@@ -74,19 +86,22 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,))
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,step1,step2,step3,))
 
         interpolateThread.start()
 
     def runAllInterpolationStepsThread(self,inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize):
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,step1,step2,step3):
         self.runAllStepsButton.setEnabled(False)
-        interpolateThread = threading.Thread(target=performAllSteps, args=(
-        inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,))
-        interpolateThread.start()
-        interpolateThread.join()
+        self.extractFramesButton.setEnabled(False)
+        self.interpolateFramesButton.setEnabled(False)
+        self.encodeOutputButton.setEnabled(False)
+        performAllSteps(inputFile,interpolationFactor,loopable,mode,crfout,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
+                        usenvenc,useAutoencode,blocksize,step1=step1,step2=step2,step3=step3)
         self.runAllStepsButton.setEnabled(True)
+        self.extractFramesButton.setEnabled(True)
+        self.interpolateFramesButton.setEnabled(True)
+        self.encodeOutputButton.setEnabled(True)
 
     def getProgressUpdate(self,progress:InterpolationProgress):
         self.interpolationProgressBar.setMaximum(progress.totalFrames)
@@ -96,6 +111,25 @@ def main():
     app = QApplication(sys.argv)
     if 'Fusion' in QStyleFactory.keys():
         app.setStyle('Fusion')
+
+    baseIntensity = 50
+
+    pal = QPalette()
+    pal.setColor(QPalette.Background, QColor(baseIntensity,baseIntensity,baseIntensity))
+    pal.setColor(QPalette.Window, QColor(baseIntensity,baseIntensity,baseIntensity))
+    pal.setColor(QPalette.WindowText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.Base, QColor(baseIntensity+10, baseIntensity+10, baseIntensity+10))
+    pal.setColor(QPalette.AlternateBase, QColor(baseIntensity, baseIntensity, baseIntensity))
+    pal.setColor(QPalette.ToolTipBase, QColor(baseIntensity, baseIntensity, baseIntensity))
+    pal.setColor(QPalette.ToolTipText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.Text, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.Button, QColor(baseIntensity+10, baseIntensity+10, baseIntensity+10))
+    pal.setColor(QPalette.ButtonText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.BrightText, QColor(255, 0, 0))
+    pal.setColor(QPalette.Highlight, QColor(125, 125, 200))
+    pal.setColor(QPalette.HighlightedText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    app.setPalette(pal)
+
     window = RIFEGUIMAINWINDOW()
     window.show()
     app.exec_()
