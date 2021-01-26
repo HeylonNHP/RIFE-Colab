@@ -19,8 +19,14 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         super().__init__()
         self.setupUi(self)  # Initialize a design
 
+        self.verticalLayout_4.setAlignment(Qt.AlignTop)
+        self.verticalLayout_3.setAlignment(Qt.AlignTop)
+        self.verticalLayout_2.setAlignment(Qt.AlignTop)
+
         self.browseInputButton.clicked.connect(self.browseInputFile)
         self.runAllStepsButton.clicked.connect(self.runAllInterpolationSteps)
+
+        subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
 
     def browseInputFile(self):
         file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
@@ -53,14 +59,29 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         print("FINISHED READING")
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
-        interpolateThread = threading.Thread(target=performAllSteps,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
+        interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
                         scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,))
 
         interpolateThread.start()
+
+    def runAllInterpolationStepsThread(self,inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize):
+        self.runAllStepsButton.setEnabled(False)
+        interpolateThread = threading.Thread(target=performAllSteps, args=(
+        inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
+        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,))
+        interpolateThread.start()
         interpolateThread.join()
+        self.runAllStepsButton.setEnabled(True)
+
+    def getProgressUpdate(self,progress:InterpolationProgress):
+        self.interpolationProgressBar.setMaximum(progress.totalFrames)
+        self.interpolationProgressBar.setValue(progress.completedFrames)
 
 def main():
     app = QApplication(sys.argv)
+    if 'Fusion' in QStyleFactory.keys():
+        app.setStyle('Fusion')
     window = RIFEGUIMAINWINDOW()
     window.show()
     app.exec_()

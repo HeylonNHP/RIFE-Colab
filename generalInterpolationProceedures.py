@@ -13,6 +13,7 @@ from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
 from Globals.GlobalValues import GlobalValues
+from EventHandling import Event
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -40,6 +41,11 @@ from rifeInterpolationFunctions import *
 gpuBatchSize = 2
 gpuIDsList = [0]
 
+interpolationProgressUpdate = Event.Event()
+
+def subscribeTointerpolationProgressUpdate(function):
+    interpolationProgressUpdate.append(function)
+
 
 def setFFmpeg4Path(path):
     global FFMPEG4
@@ -59,6 +65,8 @@ def setGPUinterpolationOptions(batchSize: int, _gpuIDsList: list):
     global gpuBatchSize
     gpuIDsList = _gpuIDsList
     gpuBatchSize = batchSize
+
+
 
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
@@ -128,7 +136,13 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                                                                origFramesFolder + '/' + files[i + 1],
                                                                interpFramesFolder + '/' + '{:015d}.png'.format(
                                                                    count + interpolationFactor))
-            queuedFrameList.progressMessage = progressMessage
+
+            interpolationProgress = InterpolationProgress()
+            interpolationProgress.progressMessage = progressMessage
+            interpolationProgress.completedFrames = i+1
+            interpolationProgress.totalFrames = len(files)
+            queuedFrameList.interpolationProgress = interpolationProgress
+
             currentFactor = interpolationFactor
 
             while currentFactor > 1:
@@ -185,7 +199,13 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                                                                origFramesFolder + '/' + files[i + 1],
                                                                interpFramesFolder + '/' + '{:015d}.png'.format(
                                                                    nextTimecode))
-            queuedFrameList.progressMessage = progressMessage
+
+            interpolationProgress = InterpolationProgress()
+            interpolationProgress.progressMessage = progressMessage
+            interpolationProgress.completedFrames = i+1
+            interpolationProgress.totalFrames = len(files)
+            queuedFrameList.interpolationProgress = interpolationProgress
+
             currentFactor = localInterpolationFactor
 
             while currentFactor > 1:
@@ -257,6 +277,13 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     if loopable:
         removeLoopContinuityFrame(interpFramesFolder)
 
+    # Raise event, interpolation finished
+    interpolationProgress = InterpolationProgress()
+    interpolationProgress.completedFrames = len(files)
+    interpolationProgress.totalFrames = len(files)
+    interpolationProgress.progressMessage = "Interpolation finished"
+    interpolationProgressUpdate(interpolationProgress)
+
     return [outputFPS]
 
 inFrameGetLock = threading.Lock()
@@ -269,7 +296,9 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
             freeVRAM(model,device)
             break
         currentQueuedFrameList: QueuedFrameList = framesQueue.get()
-        print(currentQueuedFrameList.progressMessage)
+        print(currentQueuedFrameList.interpolationProgress.progressMessage)
+        # Raise event
+        interpolationProgressUpdate(currentQueuedFrameList.interpolationProgress)
         listOfAllFramesInterpolate: list = currentQueuedFrameList.frameList
 
         # Copy start and end files
