@@ -24,7 +24,7 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.verticalLayout_2.setAlignment(Qt.AlignTop)
 
         self.browseInputButton.clicked.connect(self.browseInputFile)
-        self.runAllStepsButton.clicked.connect(self.runAllInterpolationSteps)
+        self.runAllStepsButton.clicked.connect(self.runAllSteps)
         self.extractFramesButton.clicked.connect(self.runStep1)
         self.interpolateFramesButton.clicked.connect(self.runStep2)
         self.encodeOutputButton.clicked.connect(self.runStep3)
@@ -58,6 +58,10 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
     def runStep3(self):
         self.runAllInterpolationSteps(step1=False,step2=False,step3=True)
+
+    def runAllSteps(self,nigger):
+        # This function is required because python is stupid, and will set the first boolean function parameter to false
+        self.runAllInterpolationSteps()
 
     def runAllInterpolationSteps(self,step1=True,step2=True,step3=True):
         print(1)
