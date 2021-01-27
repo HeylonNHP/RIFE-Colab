@@ -64,13 +64,11 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.runAllInterpolationSteps()
 
     def runAllInterpolationSteps(self,step1=True,step2=True,step3=True):
-        print(1)
         selectedGPUs = str(self.gpuidsSelect.currentText()).split(",")
-        print(2)
         selectedGPUs = [int(i) for i in selectedGPUs]
         setNvencSettings(selectedGPUs[0], 'slow')
         setGPUinterpolationOptions(int(self.batchthreadsNumber.value()), selectedGPUs)
-        print("READING GUI")
+
         inputFile = str(self.inputFilePathText.text())
         if os.name == 'nt':
             inputFile = inputFile.replace('/','\\')
@@ -86,7 +84,6 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         usenvenc = bool(self.nvencCheck.isChecked())
         useAutoencode = bool(self.autoencodeCheck.isChecked())
         blocksize = int(self.autoencodeBlocksizeNumber.value())
-        print("FINISHED READING")
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
