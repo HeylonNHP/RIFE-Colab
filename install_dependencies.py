@@ -47,7 +47,7 @@ def mainInstall():
         if int(subversions[0]) < 1:
             # Torch less than 1.0.0
             raise Exception
-        if '+' not in subversions[2]:
+        if '+cpu' in subversions[2]:
             # Torch CPU only version
             raise Exception
         print('Found torch', torch.__version__)
