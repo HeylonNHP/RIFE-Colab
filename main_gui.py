@@ -14,6 +14,8 @@ print(sys.path)
 from generalInterpolationProceedures import *
 
 class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
+    progressBarUpdateSignal = pyqtSignal(object)
+
     def __init__(self):
         # This is needed here for variable and method access
         super().__init__()
@@ -32,6 +34,7 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.interpolationFactorSelect.currentTextChanged.connect(self.updateVideoFPSstats)
 
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
+        self.progressBarUpdateSignal.connect(self.updateUIprogress)
 
     def browseInputFile(self):
         file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
@@ -105,8 +108,13 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.encodeOutputButton.setEnabled(True)
 
     def getProgressUpdate(self,progress:InterpolationProgress):
-        self.interpolationProgressBar.setMaximum(progress.totalFrames)
-        self.interpolationProgressBar.setValue(progress.completedFrames)
+        #self.interpolationProgressBar.setMaximum(progress.totalFrames)
+        #self.interpolationProgressBar.setValue(progress.completedFrames)
+        self.progressBarUpdateSignal.emit(progress)
+
+    def updateUIprogress(self,data:InterpolationProgress):
+        self.interpolationProgressBar.setMaximum(data.totalFrames)
+        self.interpolationProgressBar.setValue(data.completedFrames)
 
 def main():
     app = QApplication(sys.argv)
