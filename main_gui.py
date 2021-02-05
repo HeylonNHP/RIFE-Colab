@@ -15,6 +15,10 @@ from generalInterpolationProceedures import *
 
 class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
     progressBarUpdateSignal = pyqtSignal(object)
+    runAllStepsButtonEnabledSignal = pyqtSignal(bool)
+    extractFramesButtonEnabledSignal = pyqtSignal(bool)
+    interpolateFramesButtonEnabledSignal = pyqtSignal(bool)
+    encodeOutputButtonEnabledSignal = pyqtSignal(bool)
 
     def __init__(self):
         # This is needed here for variable and method access
@@ -35,6 +39,11 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
         self.progressBarUpdateSignal.connect(self.updateUIprogress)
+
+        self.runAllStepsButtonEnabledSignal.connect(self.updaterunAllStepsButtonEnabled)
+        self.extractFramesButtonEnabledSignal.connect(self.updateextractFramesButtonEnabled)
+        self.interpolateFramesButtonEnabledSignal.connect(self.updateinterpolateFramesButtonEnabled)
+        self.encodeOutputButtonEnabledSignal.connect(self.updateencodeOutputButtonEnabled)
 
     def browseInputFile(self):
         file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
@@ -62,7 +71,7 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
     def runStep3(self):
         self.runAllInterpolationSteps(step1=False,step2=False,step3=True)
 
-    def runAllSteps(self,nigger):
+    def runAllSteps(self):
         # This function is required because python is stupid, and will set the first boolean function parameter to false
         self.runAllInterpolationSteps()
 
@@ -96,25 +105,37 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
     def runAllInterpolationStepsThread(self,inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
                         scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,step1,step2,step3):
-        self.runAllStepsButton.setEnabled(False)
-        self.extractFramesButton.setEnabled(False)
-        self.interpolateFramesButton.setEnabled(False)
-        self.encodeOutputButton.setEnabled(False)
+        self.runAllStepsButtonEnabledSignal.emit(False)
+        self.extractFramesButtonEnabledSignal.emit(False)
+        self.interpolateFramesButtonEnabledSignal.emit(False)
+        self.encodeOutputButtonEnabledSignal.emit(False)
+
         performAllSteps(inputFile,interpolationFactor,loopable,mode,crfout,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
                         usenvenc,useAutoencode,blocksize,step1=step1,step2=step2,step3=step3)
-        self.runAllStepsButton.setEnabled(True)
-        self.extractFramesButton.setEnabled(True)
-        self.interpolateFramesButton.setEnabled(True)
-        self.encodeOutputButton.setEnabled(True)
+
+        self.runAllStepsButtonEnabledSignal.emit(True)
+        self.extractFramesButtonEnabledSignal.emit(True)
+        self.interpolateFramesButtonEnabledSignal.emit(True)
+        self.encodeOutputButtonEnabledSignal.emit(True)
 
     def getProgressUpdate(self,progress:InterpolationProgress):
-        #self.interpolationProgressBar.setMaximum(progress.totalFrames)
-        #self.interpolationProgressBar.setValue(progress.completedFrames)
         self.progressBarUpdateSignal.emit(progress)
 
     def updateUIprogress(self,data:InterpolationProgress):
         self.interpolationProgressBar.setMaximum(data.totalFrames)
         self.interpolationProgressBar.setValue(data.completedFrames)
+
+    def updaterunAllStepsButtonEnabled(self,data:bool):
+        self.runAllStepsButton.setEnabled(data)
+
+    def updateextractFramesButtonEnabled(self,data:bool):
+        self.extractFramesButton.setEnabled(data)
+
+    def updateinterpolateFramesButtonEnabled(self,data:bool):
+        self.interpolateFramesButton.setEnabled(data)
+
+    def updateencodeOutputButtonEnabled(self,data:bool):
+        self.encodeOutputButton.setEnabled(data)
 
 def main():
     app = QApplication(sys.argv)
