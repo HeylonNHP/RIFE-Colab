@@ -570,7 +570,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
     # Generate output name
     outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-', str(interpolationFactor), 'x-mode', str(mode),
-                               '-rife-output.mp4']
+                               '-rife-',inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
     outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
 
     if step2:

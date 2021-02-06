@@ -20,11 +20,15 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
     interpolateFramesButtonEnabledSignal = pyqtSignal(bool)
     encodeOutputButtonEnabledSignal = pyqtSignal(bool)
 
+    batchProcessingMode:bool = False
+    nonBatchControlLabels:dict = {}
+
     def __init__(self):
         # This is needed here for variable and method access
         super().__init__()
         self.setupUi(self)  # Initialize a design
 
+        self.verticalLayout_5.setAlignment(Qt.AlignTop)
         self.verticalLayout_4.setAlignment(Qt.AlignTop)
         self.verticalLayout_3.setAlignment(Qt.AlignTop)
         self.verticalLayout_2.setAlignment(Qt.AlignTop)
@@ -45,12 +49,42 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.interpolateFramesButtonEnabledSignal.connect(self.updateinterpolateFramesButtonEnabled)
         self.encodeOutputButtonEnabledSignal.connect(self.updateencodeOutputButtonEnabled)
 
+        self.tabWidget.currentChanged.connect(self.changedTabs)
+
+        self.nonBatchControlLabels['input'] = self.inputLabel.text()
+        self.nonBatchControlLabels['runall'] = self.runAllStepsButton.text()
+
+    def changedTabs(self):
+        if self.tabWidget.currentIndex() == 3:
+            self.batchProcessingMode = True
+
+            self.inputLabel.setText("Input folder")
+            self.runAllStepsButton.setText("Run Batch")
+
+            self.extractFramesButton.setEnabled(False)
+            self.interpolateFramesButton.setEnabled(False)
+            self.encodeOutputButton.setEnabled(False)
+        else:
+            self.batchProcessingMode = False
+
+            self.inputLabel.setText(self.nonBatchControlLabels['input'])
+            self.runAllStepsButton.setText(self.nonBatchControlLabels['runall'])
+
+            self.extractFramesButton.setEnabled(True)
+            self.interpolateFramesButton.setEnabled(True)
+            self.encodeOutputButton.setEnabled(True)
+
     def browseInputFile(self):
-        file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
+        file = None
+        if not self.batchProcessingMode:
+            file, _filter = QFileDialog.getOpenFileName(caption="Open video file to interpolate")
+        else:
+            file = str(QFileDialog.getExistingDirectory(caption="Open folder of files to interpolate"))
         print(str(file))
         self.inputFilePathText.setText(file)
-        
-        self.updateVideoFPSstats()
+
+        if not self.batchProcessingMode:
+            self.updateVideoFPSstats()
 
     def updateVideoFPSstats(self):
         file = str(self.inputFilePathText.text())
@@ -85,6 +119,15 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         if os.name == 'nt':
             inputFile = inputFile.replace('/','\\')
 
+        if self.batchProcessingMode:
+            if not os.path.isdir(inputFile):
+                QMessageBox.critical(self,"Path","For batch processing, the input path must be a folder")
+                return
+        else:
+            if not os.path.isfile(inputFile):
+                QMessageBox.critical(self,"Path", "For single video processing, the input path must be a video file")
+                return
+
         interpolationFactor = int(self.interpolationFactorSelect.currentText())
         loopable = bool(self.loopoutputCheck.isChecked())
         mode = int(self.modeSelect.currentText())
@@ -97,26 +140,37 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         useAutoencode = bool(self.autoencodeCheck.isChecked())
         blocksize = int(self.autoencodeBlocksizeNumber.value())
 
+        targetFPS = float(self.targetFPSnumber.value())
+
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,step1,step2,step3,))
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,step1,step2,step3,))
 
         interpolateThread.start()
 
     def runAllInterpolationStepsThread(self,inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,step1,step2,step3):
-        self.runAllStepsButtonEnabledSignal.emit(False)
-        self.extractFramesButtonEnabledSignal.emit(False)
-        self.interpolateFramesButtonEnabledSignal.emit(False)
-        self.encodeOutputButtonEnabledSignal.emit(False)
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,step1,step2,step3):
 
-        performAllSteps(inputFile,interpolationFactor,loopable,mode,crfout,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
-                        usenvenc,useAutoencode,blocksize,step1=step1,step2=step2,step3=step3)
+        batchProcessing = self.batchProcessingMode
+
+        self.runAllStepsButtonEnabledSignal.emit(False)
+        if not batchProcessing:
+            self.extractFramesButtonEnabledSignal.emit(False)
+            self.interpolateFramesButtonEnabledSignal.emit(False)
+            self.encodeOutputButtonEnabledSignal.emit(False)
+
+        if not batchProcessing:
+            performAllSteps(inputFile,interpolationFactor,loopable,mode,crfout,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
+                            usenvenc,useAutoencode,blocksize,step1=step1,step2=step2,step3=step3)
+        else:
+            batchInterpolateFolder(inputFile,mode,crfout,targetFPS,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
+                                   usenvenc,useAutoencode,blocksize)
 
         self.runAllStepsButtonEnabledSignal.emit(True)
-        self.extractFramesButtonEnabledSignal.emit(True)
-        self.interpolateFramesButtonEnabledSignal.emit(True)
-        self.encodeOutputButtonEnabledSignal.emit(True)
+        if not batchProcessing:
+            self.extractFramesButtonEnabledSignal.emit(True)
+            self.interpolateFramesButtonEnabledSignal.emit(True)
+            self.encodeOutputButtonEnabledSignal.emit(True)
 
     def getProgressUpdate(self,progress:InterpolationProgress):
         self.progressBarUpdateSignal.emit(progress)
