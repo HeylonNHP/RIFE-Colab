@@ -20,7 +20,8 @@ def downloadRIFE(installPath,onWindows):
 
     # If they are missing, grab them
     if modelFilesMissing:
-        download_file_from_google_drive('11l8zknO1V5hapv2-Ke4DG9mHyBomS0Fc', 'RIFE_trained_model_new.zip')
+        #download_file_from_google_drive('11l8zknO1V5hapv2-Ke4DG9mHyBomS0Fc', 'RIFE_trained_model_new.zip')
+        download_file_from_google_drive('1wsQIhHZ3Eg4_AfCXItFKqqyDMB4NS0Yd', 'RIFE_trained_model_new.zip')
         sevenZip = "7z"
         if onWindows:
             sevenZip = r"C:\Program Files\7-Zip\7z.exe"
