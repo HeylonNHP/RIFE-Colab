@@ -28,6 +28,8 @@ def downloadRIFE(installPath,onWindows):
 
         os.system('"'+sevenZip+'"' + r' e RIFE_trained_model_new.zip -aoa')
 
+        if not os.path.exists(installPath + '/arXiv2020RIFE'):
+            os.mkdir(installPath + '/arXiv2020RIFE')
         if not os.path.exists(installPath + '/arXiv2020RIFE/train_log'):
             os.mkdir(installPath + '/arXiv2020RIFE/train_log')
             for data in glob.glob("*.pkl"):

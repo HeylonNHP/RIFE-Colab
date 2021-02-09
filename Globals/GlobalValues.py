@@ -14,7 +14,11 @@ class GlobalValues:
 
         orig_path = os.getcwd()
 
-        os.chdir(path)
+        try:
+            os.chdir(path)
+        except:
+            '''This will break when this code is packaged by pyInstaller'''
+            pass
 
         try:
             subprocess.run([executableName],stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)

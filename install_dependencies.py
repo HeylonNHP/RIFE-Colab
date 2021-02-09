@@ -35,6 +35,28 @@ def extractArchive(archiveFile,exclusions:list = []):
             input('...')
 
 def mainInstall():
+    pathCWD = os.path.realpath(__file__)
+    pathCWD = pathCWD[:pathCWD.rindex(os.path.sep)]
+    pathCWD += os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'model' + os.path.sep
+    print(pathCWD)
+
+    rifeCodeFiles = os.listdir(pathCWD)
+
+    for file in rifeCodeFiles:
+        if not os.path.isfile(pathCWD + file):
+            continue
+        print(pathCWD + file)
+        fileObj = open(pathCWD + file,'r')
+
+        fileStr = fileObj.read()
+        fileObj.close()
+        fileStr = fileStr.replace('from model.','from arXiv2020RIFE.model.')
+
+        outFileObj = open(pathCWD + file,'w')
+        outFileObj.write(fileStr)
+        outFileObj.close()
+
+
     for package in REQUIRED_PACKAGES:
         install(package)
 
