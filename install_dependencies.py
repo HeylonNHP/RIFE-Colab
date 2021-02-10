@@ -56,6 +56,7 @@ def mainInstall():
         outFileObj.write(fileStr)
         outFileObj.close()
 
+    #return
 
     for package in REQUIRED_PACKAGES:
         install(package)
