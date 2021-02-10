@@ -5,12 +5,13 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import mainGuiUi
+#from PyQt5 import uic
 import os
 import threading
 import addInstalldirToPath
 
-#sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
-#print(sys.path)
+sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
+print(sys.path)
 from generalInterpolationProceedures import *
 
 class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
@@ -23,10 +24,13 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
     batchProcessingMode:bool = False
     nonBatchControlLabels:dict = {}
 
+
+
     def __init__(self):
         # This is needed here for variable and method access
         super().__init__()
         self.setupUi(self)  # Initialize a design
+        #uic.loadUi("main_gui.ui", self)
 
         self.verticalLayout_5.setAlignment(Qt.AlignTop)
         self.verticalLayout_4.setAlignment(Qt.AlignTop)
