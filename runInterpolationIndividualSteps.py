@@ -49,31 +49,15 @@ if args.nonlocalpngs:
 fpsDataFilePath = projectFolder + os.path.sep + 'fpsout.txt'
 
 if args.step1:
-    # Clear pngs if they exist
-    if os.path.exists(projectFolder + '/' + 'original_frames'):
-        shutil.rmtree(projectFolder + '/' + 'original_frames')
-
-    if os.path.exists(projectFolder + '/' + 'interpolated_frames'):
-        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
-
-    extractFrames(args.inputFile, projectFolder, args.mode, args.mpdecimateSensitivity)
+    performAllSteps(args.inputFile,args.interpolationFactor,args.loopable,args.mode,args.crfout,args.clearpngs,
+                    args.nonlocalpngs,args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc,step1=True,step2=False,step3=False)
 
 if args.step2:
-    outParams = runInterpolator(args.inputFile, projectFolder, args.interpolationFactor, args.loopable, args.mode, args.scenechangeSensitivity)
-    print('---INTERPOLATION DONE---')
-    fpsFile = open(fpsDataFilePath,'w')
-    fpsFile.write(str(outParams[0]))
-    fpsFile.close()
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
+                    step1=False, step2=True, step3=False)
 
 if args.step3:
-    fpsFile = open(fpsDataFilePath,'r')
-    outputFPS = float(fpsFile.readline())
-    fpsFile.close()
-    outputVideoName = args.inputFile[:args.inputFile.rindex(os.path.sep) + 1]
-    outputVideoName += '{:.2f}fps-{}x-mode{}-rife-output.mp4'.format(outputFPS, args.interpolationFactor, args.mode)
-
-    createOutput(args.inputFile, projectFolder, outputVideoName, outputFPS, args.loopable, args.mode, args.crfout, args.useNvenc)
-
-    if args.clearpngs:
-        shutil.rmtree(projectFolder + '/' + 'original_frames')
-        shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
+                    step1=False, step2=False, step3=True)
