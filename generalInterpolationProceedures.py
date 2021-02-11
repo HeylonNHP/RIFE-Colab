@@ -90,9 +90,10 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
              '0', '-frame_pts', 'true', '-vf', mpdecimate, '-qscale:v', '1', 'original_frames/%15d.png'])
 
 
-def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity):
+def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity, outputFPS):
     '''
     Equivalent to DAINAPP Step 2
+    :param outputFPS:
     '''
     global gpuIDsList
     global gpuBatchSize
@@ -102,13 +103,6 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 
     if not os.path.exists(interpFramesFolder):
         os.mkdir(interpFramesFolder)
-
-    # Get output FPS
-    outputFPS = 0
-    if mode == 1 or mode == 3:
-        outputFPS = getFPSaccurate(inputFile) * interpolationFactor
-    elif mode == 4:
-        outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
 
     # Loopable
     if loopable:
@@ -541,6 +535,16 @@ def generateTimecodesFile(projectFolder):
         float(averageDistance / float(GlobalValues.timebase))) + "\n")
     f.close()
 
+def getOutputFPS(inputFile:str, mode:int, interpolationFactor:int, useAccurateFPS:bool, accountForDuplicateFrames:bool):
+
+    if (mode == 3 or mode == 4) and accountForDuplicateFrames:
+        return (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
+
+    if useAccurateFPS:
+        return getFPSaccurate(inputFile) * interpolationFactor
+    else:
+        return getFPS(inputFile) * interpolationFactor
+
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
                     scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000,step1=True,step2=True,step3=True):
     # Get project folder path and make it if it doesn't exist
@@ -591,7 +595,8 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
                 time.sleep(1)
 
 
-        outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity)
+        outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode,
+                                    scenechangeSensitivity, outputFPS)
         print('---INTERPOLATION DONE---')
         interpolationDone[0] = True
         if useAutoEncode:
