@@ -98,6 +98,8 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         file = str(self.inputFilePathText.text())
         if not os.path.exists(file):
             return
+        if not os.path.isfile(file):
+            return
 
         accurateFPS:bool = self.useAccurateFPSCheckbox.isChecked()
         accountForDuplicatesInFPS:bool = self.accountForDuplicateFramesCheckbox.isChecked()
