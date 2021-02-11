@@ -49,8 +49,9 @@ if args.nonlocalpngs:
 fpsDataFilePath = projectFolder + os.path.sep + 'fpsout.txt'
 
 if args.step1:
-    performAllSteps(args.inputFile,args.interpolationFactor,args.loopable,args.mode,args.crfout,args.clearpngs,
-                    args.nonlocalpngs,args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc,step1=True,step2=False,step3=False)
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
+                    step1=True, step2=False, step3=False)
 
 if args.step2:
     performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,

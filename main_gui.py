@@ -164,8 +164,9 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
             self.encodeOutputButtonEnabledSignal.emit(False)
 
         if not batchProcessing:
-            performAllSteps(inputFile,interpolationFactor,loopable,mode,crfout,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
-                            usenvenc,useAutoencode,blocksize,step1=step1,step2=step2,step3=step3)
+            performAllSteps(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
+                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,
+                            step1=step1, step2=step2, step3=step3)
         else:
             batchInterpolateFolder(inputFile,mode,crfout,targetFPS,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
                                    usenvenc,useAutoencode,blocksize)

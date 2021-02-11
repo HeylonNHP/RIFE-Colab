@@ -535,7 +535,8 @@ def generateTimecodesFile(projectFolder):
         float(averageDistance / float(GlobalValues.timebase))) + "\n")
     f.close()
 
-def getOutputFPS(inputFile:str, mode:int, interpolationFactor:int, useAccurateFPS:bool, accountForDuplicateFrames:bool):
+def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurateFPS: bool,
+                 accountForDuplicateFrames: bool, mpdecimateSensitivity):
 
     if (mode == 3 or mode == 4) and accountForDuplicateFrames:
         return (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
@@ -546,7 +547,9 @@ def getOutputFPS(inputFile:str, mode:int, interpolationFactor:int, useAccurateFP
         return getFPS(inputFile) * interpolationFactor
 
 def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000,step1=True,step2=True,step3=True):
+                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,
+                    autoEncodeBlockSize=3000, useAccurateFPS=True, accountForDuplicateFrames=False, step1=True,
+                    step2=True, step3=True):
     # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
@@ -566,11 +569,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             return
 
     # Get outputFPS
-    outputFPS = None
-    if mode == 1 or mode == 3:
-        outputFPS = getFPSaccurate(inputFile) * interpolationFactor
-    elif mode == 4:
-        outputFPS = (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
+    outputFPS = getOutputFPS(inputFile,mode,interpolationFactor,useAccurateFPS,accountForDuplicateFrames,mpdecimateSensitivity)
 
     # Generate output name
     outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-', str(interpolationFactor), 'x-mode', str(mode),
@@ -642,13 +641,13 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
             print("looping?", '[l]' in inputVideoFile)
             if '[l]' in inputVideoFile:
                 print("LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs,
-                                nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc,useAutoEncode,autoEncodeBlockSize)
+                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs, nonlocalpngs,
+                                scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
+                                autoEncodeBlockSize)
             else:
                 print("DON'T LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs,
-                                nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity,
-                                useNvenc,useAutoEncode,autoEncodeBlockSize)
+                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs, nonlocalpngs,
+                                scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
+                                autoEncodeBlockSize)
         except:
             traceback.print_exc()
