@@ -7,7 +7,7 @@ from Globals.GlobalValues import GlobalValues
 ffmpegPath = GlobalValues().getFFmpegPath()
 
 def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,blockSize=1000):
+                             crfout,useNvenc,nvencGPUID,blockSize=1000):
     '''
 
     :param projectFolder: Interpolation project folder
@@ -59,7 +59,7 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
 
         encodingPreset = []
         if useNvenc:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu','0','-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
+            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu',str(nvencGPUID),'-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
         else:
             encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
 
@@ -87,12 +87,17 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
     concatFile.close()
     p2 = run([ffmpegPath,'-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c:v','copy', outputFile])
     #p2.wait()
+
+    if not confirmSuccessfulOutput(outputFile):
+        print("Something went wrong generating concatenated output - Not Deleting temp files")
+        return
+
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
 def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,blockSize=3000):
+                             crfout,useNvenc,nvencGPUID,blockSize=3000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
 
@@ -169,7 +174,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         # Build ffmpeg command and run ffmpeg
         encodingPreset = []
         if useNvenc:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu','0','-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
+            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu',str(nvencGPUID),'-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
         else:
             encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
 
@@ -211,7 +216,22 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     print(str(totalDuration))
     print('Test length',totalLength)
 
+    if not confirmSuccessfulOutput(outputFile):
+        print("Something went wrong generating concatenated output - Not Deleting temp files")
+        return
+
     # Remove blocks and concat file - Output is already created, don't need these anymore
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
+
+
+def confirmSuccessfulOutput(outputFile):
+    # Check exists
+    if not os.path.exists(outputFile):
+        return False
+
+    if os.path.getsize(outputFile) == 0:
+        return False
+
+    return True

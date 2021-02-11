@@ -583,9 +583,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             if the interpolator manages to start first'''
             waitForThreadStart = [False]
             if mode == 1:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],autoEncodeBlockSize,))
             elif mode == 3 or mode == 4:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],autoEncodeBlockSize,))
             autoEncodeThread.start()
             while waitForThreadStart[0] == False:
                 time.sleep(1)
