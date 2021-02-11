@@ -641,11 +641,11 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
                 print("LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs, nonlocalpngs,
                                 scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
-                                autoEncodeBlockSize)
+                                autoEncodeBlockSize,useAccurateFPS,accountForDuplicateFrames)
             else:
                 print("DON'T LOOP")
                 performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs, nonlocalpngs,
                                 scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
-                                autoEncodeBlockSize)
+                                autoEncodeBlockSize,useAccurateFPS,accountForDuplicateFrames)
         except:
             traceback.print_exc()
