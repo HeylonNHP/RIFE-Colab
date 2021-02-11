@@ -45,6 +45,9 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         self.encodeOutputButton.clicked.connect(self.runStep3)
 
         self.interpolationFactorSelect.currentTextChanged.connect(self.updateVideoFPSstats)
+        self.accountForDuplicateFramesCheckbox.stateChanged.connect(self.updateVideoFPSstats)
+        self.useAccurateFPSCheckbox.stateChanged.connect(self.updateVideoFPSstats)
+        self.modeSelect.currentTextChanged.connect(self.updateVideoFPSstats)
 
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
         self.progressBarUpdateSignal.connect(self.updateUIprogress)
@@ -96,8 +99,11 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         if not os.path.exists(file):
             return
 
+        accurateFPS:bool = self.useAccurateFPSCheckbox.isChecked()
+        accountForDuplicatesInFPS:bool = self.accountForDuplicateFramesCheckbox.isChecked()
+
         videoFPS = getOutputFPS(str(file),int(str(self.modeSelect.currentText())),int(str(self.interpolationFactorSelect.currentText())),
-                                True,False,str(self.mpdecimateText.text()))
+                                accurateFPS,accountForDuplicatesInFPS,str(self.mpdecimateText.text()))
 
         print(videoFPS)
         self.VideostatsInputFPStext.setText(str(videoFPS/float(self.interpolationFactorSelect.currentText())))
@@ -149,14 +155,19 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         targetFPS = float(self.targetFPSnumber.value())
 
+        accurateFPS: bool = self.useAccurateFPSCheckbox.isChecked()
+        accountForDuplicatesInFPS: bool = self.accountForDuplicateFramesCheckbox.isChecked()
+
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,step1,step2,step3,))
+                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,accurateFPS,accountForDuplicatesInFPS,step1,step2,step3,))
 
         interpolateThread.start()
 
-    def runAllInterpolationStepsThread(self,inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,step1,step2,step3):
+    def runAllInterpolationStepsThread(self, inputFile, interpolationFactor, loopable, mode, crfout, clearpngs,
+                                       nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity, usenvenc,
+                                       useAutoencode, blocksize, targetFPS, useAccurateFPS, accountForDuplicateFrames,
+                                       step1, step2, step3):
 
         batchProcessing = self.batchProcessingMode
 
@@ -168,7 +179,7 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         if not batchProcessing:
             performAllSteps(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,
+                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,useAccurateFPS,accountForDuplicateFrames,
                             step1=step1, step2=step2, step3=step3)
         else:
             batchInterpolateFolder(inputFile,mode,crfout,targetFPS,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
