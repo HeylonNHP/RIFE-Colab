@@ -1,6 +1,7 @@
 # https://raevskymichail.medium.com/python-gui-building-a-simple-application-with-pyqt-and-qt-designer-e9f8cda76246
 import sys
 #from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -95,9 +96,11 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         if not os.path.exists(file):
             return
 
-        videoFPS = getFPSaccurate(str(file))
-        self.VideostatsInputFPStext.setText(str(videoFPS))
-        videoFPS = videoFPS * float(self.interpolationFactorSelect.currentText())
+        videoFPS = getOutputFPS(str(file),int(str(self.modeSelect.currentText())),int(str(self.interpolationFactorSelect.currentText())),
+                                True,False,str(self.mpdecimateText.text()))
+
+        print(videoFPS)
+        self.VideostatsInputFPStext.setText(str(videoFPS/float(self.interpolationFactorSelect.currentText())))
         self.VideostatsOutputFPStext.setText(str(videoFPS))
 
     def runStep1(self):
@@ -196,6 +199,13 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
     def updateencodeOutputButtonEnabled(self,data:bool):
         self.encodeOutputButton.setEnabled(data)
 
+def excepthook(exc_type, exc_value, exc_tb):
+    tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+    print("error catched!:")
+    print("error message:\n", tb)
+    QtWidgets.QApplication.quit()
+    # or QtWidgets.QApplication.exit(0)
+
 def main():
     app = QApplication(sys.argv)
     if 'Fusion' in QStyleFactory.keys():
@@ -219,9 +229,12 @@ def main():
     pal.setColor(QPalette.HighlightedText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
     app.setPalette(pal)
 
+    sys.excepthook = excepthook
     window = RIFEGUIMAINWINDOW()
     window.show()
-    app.exec_()
+    ret = app.exec_()
+    print("event loop exited")
+    sys.exit(ret)
 
 if __name__ == '__main__':
     main()
