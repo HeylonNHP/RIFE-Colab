@@ -8,15 +8,17 @@ def setFFmpegLocation(location):
     global ffmpegLocation
     ffmpegLocation = location
 
-def getFrameCount(inputPath,mpdecimate):
+def getFrameCount(inputPath,mpdecimate,mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
     Gets the frame count of the video
     '''
+    hi, lo, frac = mpdecimateSensitivity.split(",")
+    mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
     frameCount = 0
     result = None
     if mpdecimate:
         # ffmpeg -i input.mkv -map 0:v:0 -c copy -f null -
-        result = subprocess.run([ffmpegLocation, '-i',inputPath,'-vf','mpdecimate','-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
+        result = subprocess.run([ffmpegLocation, '-i',inputPath,'-vf',mpdecimate,'-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
     else:
         result = subprocess.run([ffmpegLocation, '-i',inputPath,'-map','0:v:0','-c','rawvideo','-f','null','-'], stderr=subprocess.PIPE)
     lines = result.stderr.splitlines()
