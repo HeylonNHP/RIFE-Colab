@@ -539,7 +539,7 @@ def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurat
                  accountForDuplicateFrames: bool, mpdecimateSensitivity):
 
     if (mode == 3 or mode == 4) and accountForDuplicateFrames:
-        return (getFrameCount(inputFile, True) / getLength(inputFile)) * interpolationFactor
+        return (getFrameCount(inputFile, True, mpdecimateSensitivity) / getLength(inputFile)) * interpolationFactor
 
     if useAccurateFPS:
         return getFPSaccurate(inputFile) * interpolationFactor
