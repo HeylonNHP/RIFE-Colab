@@ -610,8 +610,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
 
-def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs,
-                           scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,autoEncodeBlockSize=3000):
+def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs, scenechangeSensitivity,
+                           mpdecimateSensitivity, useNvenc, useAccurateFPS=True, accountForDuplicateFrames=True,
+                           useAutoEncode=False, autoEncodeBlockSize=3000):
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
@@ -624,10 +625,7 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
         try:
             print(inputVideoFile)
 
-            if mode == 1 or mode == 3:
-                currentFPS = getFPSaccurate(inputVideoFile)
-            elif mode == 4 or mode == 3:
-                currentFPS = getFrameCount(inputVideoFile, True) / getLength(inputVideoFile)
+            currentFPS = getOutputFPS(inputVideoFile,mode,1,useAccurateFPS,accountForDuplicateFrames,mpdecimateSensitivity)
 
             # Attempt to interpolate everything to above 59fps
             targetFPS = fpsTarget

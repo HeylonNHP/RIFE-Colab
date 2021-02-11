@@ -36,5 +36,6 @@ selectedGPUs = [int(i) for i in selectedGPUs]
 setNvencSettings(selectedGPUs[0],'slow')
 setGPUinterpolationOptions(args.batchSize,selectedGPUs)
 # Batch interpolation code
-batchInterpolateFolder(args.inputDirectory,args.mode,args.crf,args.fpsTarget,args.clearpngs,args.nonlocalpngs,
-                       args.scenechangeSensitivity,args.mpdecimateSensitivity,args.useNvenc,args.autoencode,args.blocksize)
+batchInterpolateFolder(args.inputDirectory, args.mode, args.crf, args.fpsTarget, args.clearpngs, args.nonlocalpngs,
+                       args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc, True, True,
+                       args.autoencode, args.blocksize)

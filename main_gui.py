@@ -182,8 +182,8 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
                             scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,useAccurateFPS,accountForDuplicateFrames,
                             step1=step1, step2=step2, step3=step3)
         else:
-            batchInterpolateFolder(inputFile,mode,crfout,targetFPS,clearpngs,nonlocalpngs,scenechangeSensitivity,mpdecimateSensitivity,
-                                   usenvenc,useAutoencode,blocksize)
+            batchInterpolateFolder(inputFile, mode, crfout, targetFPS, clearpngs, nonlocalpngs, scenechangeSensitivity,
+                                   mpdecimateSensitivity, usenvenc, useAccurateFPS, accountForDuplicateFrames, useAutoencode, blocksize)
 
         self.runAllStepsButtonEnabledSignal.emit(True)
         if not batchProcessing:
