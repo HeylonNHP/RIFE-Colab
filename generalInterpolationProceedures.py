@@ -4,6 +4,8 @@ import shutil
 import traceback
 from queue import Queue
 import threading
+
+from QueuedFrames.SaveFramesList import SaveFramesList
 from QueuedFrames.queuedFrameList import *
 from QueuedFrames.queuedFrame import *
 from QueuedFrames.FrameFile import *
@@ -365,8 +367,11 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
             break
 
         # Add interpolated frames to png save queue
-        for midFrame1 in listOfCompletedFrames:
-            outFramesQueue.put(midFrame1)
+        outputFramesList:SaveFramesList = SaveFramesList(listOfCompletedFrames,currentQueuedFrameList.startFrameDest,currentQueuedFrameList.endFrameDest)
+
+        '''for midFrame1 in listOfCompletedFrames:
+            outFramesQueue.put(midFrame1)'''
+        outFramesQueue.put(outputFramesList)
 
         # Start frame is no-longer needed, remove from RAM
         with inFrameGetLock:
@@ -384,7 +389,7 @@ def freeVRAM(model, device):
 
 def queueThreadSaveFrame(outFramesQueue: Queue):
     while True:
-        item: FrameFile = outFramesQueue.get()
+        item: SaveFramesList = outFramesQueue.get()
         if item is None:
             print("Got none - save thread")
             outFramesQueue.put(None)
@@ -397,7 +402,7 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
             time.sleep(5)
             total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
             freeSpaceInMB = free / (2 ** 20)
-        item.saveImageData()
+        item.saveAllPNGsInList()
 
 def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
     maxListLength = 128
