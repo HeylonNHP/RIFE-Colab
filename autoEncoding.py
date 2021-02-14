@@ -6,10 +6,11 @@ import threading
 from Globals.GlobalValues import GlobalValues
 ffmpegPath = GlobalValues().getFFmpegPath()
 
-def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,nvencGPUID,blockSize=1000):
+def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
+                             crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, blockSize=1000):
     '''
 
+    :param currentSavingPNGRanges:
     :param projectFolder: Interpolation project folder
     :param interpolationDone: First index is interpolation state, second index is output fps
     :param blockSize: Size of chunk to autoencode
@@ -28,8 +29,8 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
             time.sleep(1)
             continue
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
-        # Add 128 to wait for the save queue to finish
-        if len(interpolatedFrames) < blockSize+(128*8):
+
+        if len(interpolatedFrames) < blockSize:
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
@@ -42,6 +43,11 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
         filesInBlock = []
         for i in range(0,blockSize):
             filesInBlock.append(interpolatedFrames[i])
+
+        # If the save thread hasn't finished saving PNGs into this block range - Wait
+        if confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock, currentSavingPNGRanges) == False:
+            time.sleep(1)
+            continue
 
         # Get duration of current block to maintain timing
         blockDuration = ((1.0 / outputFPS) * len(filesInBlock))
@@ -96,8 +102,8 @@ def mode1AutoEncoding_Thread(threadStart:list,projectFolder, inputFile,outputFil
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
-def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputFile, interpolationDone,outputFPS,
-                             crfout,useNvenc,nvencGPUID,blockSize=3000):
+def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
+                              crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, blockSize=3000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
 
@@ -117,8 +123,8 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
             continue
 
         interpolatedFrames = os.listdir(interpolatedFramesFolder)
-        # Add 1024 to wait for the save queue to finish
-        if len(interpolatedFrames) < blockSize+(128*8):
+
+        if len(interpolatedFrames) < blockSize:
             if interpolationDone[0] == False:
                 time.sleep(1)
                 continue
@@ -128,6 +134,7 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
                     break
 
         interpolatedFrames.sort()
+
 
         '''Last frame from last block is kept for use by chooseFramesList
         If the only frame left is the frame kept from the last block
@@ -139,6 +146,11 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
         filesInBlock = []
         for i in range(0, blockSize):
             filesInBlock.append(interpolatedFrames[i])
+
+        # If the save thread hasn't finished saving PNGs into this block range - Wait
+        if confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock,currentSavingPNGRanges) == False:
+            time.sleep(1)
+            continue
 
         # Get the length in ms of the current block, including the next block start time to get the length of the last frame in the current block
         # Used to keep duration of each block to use for maintaining correct timing when concatenating all blocks
@@ -213,8 +225,8 @@ def mode34AutoEncoding_Thread(threadStart:list, projectFolder, inputFile,outputF
     for duration in blockDurations:
         totalDuration += duration
 
-    print(str(totalDuration))
-    print('Test length',totalLength)
+    #print(str(totalDuration))
+    #print('Test length',totalLength)
 
     if not confirmSuccessfulOutput(outputFile):
         print("Something went wrong generating concatenated output - Not Deleting temp files")
@@ -235,3 +247,25 @@ def confirmSuccessfulOutput(outputFile):
         return False
 
     return True
+
+def confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock:list,currentSavingPNGRanges:list):
+    maxTimecodeInBlock = int(max(filesInBlock)[:-4])
+
+    for frameRange in currentSavingPNGRanges:
+        start:str = frameRange[0]
+        end:str = frameRange[1]
+
+        # Strip out path
+        start = start[start.rindex('/')+1:-4]
+        end = end[end.rindex('/')+1:-4]
+
+        startInt:int = int(start)
+        endInt:int = int(end)
+
+        if startInt <= maxTimecodeInBlock or endInt <= maxTimecodeInBlock:
+            '''If there are frames still being saved within the current block
+            Return false'''
+            print("Waiting on save thread before processing autoblock...")
+            return False
+        else:
+            return True

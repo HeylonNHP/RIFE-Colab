@@ -44,6 +44,7 @@ gpuBatchSize = 2
 gpuIDsList = [0]
 
 interpolationProgressUpdate = Event.Event()
+currentSavingPNGRanges:list = []
 
 def subscribeTointerpolationProgressUpdate(function):
     interpolationProgressUpdate.append(function)
@@ -394,6 +395,8 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
             print("Got none - save thread")
             outFramesQueue.put(None)
             break
+        currentSavingPNGRange = [item.startOutputFrame,item.endOutputFrame]
+        currentSavingPNGRanges.append(currentSavingPNGRange)
 
         total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
         freeSpaceInMB = free / (2**20)
@@ -403,6 +406,7 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
             total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
             freeSpaceInMB = free / (2 ** 20)
         item.saveAllPNGsInList()
+        currentSavingPNGRanges.remove(currentSavingPNGRange)
 
 def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
     maxListLength = 128
@@ -591,9 +595,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             if the interpolator manages to start first'''
             waitForThreadStart = [False]
             if mode == 1:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],currentSavingPNGRanges,autoEncodeBlockSize,))
             elif mode == 3 or mode == 4:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],currentSavingPNGRanges,autoEncodeBlockSize,))
             autoEncodeThread.start()
             while waitForThreadStart[0] == False:
                 time.sleep(1)
@@ -605,6 +609,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
         interpolationDone[0] = True
         if useAutoEncode:
             autoEncodeThread.join()
+            print("---AUTO ENCODING DONE---")
 
     if step3:
         if not useAutoEncode:
