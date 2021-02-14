@@ -1,12 +1,12 @@
 # https://raevskymichail.medium.com/python-gui-building-a-simple-application-with-pyqt-and-qt-designer-e9f8cda76246
 import sys
-#from PyQt5 import QtWidgets
+# from PyQt5 import QtWidgets
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 import mainGuiUi
-#from PyQt5 import uic
+# from PyQt5 import uic
 import os
 import threading
 import addInstalldirToPath
@@ -15,23 +15,22 @@ sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
 from generalInterpolationProceedures import *
 
-class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
+
+class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
     progressBarUpdateSignal = pyqtSignal(object)
     runAllStepsButtonEnabledSignal = pyqtSignal(bool)
     extractFramesButtonEnabledSignal = pyqtSignal(bool)
     interpolateFramesButtonEnabledSignal = pyqtSignal(bool)
     encodeOutputButtonEnabledSignal = pyqtSignal(bool)
 
-    batchProcessingMode:bool = False
-    nonBatchControlLabels:dict = {}
-
-
+    batchProcessingMode: bool = False
+    nonBatchControlLabels: dict = {}
 
     def __init__(self):
         # This is needed here for variable and method access
         super().__init__()
         self.setupUi(self)  # Initialize a design
-        #uic.loadUi("main_gui.ui", self)
+        # uic.loadUi("main_gui.ui", self)
 
         self.verticalLayout_5.setAlignment(Qt.AlignTop)
         self.verticalLayout_4.setAlignment(Qt.AlignTop)
@@ -94,6 +93,9 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         if not self.batchProcessingMode:
             self.updateVideoFPSstats()
 
+    lastMPdecimate: str = ""
+    lastVideoFPS: float = None
+
     def updateVideoFPSstats(self):
         file = str(self.inputFilePathText.text())
         if not os.path.exists(file):
@@ -101,30 +103,42 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         if not os.path.isfile(file):
             return
 
-        accurateFPS:bool = self.useAccurateFPSCheckbox.isChecked()
-        accountForDuplicatesInFPS:bool = self.accountForDuplicateFramesCheckbox.isChecked()
+        accurateFPS: bool = self.useAccurateFPSCheckbox.isChecked()
+        accountForDuplicatesInFPS: bool = self.accountForDuplicateFramesCheckbox.isChecked()
 
-        videoFPS = getOutputFPS(str(file),int(str(self.modeSelect.currentText())),int(str(self.interpolationFactorSelect.currentText())),
-                                accurateFPS,accountForDuplicatesInFPS,str(self.mpdecimateText.text()))
+        videoFPS = None
+        mode = int(str(self.modeSelect.currentText()))
+        currentMPdecimate = str(self.mpdecimateText.text())
+        if (mode == 3 or mode == 4) and accountForDuplicatesInFPS:
+            if self.lastVideoFPS is not None and self.lastMPdecimate == currentMPdecimate:
+                videoFPS = self.lastVideoFPS
+
+        if videoFPS is None:
+            videoFPS = getOutputFPS(str(file), int(str(self.modeSelect.currentText())), 1,
+                                    accurateFPS, accountForDuplicatesInFPS, str(self.mpdecimateText.text()))
+
+        if (mode == 3 or mode == 4) and accountForDuplicatesInFPS:
+            self.lastVideoFPS = videoFPS
+        self.lastMPdecimate = str(self.mpdecimateText.text())
 
         print(videoFPS)
-        self.VideostatsInputFPStext.setText(str(videoFPS/float(self.interpolationFactorSelect.currentText())))
-        self.VideostatsOutputFPStext.setText(str(videoFPS))
+        self.VideostatsInputFPStext.setText(str(videoFPS))
+        self.VideostatsOutputFPStext.setText(str(videoFPS * float(self.interpolationFactorSelect.currentText())))
 
     def runStep1(self):
-        self.runAllInterpolationSteps(step1=True,step2=False,step3=False)
+        self.runAllInterpolationSteps(step1=True, step2=False, step3=False)
 
     def runStep2(self):
-        self.runAllInterpolationSteps(step1=False,step2=True,step3=False)
+        self.runAllInterpolationSteps(step1=False, step2=True, step3=False)
 
     def runStep3(self):
-        self.runAllInterpolationSteps(step1=False,step2=False,step3=True)
+        self.runAllInterpolationSteps(step1=False, step2=False, step3=True)
 
     def runAllSteps(self):
         # This function is required because python is stupid, and will set the first boolean function parameter to false
         self.runAllInterpolationSteps()
 
-    def runAllInterpolationSteps(self,step1=True,step2=True,step3=True):
+    def runAllInterpolationSteps(self, step1=True, step2=True, step3=True):
         selectedGPUs = str(self.gpuidsSelect.currentText()).split(",")
         selectedGPUs = [int(i) for i in selectedGPUs]
         setNvencSettings(selectedGPUs[0], 'slow')
@@ -132,15 +146,15 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         inputFile = str(self.inputFilePathText.text())
         if os.name == 'nt':
-            inputFile = inputFile.replace('/','\\')
+            inputFile = inputFile.replace('/', '\\')
 
         if self.batchProcessingMode:
             if not os.path.isdir(inputFile):
-                QMessageBox.critical(self,"Path","For batch processing, the input path must be a folder")
+                QMessageBox.critical(self, "Path", "For batch processing, the input path must be a folder")
                 return
         else:
             if not os.path.isfile(inputFile):
-                QMessageBox.critical(self,"Path", "For single video processing, the input path must be a video file")
+                QMessageBox.critical(self, "Path", "For single video processing, the input path must be a video file")
                 return
 
         interpolationFactor = int(self.interpolationFactorSelect.currentText())
@@ -161,8 +175,10 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
         accountForDuplicatesInFPS: bool = self.accountForDuplicateFramesCheckbox.isChecked()
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
-        interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread,args=(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS,accurateFPS,accountForDuplicatesInFPS,step1,step2,step3,))
+        interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
+        inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
+        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS, accurateFPS,
+        accountForDuplicatesInFPS, step1, step2, step3,))
 
         interpolateThread.start()
 
@@ -181,11 +197,13 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
 
         if not batchProcessing:
             performAllSteps(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,useAccurateFPS,accountForDuplicateFrames,
+                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,
+                            useAccurateFPS, accountForDuplicateFrames,
                             step1=step1, step2=step2, step3=step3)
         else:
             batchInterpolateFolder(inputFile, mode, crfout, targetFPS, clearpngs, nonlocalpngs, scenechangeSensitivity,
-                                   mpdecimateSensitivity, usenvenc, useAccurateFPS, accountForDuplicateFrames, useAutoencode, blocksize)
+                                   mpdecimateSensitivity, usenvenc, useAccurateFPS, accountForDuplicateFrames,
+                                   useAutoencode, blocksize)
 
         self.runAllStepsButtonEnabledSignal.emit(True)
         if not batchProcessing:
@@ -193,24 +211,25 @@ class RIFEGUIMAINWINDOW(QMainWindow,mainGuiUi.Ui_MainWindow):
             self.interpolateFramesButtonEnabledSignal.emit(True)
             self.encodeOutputButtonEnabledSignal.emit(True)
 
-    def getProgressUpdate(self,progress:InterpolationProgress):
+    def getProgressUpdate(self, progress: InterpolationProgress):
         self.progressBarUpdateSignal.emit(progress)
 
-    def updateUIprogress(self,data:InterpolationProgress):
+    def updateUIprogress(self, data: InterpolationProgress):
         self.interpolationProgressBar.setMaximum(data.totalFrames)
         self.interpolationProgressBar.setValue(data.completedFrames)
 
-    def updaterunAllStepsButtonEnabled(self,data:bool):
+    def updaterunAllStepsButtonEnabled(self, data: bool):
         self.runAllStepsButton.setEnabled(data)
 
-    def updateextractFramesButtonEnabled(self,data:bool):
+    def updateextractFramesButtonEnabled(self, data: bool):
         self.extractFramesButton.setEnabled(data)
 
-    def updateinterpolateFramesButtonEnabled(self,data:bool):
+    def updateinterpolateFramesButtonEnabled(self, data: bool):
         self.interpolateFramesButton.setEnabled(data)
 
-    def updateencodeOutputButtonEnabled(self,data:bool):
+    def updateencodeOutputButtonEnabled(self, data: bool):
         self.encodeOutputButton.setEnabled(data)
+
 
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
@@ -218,6 +237,7 @@ def excepthook(exc_type, exc_value, exc_tb):
     print("error message:\n", tb)
     QtWidgets.QApplication.quit()
     # or QtWidgets.QApplication.exit(0)
+
 
 def main():
     app = QApplication(sys.argv)
@@ -227,19 +247,19 @@ def main():
     baseIntensity = 50
 
     pal = QPalette()
-    pal.setColor(QPalette.Background, QColor(baseIntensity,baseIntensity,baseIntensity))
-    pal.setColor(QPalette.Window, QColor(baseIntensity,baseIntensity,baseIntensity))
-    pal.setColor(QPalette.WindowText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
-    pal.setColor(QPalette.Base, QColor(baseIntensity+10, baseIntensity+10, baseIntensity+10))
+    pal.setColor(QPalette.Background, QColor(baseIntensity, baseIntensity, baseIntensity))
+    pal.setColor(QPalette.Window, QColor(baseIntensity, baseIntensity, baseIntensity))
+    pal.setColor(QPalette.WindowText, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
+    pal.setColor(QPalette.Base, QColor(baseIntensity + 10, baseIntensity + 10, baseIntensity + 10))
     pal.setColor(QPalette.AlternateBase, QColor(baseIntensity, baseIntensity, baseIntensity))
     pal.setColor(QPalette.ToolTipBase, QColor(baseIntensity, baseIntensity, baseIntensity))
-    pal.setColor(QPalette.ToolTipText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
-    pal.setColor(QPalette.Text, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
-    pal.setColor(QPalette.Button, QColor(baseIntensity+10, baseIntensity+10, baseIntensity+10))
-    pal.setColor(QPalette.ButtonText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.ToolTipText, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
+    pal.setColor(QPalette.Text, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
+    pal.setColor(QPalette.Button, QColor(baseIntensity + 10, baseIntensity + 10, baseIntensity + 10))
+    pal.setColor(QPalette.ButtonText, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
     pal.setColor(QPalette.BrightText, QColor(255, 0, 0))
     pal.setColor(QPalette.Highlight, QColor(125, 125, 200))
-    pal.setColor(QPalette.HighlightedText, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
+    pal.setColor(QPalette.HighlightedText, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
     app.setPalette(pal)
 
     sys.excepthook = excepthook
@@ -248,6 +268,7 @@ def main():
     ret = app.exec_()
     print("event loop exited")
     sys.exit(ret)
+
 
 if __name__ == '__main__':
     main()
