@@ -365,7 +365,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "RIFE Colab GUI"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.16</p></body></html>"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.17</p></body></html>"))
         self.inputLabel.setText(_translate("MainWindow", "Input file"))
         self.browseInputButton.setText(_translate("MainWindow", "Browse"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Frame extraction options"))
@@ -439,7 +439,9 @@ class Ui_MainWindow(object):
 "For looped output, add [l] to the folder or filename of a batch input</body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "Batch processing"))
         self.groupBox_6.setTitle(_translate("MainWindow", "RIFE Model"))
-        self.label_22.setText(_translate("MainWindow", "<b>Update RIFE Model -</b>"))
+        self.label_22.setText(_translate("MainWindow", "<b>Update RIFE Model -</b>\n"
+"<br>\n"
+"Requires 7-zip to be installed before updating"))
         self.updateRifeModelButton.setText(_translate("MainWindow", "Update"))
         self.groupBox_7.setTitle(_translate("MainWindow", "Save GUI state"))
         self.label_23.setText(_translate("MainWindow", "<b>Keep settings between GUI restarts -</b>"))

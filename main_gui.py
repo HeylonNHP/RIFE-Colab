@@ -20,7 +20,7 @@ from generalInterpolationProceedures import *
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
     MainGUIpath = os.path.realpath(__file__)
-    path = MainGUIpath[:MainGUIpath.rindex(os.path.sep)]
+    MainGUIpath = MainGUIpath[:MainGUIpath.rindex(os.path.sep)]
     MAIN_PRESET_FILE = MainGUIpath + os.path.sep + "defaults.preset"
 
     progressBarUpdateSignal = pyqtSignal(object)
