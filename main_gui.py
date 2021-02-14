@@ -32,10 +32,13 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         self.setupUi(self)  # Initialize a design
         # uic.loadUi("main_gui.ui", self)
 
+        self.verticalLayout_6.setAlignment(Qt.AlignTop)
         self.verticalLayout_5.setAlignment(Qt.AlignTop)
         self.verticalLayout_4.setAlignment(Qt.AlignTop)
         self.verticalLayout_3.setAlignment(Qt.AlignTop)
         self.verticalLayout_2.setAlignment(Qt.AlignTop)
+
+        self.updateRifeModelButton.clicked.connect(self.grabLatestRifeModel)
 
         self.browseInputButton.clicked.connect(self.browseInputFile)
         self.runAllStepsButton.clicked.connect(self.runAllSteps)
@@ -230,7 +233,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
     def updateencodeOutputButtonEnabled(self, data: bool):
         self.encodeOutputButton.setEnabled(data)
 
-
+    def grabLatestRifeModel(self):
+        downloadRIFE(installPath, onWindows,forceDownloadModels=True)
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     print("error catched!:")

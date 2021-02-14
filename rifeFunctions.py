@@ -5,7 +5,7 @@ import os
 
 RIFEPATH = 'arXiv2020RIFE'
 
-def downloadRIFE(installPath,onWindows):
+def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
     # Run if not previously setup
     os.chdir(installPath)
     if not os.path.exists('arXiv2020RIFE'):
@@ -15,7 +15,12 @@ def downloadRIFE(installPath,onWindows):
     modelFiles = ['contextnet.pkl','flownet.pkl','unet.pkl']
     modelFilesMissing = False
     for modelFile in modelFiles:
-        if not os.path.exists(installPath + os.path.sep + RIFEPATH + os.path.sep + 'train_log' + os.path.sep + modelFile):
+        modelPath = installPath + os.path.sep + RIFEPATH + os.path.sep + 'train_log' + os.path.sep + modelFile
+
+        if forceDownloadModels and os.path.exists(modelPath):
+            os.remove(modelPath)
+
+        if not os.path.exists(modelPath):
             modelFilesMissing = True
 
     # If they are missing, grab them
@@ -32,9 +37,9 @@ def downloadRIFE(installPath,onWindows):
             os.mkdir(installPath + '/arXiv2020RIFE')
         if not os.path.exists(installPath + '/arXiv2020RIFE/train_log'):
             os.mkdir(installPath + '/arXiv2020RIFE/train_log')
-            for data in glob.glob("*.pkl"):
-                shutil.move(data, installPath + "/arXiv2020RIFE/train_log/")
-        # os.chdir(installPath + '/arXiv2020RIFE/')
+        for data in glob.glob("*.pkl"):
+            shutil.move(data, installPath + "/arXiv2020RIFE/train_log/")
+
         os.remove(installPath+"/RIFE_trained_model_new.zip")
 
 

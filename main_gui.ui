@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>948</width>
-    <height>655</height>
+    <height>693</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,7 +73,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -607,6 +607,36 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;From this page, select an input folder, and set a target FPS and then click Run batch&lt;br&gt;The target FPS sets the minimum output FPS. The interpolator will use a high enough interpolation factor to meet or exceed it.
 &lt;br&gt;
 For looped output, add [l] to the folder or filename of a batch input&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_5">
+       <attribute name="title">
+        <string>Settings</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QGroupBox" name="groupBox_6">
+          <property name="title">
+           <string>RIFE Model</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_7">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>&lt;b&gt;Update RIFE Model -&lt;/b&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QPushButton" name="updateRifeModelButton">
+             <property name="text">
+              <string>Update</string>
              </property>
             </widget>
            </item>

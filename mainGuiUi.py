@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(948, 655)
+        MainWindow.resize(948, 693)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -270,6 +270,22 @@ class Ui_MainWindow(object):
         self.gridLayout_6.addWidget(self.label_20, 0, 0, 1, 2)
         self.verticalLayout_5.addWidget(self.groupBox_5)
         self.tabWidget.addTab(self.tab_4, "")
+        self.tab_5 = QtWidgets.QWidget()
+        self.tab_5.setObjectName("tab_5")
+        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.tab_5)
+        self.verticalLayout_6.setObjectName("verticalLayout_6")
+        self.groupBox_6 = QtWidgets.QGroupBox(self.tab_5)
+        self.groupBox_6.setObjectName("groupBox_6")
+        self.gridLayout_7 = QtWidgets.QGridLayout(self.groupBox_6)
+        self.gridLayout_7.setObjectName("gridLayout_7")
+        self.label_22 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_22.setObjectName("label_22")
+        self.gridLayout_7.addWidget(self.label_22, 0, 0, 1, 1)
+        self.updateRifeModelButton = QtWidgets.QPushButton(self.groupBox_6)
+        self.updateRifeModelButton.setObjectName("updateRifeModelButton")
+        self.gridLayout_7.addWidget(self.updateRifeModelButton, 0, 1, 1, 1)
+        self.verticalLayout_6.addWidget(self.groupBox_6)
+        self.tabWidget.addTab(self.tab_5, "")
         self.verticalLayout.addWidget(self.tabWidget)
         self.interpolationProgressBar = QtWidgets.QProgressBar(self.centralwidget)
         self.interpolationProgressBar.setProperty("value", 0)
@@ -303,7 +319,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -382,6 +398,10 @@ class Ui_MainWindow(object):
 "<br>\n"
 "For looped output, add [l] to the folder or filename of a batch input</body></html>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "Batch processing"))
+        self.groupBox_6.setTitle(_translate("MainWindow", "RIFE Model"))
+        self.label_22.setText(_translate("MainWindow", "<b>Update RIFE Model -</b>"))
+        self.updateRifeModelButton.setText(_translate("MainWindow", "Update"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("MainWindow", "Settings"))
         self.extractFramesButton.setText(_translate("MainWindow", "Step 1: Extract frames"))
         self.interpolateFramesButton.setText(_translate("MainWindow", "Step 2: Interpolate"))
         self.encodeOutputButton.setText(_translate("MainWindow", "Step 3: Encode output"))
