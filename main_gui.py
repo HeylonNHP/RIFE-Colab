@@ -19,7 +19,9 @@ from generalInterpolationProceedures import *
 
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
-    MAIN_PRESET_FILE = "defaults.preset"
+    MainGUIpath = os.path.realpath(__file__)
+    path = MainGUIpath[:MainGUIpath.rindex(os.path.sep)]
+    MAIN_PRESET_FILE = MainGUIpath + os.path.sep + "defaults.preset"
 
     progressBarUpdateSignal = pyqtSignal(object)
     runAllStepsButtonEnabledSignal = pyqtSignal(bool)
@@ -339,9 +341,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
     def preset_updateList(self):
         self.presetListComboBox.clear()
-        path = os.path.realpath(__file__)
-        path = path[:path.rindex(os.path.sep)]
-        for data in glob.glob(path + os.path.sep +"*.preset"):
+
+        for data in glob.glob(self.MainGUIpath + os.path.sep +"*.preset"):
             self.presetListComboBox.addItem(data[data.rindex(os.path.sep)+1:])
 
     def preset_createNew(self):
@@ -351,34 +352,27 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         if presetName[-7:] != ".preset":
             presetName = presetName + ".preset"
 
-        path = os.path.realpath(__file__)
-        path = path[:path.rindex(os.path.sep)]
-        self.saveSettingsFile(path + os.path.sep + presetName)
+        self.saveSettingsFile(self.MainGUIpath + os.path.sep + presetName)
         self.preset_updateList()
 
     def preset_load(self):
         selectedPreset = self.presetListComboBox.currentText()
 
-        path = os.path.realpath(__file__)
-        path = path[:path.rindex(os.path.sep)]
-        self.loadSettingsFile(path + os.path.sep + selectedPreset)
+        self.loadSettingsFile(self.MainGUIpath + os.path.sep + selectedPreset)
 
     def preset_save(self):
         selectedPreset = self.presetListComboBox.currentText()
 
-        path = os.path.realpath(__file__)
-        path = path[:path.rindex(os.path.sep)]
-        self.saveSettingsFile(path + os.path.sep + selectedPreset)
+        self.saveSettingsFile(self.MainGUIpath + os.path.sep + selectedPreset)
 
     def preset_delete(self):
         selectedPreset = self.presetListComboBox.currentIndex()
         selectedPresetText = self.presetListComboBox.currentText()
         self.presetListComboBox.removeItem(selectedPreset)
-        path = os.path.realpath(__file__)
-        path = path[:path.rindex(os.path.sep)]
-        if os.path.isfile(path + os.path.sep + selectedPresetText):
-            print("DELETE",path + os.path.sep + selectedPresetText)
-            os.remove(path + os.path.sep + selectedPresetText)
+
+        if os.path.isfile(self.MainGUIpath + os.path.sep + selectedPresetText):
+            print("DELETE",self.MainGUIpath + os.path.sep + selectedPresetText)
+            os.remove(self.MainGUIpath + os.path.sep + selectedPresetText)
 
     def closeEvent(self, a0: QCloseEvent) -> None:
         if self.saveGUIstateCheck.isChecked():
