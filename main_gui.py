@@ -136,7 +136,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         if (mode == 3 or mode == 4) and accountForDuplicatesInFPS:
             self.lastVideoFPS = videoFPS
-        self.lastMPdecimate = str(self.mpdecimateText.text())
+            self.lastMPdecimate = str(self.mpdecimateText.text())
 
         print(videoFPS)
         self.VideostatsInputFPStext.setText(str(videoFPS))
