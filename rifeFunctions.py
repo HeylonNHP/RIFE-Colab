@@ -41,5 +41,3 @@ def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
             shutil.move(data, installPath + "/arXiv2020RIFE/train_log/")
 
         os.remove(installPath+"/RIFE_trained_model_new.zip")
-
-

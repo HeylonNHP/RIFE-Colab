@@ -8,6 +8,7 @@ from PyQt5.QtCore import *
 import mainGuiUi
 # from PyQt5 import uic
 import os
+import json
 import threading
 import addInstalldirToPath
 
@@ -17,6 +18,8 @@ from generalInterpolationProceedures import *
 
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
+    MAIN_PRESET_FILE = "defaults.json"
+
     progressBarUpdateSignal = pyqtSignal(object)
     runAllStepsButtonEnabledSignal = pyqtSignal(bool)
     extractFramesButtonEnabledSignal = pyqtSignal(bool)
@@ -63,6 +66,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         self.nonBatchControlLabels['input'] = self.inputLabel.text()
         self.nonBatchControlLabels['runall'] = self.runAllStepsButton.text()
+
+        self.saveGUIstateCheck.stateChanged.connect(self.onSaveGUIstateCheckChange)
+
+        self.loadSettingsFile(self.MAIN_PRESET_FILE)
 
     def changedTabs(self):
         if self.tabWidget.currentIndex() == 3:
@@ -235,6 +242,98 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
     def grabLatestRifeModel(self):
         downloadRIFE(installPath, onWindows,forceDownloadModels=True)
+
+    def getCurrentUIsettings(self):
+        settingsDict = {}
+
+        settingsDict['mpdecimate'] = str(self.mpdecimateText.text())
+        settingsDict['nonlocalpngs'] = bool(self.nonlocalpngsCheck.isChecked())
+        settingsDict['clearpngs'] = bool(self.clearpngsCheck.isChecked())
+
+        settingsDict['useaccuratefps'] = bool(self.useAccurateFPSCheckbox.isChecked())
+        settingsDict['accountforduplicateframes'] = bool(self.accountForDuplicateFramesCheckbox.isChecked())
+        settingsDict['interpolationfactor'] = str(self.interpolationFactorSelect.currentText())
+        settingsDict['framehandlingmode'] = int(self.modeSelect.currentIndex())
+        settingsDict['scenechangesensitivity'] = float(self.scenechangeSensitivityNumber.value())
+        settingsDict['gpuids'] = str(self.gpuidsSelect.currentText())
+        settingsDict['batchthreads'] = int(self.batchthreadsNumber.value())
+
+        settingsDict['loopoutput'] = bool(self.loopoutputCheck.isChecked())
+        settingsDict['usenvenc'] = bool(self.nvencCheck.isChecked())
+        settingsDict['crfout'] = float(self.crfoutNumber.value())
+        settingsDict['useautoencoding'] = bool(self.autoencodeCheck.isChecked())
+        settingsDict['autoencodingblocksize'] = int(self.autoencodeBlocksizeNumber.value())
+
+        settingsDict['batchtargetfps'] = float(self.targetFPSnumber.value())
+
+        settingsDict['saveguistate'] = bool(self.saveGUIstateCheck.isChecked())
+
+        return settingsDict
+
+    def setCurrentUIsettings(self,settingsDict:dict):
+        if 'mpdecimate' in settingsDict:
+            self.mpdecimateText.setText(settingsDict['mpdecimate'])
+        if 'nonlocalpngs' in settingsDict:
+            self.nonlocalpngsCheck.setChecked(settingsDict['nonlocalpngs'])
+        if 'clearpngs' in settingsDict:
+            self.clearpngsCheck.setChecked(settingsDict['clearpngs'])
+
+        if 'useaccuratefps' in settingsDict:
+            self.useAccurateFPSCheckbox.setChecked(settingsDict['useaccuratefps'])
+        if 'accountforduplicateframes' in settingsDict:
+            self.accountForDuplicateFramesCheckbox.setChecked(settingsDict['accountforduplicateframes'])
+        if 'interpolationfactor' in settingsDict:
+            self.interpolationFactorSelect.setCurrentText(settingsDict['interpolationfactor'])
+        if 'framehandlingmode' in settingsDict:
+            self.modeSelect.setCurrentIndex(settingsDict['framehandlingmode'])
+        if 'scenechangesensitivity' in settingsDict:
+            self.scenechangeSensitivityNumber.setValue(settingsDict['scenechangesensitivity'])
+        if 'gpuids' in settingsDict:
+            self.gpuidsSelect.setCurrentText(settingsDict['gpuids'])
+        if 'batchthreads' in settingsDict:
+            self.batchthreadsNumber.setValue(settingsDict['batchthreads'])
+
+        if 'loopoutput' in settingsDict:
+            self.loopoutputCheck.setChecked(settingsDict['loopoutput'])
+        if 'usenvenc' in settingsDict:
+            self.nvencCheck.setChecked(settingsDict['usenvenc'])
+        if 'crfout' in settingsDict:
+            self.crfoutNumber.setValue(settingsDict['crfout'])
+        if 'useautoencoding' in settingsDict:
+            self.autoencodeCheck.setChecked(settingsDict['useautoencoding'])
+        if 'autoencodingblocksize' in settingsDict:
+            self.autoencodeBlocksizeNumber.setValue(settingsDict['autoencodingblocksize'])
+
+        if 'batchtargetfps' in settingsDict:
+            self.targetFPSnumber.setValue(settingsDict['batchtargetfps'])
+
+        if 'saveguistate' in settingsDict:
+            self.saveGUIstateCheck.setChecked(settingsDict['saveguistate'])
+
+    def saveSettingsFile(self,filename:str):
+        settingsDict = self.getCurrentUIsettings()
+        outFile = open(filename,'w')
+        outFile.write(json.dumps(settingsDict))
+        outFile.close()
+
+    def loadSettingsFile(self,filename:str):
+        if not os.path.isfile(filename):
+            return
+        inFile = open(filename,'r')
+        settingsDict:dict = json.loads(inFile.read())
+        inFile.close()
+        self.setCurrentUIsettings(settingsDict)
+
+    def onSaveGUIstateCheckChange(self):
+        # Remove preset file if user chooses not to save GUI state
+        if not self.saveGUIstateCheck.isChecked():
+            if os.path.isfile(self.MAIN_PRESET_FILE):
+                os.remove(self.MAIN_PRESET_FILE)
+
+    def closeEvent(self, a0: QCloseEvent) -> None:
+        if self.saveGUIstateCheck.isChecked():
+            self.saveSettingsFile(self.MAIN_PRESET_FILE)
+
 def excepthook(exc_type, exc_value, exc_tb):
     tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
     print("error catched!:")
