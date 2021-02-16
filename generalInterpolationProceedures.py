@@ -231,7 +231,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     loadPNGThread = threading.Thread(target=queueThreadLoadFrame,args=(origFramesFolder,inFramesList,))
     loadPNGThread.start()
 
-    outFramesQueue: Queue = Queue(maxsize=128)
+    outFramesQueue: Queue = Queue(maxsize=32)
     gpuList: list = gpuIDsList
     batchSize: int = gpuBatchSize
     threads: list = []
