@@ -113,6 +113,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.updateVideoFPSstats()
 
     lastMPdecimate: str = ""
+    lastVideoPath:str = ""
     lastVideoFPS: float = None
 
     def updateVideoFPSstats(self):
@@ -128,8 +129,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         videoFPS = None
         mode = int(str(self.modeSelect.currentText()))
         currentMPdecimate = str(self.mpdecimateText.text())
+        currentVideoPath = str(self.inputFilePathText.text())
         if (mode == 3 or mode == 4) and accountForDuplicatesInFPS:
-            if self.lastVideoFPS is not None and self.lastMPdecimate == currentMPdecimate:
+            if self.lastVideoFPS is not None and self.lastMPdecimate == currentMPdecimate and currentVideoPath == self.lastVideoPath:
                 videoFPS = self.lastVideoFPS
 
         if videoFPS is None:
@@ -139,6 +141,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         if (mode == 3 or mode == 4) and accountForDuplicatesInFPS:
             self.lastVideoFPS = videoFPS
             self.lastMPdecimate = str(self.mpdecimateText.text())
+            self.lastVideoPath = currentVideoPath
 
         print(videoFPS)
         self.VideostatsInputFPStext.setText(str(videoFPS))
