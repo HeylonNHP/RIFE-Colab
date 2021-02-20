@@ -723,6 +723,45 @@ Requires 7-zip to be installed before updating</string>
           </layout>
          </widget>
         </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_9">
+          <property name="title">
+           <string>After interpolation is complete</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="text">
+                <string>&lt;b&gt;System power:&lt;/b&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="systemPowerOptionsComboBox">
+               <item>
+                <property name="text">
+                 <string>Do nothing</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Shutdown computer</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Suspend computer</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>

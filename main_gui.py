@@ -12,6 +12,7 @@ import json
 import glob
 import threading
 import addInstalldirToPath
+from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
@@ -196,18 +197,20 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         accurateFPS: bool = self.useAccurateFPSCheckbox.isChecked()
         accountForDuplicatesInFPS: bool = self.accountForDuplicateFramesCheckbox.isChecked()
 
+        afterInterpolationAction: int = self.systemPowerOptionsComboBox.currentIndex()
+
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
         inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
         scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS, accurateFPS,
-        accountForDuplicatesInFPS, step1, step2, step3,))
+        accountForDuplicatesInFPS, step1, step2, step3,afterInterpolationAction))
 
         interpolateThread.start()
 
     def runAllInterpolationStepsThread(self, inputFile, interpolationFactor, loopable, mode, crfout, clearpngs,
                                        nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity, usenvenc,
                                        useAutoencode, blocksize, targetFPS, useAccurateFPS, accountForDuplicateFrames,
-                                       step1, step2, step3):
+                                       step1, step2, step3, afterInterpolationIsFinishedActionChoice=0):
 
         batchProcessing = self.batchProcessingMode
 
@@ -232,6 +235,16 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.extractFramesButtonEnabledSignal.emit(True)
             self.interpolateFramesButtonEnabledSignal.emit(True)
             self.encodeOutputButtonEnabledSignal.emit(True)
+
+        if step3 or (useAutoencode and step2):
+            # The user likely doesn't want the machine to shutdown/suspend before the output is processed
+            if afterInterpolationIsFinishedActionChoice == 1:
+                # Shutdown
+                MachinePowerStatesHandler.shutdownComputer()
+            elif afterInterpolationIsFinishedActionChoice == 2:
+                # Suspend
+                MachinePowerStatesHandler.suspendComputer()
+
 
     def getProgressUpdate(self, progress: InterpolationProgress):
         self.progressBarUpdateSignal.emit(progress)
@@ -280,6 +293,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         settingsDict['saveguistate'] = bool(self.saveGUIstateCheck.isChecked())
 
+        settingsDict['systemPowerOption'] = int(self.systemPowerOptionsComboBox.currentIndex())
+
         return settingsDict
 
     def setCurrentUIsettings(self,settingsDict:dict):
@@ -321,6 +336,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         if 'saveguistate' in settingsDict:
             self.saveGUIstateCheck.setChecked(settingsDict['saveguistate'])
+
+        if 'systemPowerOption' in settingsDict:
+            self.systemPowerOptionsComboBox.setCurrentIndex(settingsDict['systemPowerOption'])
 
     def saveSettingsFile(self,filename:str):
         settingsDict = self.getCurrentUIsettings()

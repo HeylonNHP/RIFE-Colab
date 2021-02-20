@@ -162,7 +162,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         shutil.copy(origFramesFolder + '/' + files[0], interpFramesFolder + '/' + '{:015d}.png'.format(count))
         # To ensure no duplicates on the output with the new VFR to CFR algorithm, double the interpolation factor. TODO: Investigate
         modeModOutputFPS = outputFPS
-        #if mode == 3:
+
         interpolationFactor = interpolationFactor * 2
         modeModOutputFPS = modeModOutputFPS * 2
 
