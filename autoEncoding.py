@@ -7,9 +7,10 @@ from Globals.GlobalValues import GlobalValues
 ffmpegPath = GlobalValues().getFFmpegPath()
 
 def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
-                             crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, blockSize=1000):
+                             crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, useH265, blockSize=1000):
     '''
 
+    :param useH265:
     :param currentSavingPNGRanges:
     :param projectFolder: Interpolation project folder
     :param interpolationDone: First index is interpolation state, second index is output fps
@@ -63,11 +64,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
         blockFramesFile.write(framesFileString)
         blockFramesFile.close()
 
-        encodingPreset = []
-        if useNvenc:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu',str(nvencGPUID),'-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
-        else:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
+        encodingPreset = generateEncodingPreset(useNvenc,crfout,useH265,nvencGPUID)
 
         ffmpegCommand = [ffmpegPath,'-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
@@ -103,7 +100,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
     os.remove(concatFilePath)
 
 def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
-                              crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, blockSize=3000):
+                              crfout, useNvenc, nvencGPUID, currentSavingPNGRanges, useH265, blockSize=3000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
 
@@ -184,11 +181,7 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         blockFramesFile.close()
 
         # Build ffmpeg command and run ffmpeg
-        encodingPreset = []
-        if useNvenc:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu',str(nvencGPUID),'-preset','slow','-profile','high','-rc', 'vbr', '-b:v', '0', '-cq',str(crfout+10)]
-        else:
-            encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
+        encodingPreset = generateEncodingPreset(useNvenc, crfout, useH265, nvencGPUID)
 
         ffmpegCommand = [ffmpegPath,'-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
@@ -237,6 +230,24 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
+def generateEncodingPreset(useNvenc:bool, crfout:float,useH265:bool,nvencGPUID:int = 0):
+    encodingPreset = []
+
+    cpuEncoder = 'libx264'
+    nvencEncoder = 'h264_nvenc'
+    encodingProfile = 'high'
+
+    if useH265:
+        cpuEncoder = 'libx265'
+        nvencEncoder = 'hevc_nvenc'
+        encodingProfile = 'main'
+
+    if useNvenc:
+        encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', nvencEncoder, '-gpu', str(nvencGPUID), '-preset', 'slow',
+                          '-profile', encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
+    else:
+        encodingPreset = ['-pix_fmt', 'yuv420p', '-c:v', cpuEncoder, '-preset', 'veryslow', '-crf', '{}'.format(crfout)]
+    return encodingPreset
 
 def confirmSuccessfulOutput(outputFile):
     # Check exists

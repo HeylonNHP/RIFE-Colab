@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>948</width>
-    <height>693</height>
+    <height>740</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -267,33 +267,6 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QSpinBox" name="batchthreadsNumber">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999999</number>
-             </property>
-             <property name="value">
-              <number>2</number>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Scene change sensitivity -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lower is more sensitivity&lt;br/&gt;Higher is less sensitivity&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;GPU ID's -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Separate ID numbers using commas for multi-gpu processing&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="1">
             <widget class="QComboBox" name="modeSelect">
              <property name="currentText">
@@ -316,6 +289,26 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
              </item>
             </widget>
            </item>
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="batchthreadsNumber">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999999</number>
+             </property>
+             <property name="value">
+              <number>2</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;GPU ID's -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Separate ID numbers using commas for multi-gpu processing&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="1">
             <widget class="QCheckBox" name="useAccurateFPSCheckbox">
              <property name="text">
@@ -326,10 +319,10 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_7">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_5">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Batch processing threads -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If not seeing 100% CUDA use on GPU&lt;br/&gt;Increase batch threads&lt;br/&gt;If using too much VRAM&lt;br/&gt;Decrease batch threads&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Scene change sensitivity -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Lower is more sensitivity&lt;br/&gt;Higher is less sensitivity&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -397,10 +390,25 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
              </item>
             </widget>
            </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Batch processing threads -&lt;/span&gt;&lt;/p&gt;&lt;p&gt;If not seeing 100% CUDA use on GPU&lt;br/&gt;Increase batch threads&lt;br/&gt;If using too much VRAM&lt;br/&gt;Decrease batch threads&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
            <item row="2" column="0">
             <widget class="QLabel" name="label_3">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Interpolation factor -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>&lt;b&gt;Account for duplicate frames in FPS calculation -&lt;/b&gt;&lt;br&gt;
+Slow to calculate FPS when enabled</string>
              </property>
             </widget>
            </item>
@@ -426,16 +434,29 @@ Mode 4 - duplicate frame handling with fixed interpolation factor (Slow, works w
              </item>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_21">
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="accountForDuplicateFramesCheckbox">
              <property name="text">
-              <string>&lt;b&gt;Account for duplicate frames in FPS calculation -&lt;/b&gt;&lt;br&gt;
-Slow to calculate FPS when enabled</string>
+              <string>Enable</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="accountForDuplicateFramesCheckbox">
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>&lt;b&gt;Enable half-precision floats -&lt;/b&gt;
+&lt;br&gt;
+Significantly reduces VRAM use (Good for low VRAM GPUs)
+&lt;br&gt;
+May slightly affect quality in some scenarios</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="QCheckBox" name="enableHalfPrecisionFloatsCheck">
              <property name="text">
               <string>Enable</string>
              </property>
@@ -466,30 +487,23 @@ Slow to calculate FPS when enabled</string>
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Begin encoding the output while interpolation is still running&lt;br&gt;
-Saves space for interpolated png frames (Good for low space disks)&lt;br&gt;
-May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="crfoutNumber">
              <property name="minimum">
-              <number>1</number>
+              <double>-10.000000000000000</double>
              </property>
              <property name="maximum">
-              <number>999999999</number>
+              <double>100.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.250000000000000</double>
              </property>
              <property name="value">
-              <number>3000</number>
+              <double>20.000000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_9">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
@@ -508,30 +522,37 @@ More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QDoubleSpinBox" name="crfoutNumber">
+           <item row="5" column="1">
+            <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
              <property name="minimum">
-              <double>-10.000000000000000</double>
+              <number>1</number>
              </property>
              <property name="maximum">
-              <double>100.000000000000000</double>
-             </property>
-             <property name="singleStep">
-              <double>0.250000000000000</double>
+              <number>999999999</number>
              </property>
              <property name="value">
-              <double>20.000000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QCheckBox" name="autoencodeCheck">
-             <property name="text">
-              <string>Enable auto encoding</string>
+              <number>3000</number>
              </property>
             </widget>
            </item>
            <item row="4" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Begin encoding the output while interpolation is still running&lt;br&gt;
+Saves space for interpolated png frames (Good for low space disks)&lt;br&gt;
+May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
             <widget class="QLabel" name="label_11">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding block size -&lt;/span&gt;&lt;/p&gt;
@@ -548,10 +569,10 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_15">
+           <item row="4" column="1">
+            <widget class="QCheckBox" name="autoencodeCheck">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Enable auto encoding</string>
              </property>
             </widget>
            </item>
@@ -560,6 +581,31 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
              <property name="text">
               <string>Enable</string>
              </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>&lt;b&gt;Output encoder -&lt;/b&gt;
+&lt;br&gt;
+H.264 - Faster, less quality/size, much better support, max res: 4K
+&lt;br&gt;
+H.265 - Slower, better quality/size, worse support, max res: 8K</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="outputEncoderSelectComboBox">
+             <item>
+              <property name="text">
+               <string>H.264</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>H.265</string>
+              </property>
+             </item>
             </widget>
            </item>
           </layout>

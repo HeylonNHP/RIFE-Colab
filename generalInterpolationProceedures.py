@@ -20,6 +20,8 @@ from EventHandling import Event
 import warnings
 warnings.filterwarnings("ignore")
 
+useH265: bool = False
+
 FFMPEG4 = GlobalValues().getFFmpegPath()
 GPUID = 0
 nvencPreset = 'p7'
@@ -69,7 +71,9 @@ def setGPUinterpolationOptions(batchSize: int, _gpuIDsList: list):
     gpuIDsList = _gpuIDsList
     gpuBatchSize = batchSize
 
-
+def setUseH265(enable: bool):
+    global useH265
+    useH265 = enable
 
 
 def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
@@ -425,19 +429,29 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     '''
     Equivalent to DAINAPP Step 3
     '''
+    print("---Encoding output---")
     os.chdir(projectFolder)
     maxLoopLength = 15
     preferredLoopLength = 10
     inputLength = getLength(inputFile)
 
+    cpuEncoder = 'libx264'
+    nvencEncoder = 'h264_nvenc'
+    encodingProfile = 'high'
+
+    if useH265:
+        cpuEncoder = 'libx265'
+        nvencEncoder = 'hevc_nvenc'
+        encodingProfile = 'main'
+
     inputFFmpeg = ""
 
-    encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'libx264', '-preset', 'veryslow',
+    encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', cpuEncoder, '-preset', 'veryslow',
                      '-crf', '{}'.format(crfout)]
     ffmpegSelected = FFMPEG4
     if useNvenc:
-        encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', 'h264_nvenc', '-gpu', str(GPUID), '-preset', str(nvencPreset),
-                         '-profile', 'high', '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
+        encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', nvencEncoder, '-gpu', str(GPUID), '-preset', str(nvencPreset),
+                         '-profile', encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
         ffmpegSelected = GlobalValues().getFFmpegPath()
 
     if mode == 1:
@@ -450,7 +464,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
     if loopable == False or (maxLoopLength / float(inputLength) < 2):
         # Don't loop, too long input
-        print('Dont loop', maxLoopLength / float(inputLength))
+        # print('Dont loop', maxLoopLength / float(inputLength))
 
         command = [ffmpegSelected, '-hide_banner', '-stats', '-loglevel', 'error', '-y']
         command = command + inputFFmpeg
@@ -461,7 +475,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     else:
         loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
         loopCount = str(loopCount)
-        print('Loop', loopCount)
+        # print('Loop', loopCount)
 
         command = [FFMPEG4, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
         runAndPrintOutput(command)
@@ -469,7 +483,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         audioInput = []
         if os.path.exists('loop.flac'):
             audioInput = ['-i', 'loop.flac', '-map', '0', '-map', '1']
-            print("Looped audio exists")
+            # print("Looped audio exists")
 
         command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
         command = command + inputFFmpeg
@@ -482,6 +496,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         pipe1.wait()
         if os.path.exists('loop.flac'):
             os.remove('loop.flac')
+    print("---Finished Encoding---")
 
 
 def generateLoopContinuityFrame(framesFolder):
@@ -559,6 +574,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
                     scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,
                     autoEncodeBlockSize=3000, useAccurateFPS=True, accountForDuplicateFrames=False, step1=True,
                     step2=True, step3=True):
+    global useH265
     # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
@@ -595,9 +611,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             if the interpolator manages to start first'''
             waitForThreadStart = [False]
             if mode == 1:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],currentSavingPNGRanges,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],currentSavingPNGRanges,useH265,autoEncodeBlockSize,))
             elif mode == 3 or mode == 4:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],currentSavingPNGRanges,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],currentSavingPNGRanges,useH265,autoEncodeBlockSize,))
             autoEncodeThread.start()
             while waitForThreadStart[0] == False:
                 time.sleep(1)

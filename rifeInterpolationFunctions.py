@@ -12,9 +12,12 @@ import gc
 import threading
 from QueuedFrames.FrameFile import FrameFile
 
+useHalfPrecision: bool = False
+
 setupRifeThreadLock = threading.Lock()
 
 def setupRIFE(installPath, GPUID):
+    global useHalfPrecision
     with setupRifeThreadLock:
         try:
             torch.cuda.set_device(GPUID)
@@ -26,7 +29,10 @@ def setupRIFE(installPath, GPUID):
             torch.set_grad_enabled(False)
             torch.backends.cudnn.enabled = True
             torch.backends.cudnn.benchmark = True
-            #torch.set_default_tensor_type(torch.HalfTensor)
+            if useHalfPrecision:
+                torch.set_default_tensor_type(torch.HalfTensor)
+            else:
+                torch.set_default_tensor_type(torch.FloatTensor)
         else:
             print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
 
@@ -40,6 +46,7 @@ import time
 
 
 def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, outputFrame:FrameFile, scenechangeSensitivity=0.2):
+    global useHalfPrecision
     img0 = img0frame.getImageData()
     img1 = img1frame.getImageData()
 
@@ -55,8 +62,12 @@ def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, out
     padding = (0, pw - w, 0, ph - h)
     p = (F.interpolate(img0, (16, 16), mode='bilinear', align_corners=False)
          - F.interpolate(img1, (16, 16), mode='bilinear', align_corners=False)).abs().mean()
-    img0 = F.pad(img0, padding)#.half()
-    img1 = F.pad(img1, padding)#.half()
+    if useHalfPrecision:
+        img0 = F.pad(img0, padding).half()
+        img1 = F.pad(img1, padding).half()
+    else:
+        img0 = F.pad(img0, padding)
+        img1 = F.pad(img1, padding)
 
     mid = None
     if p > scenechangeSensitivity:
@@ -68,31 +79,6 @@ def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, out
     outputFrame.setImageData(item)
     return outputFrame
 
-'''
-def rifeInterpolatePNGfolder(inputFolder, outputFolder):
-    if inputFolder[-1] != '/':
-        inputFolder = inputFolder + '/'
-    if outputFolder[-1] != '/':
-        outputFolder = outputFolder + '/'
-
-    if not os.path.exists(outputFolder):
-        os.mkdir(outputFolder)
-
-    files = os.listdir(inputFolder)
-    files.sort()
-
-    fileCount = 1
-    shutil.copy(inputFolder + files[0], outputFolder + '{:06d}.png'.format(fileCount))
-    fileCount += 1
-    for i in range(0, len(files) - 1):
-        fullFile = inputFolder + files[i]
-        print(fullFile, '(' + str(len(files) - 1) + ')', '-', "{:.2f}%".format((i / (len(files) - 1)) * 100))
-        rifeInterpolate(inputFolder + files[i], inputFolder + files[i + 1],
-                        outputFolder + '{:06d}.png'.format(fileCount))
-
-        fileCount += 1
-        shutil.copy(inputFolder + files[i + 1], outputFolder + '{:06d}.png'.format(fileCount))
-        fileCount += 1
-    # del model
-    # gc.collect()
-    # torch.cuda.empty_cache()'''
+def setUseHalfPrecision(enable:bool):
+    global useHalfPrecision
+    useHalfPrecision = enable

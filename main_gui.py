@@ -199,6 +199,17 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         afterInterpolationAction: int = self.systemPowerOptionsComboBox.currentIndex()
 
+        useHalfPrecisionChecked: bool = self.enableHalfPrecisionFloatsCheck.isChecked()
+
+        outputEncoderSelection: int = self.outputEncoderSelectComboBox.currentIndex()
+
+        setUseHalfPrecision(useHalfPrecisionChecked)
+
+        if outputEncoderSelection == 0:
+            setUseH265(False)
+        else:
+            setUseH265(True)
+
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
         inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
@@ -282,12 +293,14 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['scenechangesensitivity'] = float(self.scenechangeSensitivityNumber.value())
         settingsDict['gpuids'] = str(self.gpuidsSelect.currentText())
         settingsDict['batchthreads'] = int(self.batchthreadsNumber.value())
+        settingsDict['useHalfPrecisionFloats'] = bool(self.enableHalfPrecisionFloatsCheck.isChecked())
 
         settingsDict['loopoutput'] = bool(self.loopoutputCheck.isChecked())
         settingsDict['usenvenc'] = bool(self.nvencCheck.isChecked())
         settingsDict['crfout'] = float(self.crfoutNumber.value())
         settingsDict['useautoencoding'] = bool(self.autoencodeCheck.isChecked())
         settingsDict['autoencodingblocksize'] = int(self.autoencodeBlocksizeNumber.value())
+        settingsDict['outputEncoderSelection'] = int(self.outputEncoderSelectComboBox.currentIndex())
 
         settingsDict['batchtargetfps'] = float(self.targetFPSnumber.value())
 
@@ -319,6 +332,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.gpuidsSelect.setCurrentText(settingsDict['gpuids'])
         if 'batchthreads' in settingsDict:
             self.batchthreadsNumber.setValue(settingsDict['batchthreads'])
+        if 'useHalfPrecisionFloats' in settingsDict:
+            self.enableHalfPrecisionFloatsCheck.setChecked(settingsDict['useHalfPrecisionFloats'])
 
         if 'loopoutput' in settingsDict:
             self.loopoutputCheck.setChecked(settingsDict['loopoutput'])
@@ -330,6 +345,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.autoencodeCheck.setChecked(settingsDict['useautoencoding'])
         if 'autoencodingblocksize' in settingsDict:
             self.autoencodeBlocksizeNumber.setValue(settingsDict['autoencodingblocksize'])
+        if 'outputEncoderSelection' in settingsDict:
+            self.outputEncoderSelectComboBox.setCurrentIndex(settingsDict['outputEncoderSelection'])
 
         if 'batchtargetfps' in settingsDict:
             self.targetFPSnumber.setValue(settingsDict['batchtargetfps'])
