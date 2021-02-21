@@ -290,6 +290,11 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 inFrameGetLock = threading.Lock()
 
 def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesList:list, gpuid):
+    '''
+    Loads frames from queue (Or from HDD if frame not in queue) to interpolate,
+    based on frames specified in inFramesList
+    Puts frameLists in output queue to save
+    '''
     device, model = setupRIFE(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
@@ -387,12 +392,18 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
     print("END")
 
 def freeVRAM(model, device):
+    '''
+    Attempts to free the RIFE model and GPU device from memory
+    '''
     del model
     del device
     gc.collect()
     torch.cuda.empty_cache()
 
 def queueThreadSaveFrame(outFramesQueue: Queue):
+    '''
+    Takes framelists from queue and saves each frame as a png to disk
+    '''
     while True:
         item: SaveFramesList = outFramesQueue.get()
         if item is None:
@@ -413,6 +424,9 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
         currentSavingPNGRanges.remove(currentSavingPNGRange)
 
 def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
+    '''
+    Loads png frames from disk and places them in a queue to be interpolated
+    '''
     maxListLength = 128
     frameFilesList = os.listdir(origFramesFolder)
     frameFilesList.sort()
@@ -500,6 +514,11 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
 
 def generateLoopContinuityFrame(framesFolder):
+    '''
+    Copy first frame to last frame so the interpolator can properly create a looping output
+    :param framesFolder: Path to folder with frames
+    :return:
+    '''
     files = os.listdir(framesFolder)
     files.sort()
 
@@ -519,6 +538,11 @@ def generateLoopContinuityFrame(framesFolder):
 
 
 def removeLoopContinuityFrame(framesFolder):
+    '''
+    Removes last frame (In sequence) in folder
+    :param framesFolder: Path to folder with frames
+    :return:
+    '''
     files = os.listdir(framesFolder)
     files.sort()
     os.remove(framesFolder + '/' + files[-1])
@@ -561,7 +585,11 @@ def generateTimecodesFile(projectFolder):
 
 def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurateFPS: bool,
                  accountForDuplicateFrames: bool, mpdecimateSensitivity):
-
+    '''
+    Takes an input file, and calculates the output FPS from a given interpolation factor
+    Accurate FPS uses FFmpeg tbc for FPS
+    AccountForDuplicateFrames runs mpdecimate and calculates FPS with duplicates removed
+    '''
     if (mode == 3 or mode == 4) and accountForDuplicateFrames:
         return (getFrameCount(inputFile, True, mpdecimateSensitivity) / getLength(inputFile)) * interpolationFactor
 
@@ -574,6 +602,10 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
                     scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,
                     autoEncodeBlockSize=3000, useAccurateFPS=True, accountForDuplicateFrames=False, step1=True,
                     step2=True, step3=True):
+    '''
+    Perform all interpolation steps; extract, interpolate, encode
+    Options to run individual steps
+    '''
     global useH265
     # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
@@ -639,6 +671,11 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs, scenechangeSensitivity,
                            mpdecimateSensitivity, useNvenc, useAccurateFPS=True, accountForDuplicateFrames=True,
                            useAutoEncode=False, autoEncodeBlockSize=3000):
+    '''
+    Batch process a folder to a specified fpsTarget
+    Using performAllSteps on each file
+    Checks to see if each input file isn't already above fpsTarget
+    '''
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
