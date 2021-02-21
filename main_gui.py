@@ -249,12 +249,13 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         if step3 or (useAutoencode and step2):
             # The user likely doesn't want the machine to shutdown/suspend before the output is processed
+            mps = MachinePowerStatesHandler()
             if afterInterpolationIsFinishedActionChoice == 1:
                 # Shutdown
-                MachinePowerStatesHandler.shutdownComputer()
+                mps.shutdownComputer()
             elif afterInterpolationIsFinishedActionChoice == 2:
                 # Suspend
-                MachinePowerStatesHandler.suspendComputer()
+                mps.suspendComputer()
 
 
     def getProgressUpdate(self, progress: InterpolationProgress):
