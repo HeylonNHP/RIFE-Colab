@@ -3,6 +3,7 @@ import os
 import shutil
 import traceback
 from queue import Queue
+import collections
 import threading
 
 from QueuedFrames.SaveFramesList import SaveFramesList
@@ -118,7 +119,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     files = os.listdir(origFramesFolder)
     files.sort()
 
-    framesQueue = Queue()
+    framesQueue:collections.deque = collections.deque()
 
     if mode == 1:
 
@@ -159,7 +160,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                 currentFactor = int(currentFactor / 2)
 
             count += interpolationFactor
-            framesQueue.put(queuedFrameList)
+            framesQueue.append(queuedFrameList)
 
     elif mode == 3 or mode == 4:
         count = 0
@@ -229,7 +230,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
                 currentFactor = int(currentFactor / 2)
 
             # count += interpolationFactor
-            framesQueue.put(queuedFrameList)
+            framesQueue.append(queuedFrameList)
 
     inFramesList: list = []
     loadPNGThread = threading.Thread(target=queueThreadLoadFrame,args=(origFramesFolder,inFramesList,))
@@ -257,7 +258,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
         rifeThread.join()
 
     # If all threads crashed before the end of interpolation - TODO: Cycle through all GPUs
-    while not framesQueue.empty():
+    while not len(framesQueue) == 0:
         print("Starting backup thread")
         rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,))
         rifeThread.start()
@@ -289,7 +290,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
 
 inFrameGetLock = threading.Lock()
 
-def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesList:list, gpuid):
+def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queue, inFramesList:list, gpuid):
     '''
     Loads frames from queue (Or from HDD if frame not in queue) to interpolate,
     based on frames specified in inFramesList
@@ -298,10 +299,10 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
     device, model = setupRIFE(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
-        if framesQueue.empty():
+        if len(framesQueue) == 0:
             freeVRAM(model,device)
             break
-        currentQueuedFrameList: QueuedFrameList = framesQueue.get()
+        currentQueuedFrameList: QueuedFrameList = framesQueue.popleft()
         print(currentQueuedFrameList.interpolationProgress.progressMessage)
         # Raise event
         interpolationProgressUpdate(currentQueuedFrameList.interpolationProgress)
@@ -365,7 +366,7 @@ def queueThreadInterpolator(framesQueue: Queue, outFramesQueue: Queue, inFramesL
                 # outFramesQueue.put(midFrame)
         except Exception as e:
             # Put current frame back into queue for another batch thread to process
-            framesQueue.put(currentQueuedFrameList)
+            framesQueue.appendleft(currentQueuedFrameList)
             if hasattr(e, 'message'):
                 print(e.message)
             else:
