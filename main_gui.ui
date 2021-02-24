@@ -487,7 +487,16 @@ May slightly affect quality in some scenarios</string>
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
-           <item row="3" column="1">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Less is higher quality&lt;br&gt;
+More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
             <widget class="QDoubleSpinBox" name="crfoutNumber">
              <property name="minimum">
               <double>-10.000000000000000</double>
@@ -503,12 +512,23 @@ May slightly affect quality in some scenarios</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_9">
+           <item row="6" column="1">
+            <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999999</number>
+             </property>
+             <property name="value">
+              <number>3000</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Less is higher quality&lt;br&gt;
-More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -522,20 +542,7 @@ More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>999999999</number>
-             </property>
-             <property name="value">
-              <number>3000</number>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="label_10">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
@@ -545,18 +552,17 @@ May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_15">
+           <item row="5" column="1">
+            <widget class="QCheckBox" name="autoencodeCheck">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Enable auto encoding</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_11">
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="loopoutputCheck">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding block size -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Higher block size saves less disk space&lt;br&gt;Lower block size potentially reduces encoding quality/compression&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>Enable</string>
              </property>
             </widget>
            </item>
@@ -569,17 +575,11 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QCheckBox" name="autoencodeCheck">
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_11">
              <property name="text">
-              <string>Enable auto encoding</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="loopoutputCheck">
-             <property name="text">
-              <string>Enable</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding block size -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Higher block size saves less disk space&lt;br&gt;Lower block size potentially reduces encoding quality/compression&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -604,6 +604,32 @@ H.265 - Slower, better quality/size, worse support, max res: 8K</string>
              <item>
               <property name="text">
                <string>H.265</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>&lt;b&gt;Output colourspace -&lt;/b&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QComboBox" name="colourspaceSelectionComboBox">
+             <item>
+              <property name="text">
+               <string>yuv420p</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>yuv422p</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>yuv444p</string>
               </property>
              </item>
             </widget>

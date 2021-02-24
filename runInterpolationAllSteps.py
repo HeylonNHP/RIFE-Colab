@@ -20,6 +20,7 @@ args = parser.parse_args()
 import os
 import sys
 import addInstalldirToPath
+from Globals.EncoderConfig import EncoderConfig
 
 # Why should we need to add the submodule to the path, just for the RIFE import to work
 # Thanks for being consistently terrible, python
@@ -31,9 +32,15 @@ from generalInterpolationProceedures import *
 selectedGPUs = str(args.gpuid).split(",")
 selectedGPUs = [int(i) for i in selectedGPUs]
 
-setNvencSettings(selectedGPUs[0],'slow')
 setGPUinterpolationOptions(args.batchSize,selectedGPUs)
 
-performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
-                args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
-                args.autoencode, args.blocksize)
+encoderConfig = EncoderConfig()
+encoderConfig.setEncodingCRF(float(args.crfout))
+if bool(args.useNvenc):
+    encoderConfig.enableNvenc(True)
+    encoderConfig.setEncodingPreset('slow')
+encoderConfig.setNvencGPUID(selectedGPUs[0])
+
+
+performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs, args.nonlocalpngs,
+                args.scenechangeSensitivity, args.mpdecimateSensitivity, encoderConfig, args.autoencode, args.blocksize)

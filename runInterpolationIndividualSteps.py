@@ -35,7 +35,6 @@ from generalInterpolationProceedures import *
 selectedGPUs = str(args.gpuid).split(",")
 selectedGPUs = [int(i) for i in selectedGPUs]
 
-setNvencSettings(selectedGPUs[0],'slow')
 setGPUinterpolationOptions(args.batchSize,selectedGPUs)
 
 print('Step1',args.step1,'Step2',args.step2,'Step3',args.step3)
@@ -48,17 +47,24 @@ if args.nonlocalpngs:
 
 fpsDataFilePath = projectFolder + os.path.sep + 'fpsout.txt'
 
+encoderConfig = EncoderConfig()
+encoderConfig.setEncodingCRF(float(args.crfout))
+if bool(args.useNvenc):
+    encoderConfig.enableNvenc(True)
+    encoderConfig.setEncodingPreset('slow')
+encoderConfig.setNvencGPUID(selectedGPUs[0])
+
 if args.step1:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
-                    step1=True, step2=False, step3=False)
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, encoderConfig, step1=True,
+                    step2=False, step3=False)
 
 if args.step2:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
-                    step1=False, step2=True, step3=False)
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, "Changeme", step1=False,
+                    step2=True, step3=False)
 
 if args.step3:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.crfout, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, args.useNvenc,
-                    step1=False, step2=False, step3=True)
+    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
+                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, "Changeme", step1=False,
+                    step2=False, step3=True)

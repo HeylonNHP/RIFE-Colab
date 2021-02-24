@@ -13,6 +13,7 @@ import glob
 import threading
 import addInstalldirToPath
 from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
+from Globals.EncoderConfig import EncoderConfig
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
@@ -164,7 +165,13 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
     def runAllInterpolationSteps(self, step1=True, step2=True, step3=True):
         selectedGPUs = str(self.gpuidsSelect.currentText()).split(",")
         selectedGPUs = [int(i) for i in selectedGPUs]
-        setNvencSettings(selectedGPUs[0], 'slow')
+
+        encoderConfig:EncoderConfig = EncoderConfig()
+
+        encoderConfig.setNvencGPUID(selectedGPUs[0])
+
+        #setNvencSettings(selectedGPUs[0], 'slow')
+
         setGPUinterpolationOptions(int(self.batchthreadsNumber.value()), selectedGPUs)
 
         inputFile = str(self.inputFilePathText.text())
@@ -203,25 +210,39 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         outputEncoderSelection: int = self.outputEncoderSelectComboBox.currentIndex()
 
+        outputColourspace: str = self.colourspaceSelectionComboBox.currentText()
+
         setUseHalfPrecision(useHalfPrecisionChecked)
 
-        if outputEncoderSelection == 0:
-            setUseH265(False)
+        if usenvenc:
+            encoderConfig.enableNvenc(True)
+            encoderConfig.setEncodingPreset('slow')
+            encoderConfig.setEncodingCRF(crfout+10)
         else:
-            setUseH265(True)
+            encoderConfig.setEncodingPreset('veryslow')
+            encoderConfig.setEncodingCRF(crfout)
+
+        if outputEncoderSelection == 0:
+            encoderConfig.enableH265(False)
+            encoderConfig.setEncodingProfile('high')
+        else:
+            encoderConfig.enableH265(True)
+            encoderConfig.setEncodingProfile('main')
+
+        encoderConfig.setPixelFormat(outputColourspace)
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
-        inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-        scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize, targetFPS, accurateFPS,
-        accountForDuplicatesInFPS, step1, step2, step3,afterInterpolationAction))
+        inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
+        scenechangeSensitivity, mpdecimateSensitivity, useAutoencode, blocksize, targetFPS, accurateFPS,
+        accountForDuplicatesInFPS, step1, step2, step3,encoderConfig ,afterInterpolationAction))
 
         interpolateThread.start()
 
-    def runAllInterpolationStepsThread(self, inputFile, interpolationFactor, loopable, mode, crfout, clearpngs,
-                                       nonlocalpngs, scenechangeSensitivity, mpdecimateSensitivity, usenvenc,
-                                       useAutoencode, blocksize, targetFPS, useAccurateFPS, accountForDuplicateFrames,
-                                       step1, step2, step3, afterInterpolationIsFinishedActionChoice=0):
+    def runAllInterpolationStepsThread(self, inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
+                                       scenechangeSensitivity, mpdecimateSensitivity, useAutoencode, blocksize,
+                                       targetFPS, useAccurateFPS, accountForDuplicateFrames, step1, step2, step3,
+                                       encoderConfig:EncoderConfig, afterInterpolationIsFinishedActionChoice=0):
 
         batchProcessing = self.batchProcessingMode
 
@@ -232,13 +253,12 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.encodeOutputButtonEnabledSignal.emit(False)
 
         if not batchProcessing:
-            performAllSteps(inputFile, interpolationFactor, loopable, mode, crfout, clearpngs, nonlocalpngs,
-                            scenechangeSensitivity, mpdecimateSensitivity, usenvenc, useAutoencode, blocksize,
-                            useAccurateFPS, accountForDuplicateFrames,
-                            step1=step1, step2=step2, step3=step3)
+            performAllSteps(inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
+                            scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoencode, blocksize,
+                            useAccurateFPS, accountForDuplicateFrames, step1=step1, step2=step2, step3=step3)
         else:
-            batchInterpolateFolder(inputFile, mode, crfout, targetFPS, clearpngs, nonlocalpngs, scenechangeSensitivity,
-                                   mpdecimateSensitivity, usenvenc, useAccurateFPS, accountForDuplicateFrames,
+            batchInterpolateFolder(inputFile, mode, targetFPS, clearpngs, nonlocalpngs, scenechangeSensitivity,
+                                   mpdecimateSensitivity, encoderConfig, useAccurateFPS, accountForDuplicateFrames,
                                    useAutoencode, blocksize)
 
         self.runAllStepsButtonEnabledSignal.emit(True)
@@ -302,6 +322,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['useautoencoding'] = bool(self.autoencodeCheck.isChecked())
         settingsDict['autoencodingblocksize'] = int(self.autoencodeBlocksizeNumber.value())
         settingsDict['outputEncoderSelection'] = int(self.outputEncoderSelectComboBox.currentIndex())
+        settingsDict['outputPixelFormat'] = int(self.colourspaceSelectionComboBox.currentIndex())
 
         settingsDict['batchtargetfps'] = float(self.targetFPSnumber.value())
 
@@ -348,6 +369,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.autoencodeBlocksizeNumber.setValue(settingsDict['autoencodingblocksize'])
         if 'outputEncoderSelection' in settingsDict:
             self.outputEncoderSelectComboBox.setCurrentIndex(settingsDict['outputEncoderSelection'])
+        if 'outputPixelFormat' in settingsDict:
+            self.colourspaceSelectionComboBox.setCurrentIndex(settingsDict['outputPixelFormat'])
 
         if 'batchtargetfps' in settingsDict:
             self.targetFPSnumber.setValue(settingsDict['batchtargetfps'])

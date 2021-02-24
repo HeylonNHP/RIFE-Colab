@@ -16,6 +16,7 @@ from runAndPrintOutput import runAndPrintOutput
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
 from Globals.GlobalValues import GlobalValues
+from Globals.EncoderConfig import EncoderConfig
 from EventHandling import Event
 
 import warnings
@@ -440,7 +441,7 @@ def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
     print("LOADED ALL FRAMES - DONE")
 
 
-def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, crfout, useNvenc):
+def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, encoderConfig:EncoderConfig):
     '''
     Equivalent to DAINAPP Step 3
     '''
@@ -450,23 +451,14 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     preferredLoopLength = 10
     inputLength = getLength(inputFile)
 
-    cpuEncoder = 'libx264'
-    nvencEncoder = 'h264_nvenc'
-    encodingProfile = 'high'
-
-    if useH265:
-        cpuEncoder = 'libx265'
-        nvencEncoder = 'hevc_nvenc'
-        encodingProfile = 'main'
-
     inputFFmpeg = ""
 
-    encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', cpuEncoder, '-preset', 'veryslow',
-                     '-crf', '{}'.format(crfout)]
+    encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset', encoderConfig.getEncodingPreset(),
+                     '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
     ffmpegSelected = FFMPEG4
-    if useNvenc:
-        encoderPreset = ['-pix_fmt', 'yuv420p', '-c:v', nvencEncoder, '-gpu', str(GPUID), '-preset', str(nvencPreset),
-                         '-profile', encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(crfout + 10)]
+    if encoderConfig.nvencEnabled():
+        encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu', str(encoderConfig.getNvencGPUID()), '-preset', str(encoderConfig.getEncodingPreset()),
+                         '-profile', encoderConfig.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(encoderConfig.getEncodingCRF())]
         ffmpegSelected = GlobalValues().getFFmpegPath()
 
     if mode == 1:
@@ -502,7 +494,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
         command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
         command = command + inputFFmpeg
-        command = command + ['-pix_fmt', 'yuv420p', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f', 'yuv4mpegpipe', '-']
+        command = command + ['-pix_fmt', encoderConfig.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f', 'yuv4mpegpipe', '-']
         command2 = [ffmpegSelected, '-y', '-i', '-']
         command2 = command2 + audioInput + encoderPreset + [str(outputVideo)]
 
@@ -599,13 +591,13 @@ def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurat
     else:
         return getFPS(inputFile) * interpolationFactor
 
-def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPNGs, nonLocalPNGs,
-                    scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode=False,
-                    autoEncodeBlockSize=3000, useAccurateFPS=True, accountForDuplicateFrames=False, step1=True,
-                    step2=True, step3=True):
+def performAllSteps(inputFile, interpolationFactor, loopable, mode, clearPNGs, nonLocalPNGs, scenechangeSensitivity,
+                    mpdecimateSensitivity, encoderConfig:EncoderConfig, useAutoEncode=False, autoEncodeBlockSize=3000,
+                    useAccurateFPS=True, accountForDuplicateFrames=False, step1=True, step2=True, step3=True):
     '''
     Perform all interpolation steps; extract, interpolate, encode
     Options to run individual steps
+    :param encoderConfig:
     '''
     global useH265
     # Get project folder path and make it if it doesn't exist
@@ -644,9 +636,9 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
             if the interpolator manages to start first'''
             waitForThreadStart = [False]
             if mode == 1:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,crf,useNvenc,gpuIDsList[0],currentSavingPNGRanges,useH265,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,currentSavingPNGRanges,encoderConfig,autoEncodeBlockSize,))
             elif mode == 3 or mode == 4:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS, crf, useNvenc,gpuIDsList[0],currentSavingPNGRanges,useH265,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,currentSavingPNGRanges,encoderConfig,autoEncodeBlockSize,))
             autoEncodeThread.start()
             while waitForThreadStart[0] == False:
                 time.sleep(1)
@@ -662,20 +654,21 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, crf, clearPN
 
     if step3:
         if not useAutoEncode:
-            createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, crf, useNvenc)
+            createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, encoderConfig)
 
         if clearPNGs:
             shutil.rmtree(projectFolder + '/' + 'original_frames')
             shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
 
-def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonlocalpngs, scenechangeSensitivity,
-                           mpdecimateSensitivity, useNvenc, useAccurateFPS=True, accountForDuplicateFrames=True,
+def batchInterpolateFolder(inputDirectory, mode, fpsTarget, clearpngs, nonlocalpngs, scenechangeSensitivity,
+                           mpdecimateSensitivity, encoderConfig:EncoderConfig, useAccurateFPS=True, accountForDuplicateFrames=True,
                            useAutoEncode=False, autoEncodeBlockSize=3000):
     '''
     Batch process a folder to a specified fpsTarget
     Using performAllSteps on each file
     Checks to see if each input file isn't already above fpsTarget
+    :param encoderConfig:
     '''
     files = []
     # r=root, d=directories, f = files
@@ -703,13 +696,13 @@ def batchInterpolateFolder(inputDirectory, mode, crf, fpsTarget, clearpngs, nonl
             print("looping?", '[l]' in inputVideoFile)
             if '[l]' in inputVideoFile:
                 print("LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, crf, clearpngs, nonlocalpngs,
-                                scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
-                                autoEncodeBlockSize,useAccurateFPS,accountForDuplicateFrames)
+                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, clearpngs, nonlocalpngs,
+                                scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoEncode,
+                                autoEncodeBlockSize, useAccurateFPS, accountForDuplicateFrames)
             else:
                 print("DON'T LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, crf, clearpngs, nonlocalpngs,
-                                scenechangeSensitivity, mpdecimateSensitivity, useNvenc, useAutoEncode,
-                                autoEncodeBlockSize,useAccurateFPS,accountForDuplicateFrames)
+                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, clearpngs, nonlocalpngs,
+                                scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoEncode,
+                                autoEncodeBlockSize, useAccurateFPS, accountForDuplicateFrames)
         except:
             traceback.print_exc()
