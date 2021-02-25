@@ -82,6 +82,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         self.loadSelectedPresetButton.clicked.connect(self.preset_load)
         self.deleteSelectedPresetButton.clicked.connect(self.preset_delete)
 
+        self.inputFilePathText.textChanged.connect(self.inputBoxTextChanged)
+
     def changedTabs(self):
         if self.tabWidget.currentIndex() == 3:
             self.batchProcessingMode = True
@@ -101,6 +103,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.extractFramesButton.setEnabled(True)
             self.interpolateFramesButton.setEnabled(True)
             self.encodeOutputButton.setEnabled(True)
+
+    def inputBoxTextChanged(self):
+        if not self.batchProcessingMode:
+            self.updateVideoFPSstats()
 
     def browseInputFile(self):
         file = None

@@ -42,7 +42,7 @@ class Ui_MainWindow(object):
         self.inputLabel = QtWidgets.QLabel(self.centralwidget)
         self.inputLabel.setObjectName("inputLabel")
         self.gridLayout.addWidget(self.inputLabel, 0, 1, 1, 1)
-        self.inputFilePathText = QtWidgets.QLineEdit(self.centralwidget)
+        self.inputFilePathText = FileEdit(self.centralwidget)
         self.inputFilePathText.setObjectName("inputFilePathText")
         self.gridLayout.addWidget(self.inputFilePathText, 0, 2, 1, 1)
         self.browseInputButton = QtWidgets.QPushButton(self.centralwidget)
@@ -520,3 +520,4 @@ class Ui_MainWindow(object):
         self.interpolateFramesButton.setText(_translate("MainWindow", "Step 2: Interpolate"))
         self.encodeOutputButton.setText(_translate("MainWindow", "Step 3: Encode output"))
         self.runAllStepsButton.setText(_translate("MainWindow", "Run all steps"))
+from pyqtHeaders.FileEdit import FileEdit

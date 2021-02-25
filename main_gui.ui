@@ -59,7 +59,7 @@
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QLineEdit" name="inputFilePathText"/>
+       <widget class="FileEdit" name="inputFilePathText"/>
       </item>
       <item row="0" column="3">
        <widget class="QPushButton" name="browseInputButton">
@@ -895,6 +895,13 @@ Requires 7-zip to be installed before updating</string>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>FileEdit</class>
+   <extends>QLineEdit</extends>
+   <header>pyqtHeaders.FileEdit</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
