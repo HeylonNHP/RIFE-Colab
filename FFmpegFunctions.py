@@ -57,11 +57,16 @@ def getFPS(inputPath):
             decodedLine = line.decode('UTF-8')
         except:
             continue
-        if 'Stream #0:0' in decodedLine:
+        if 'Stream #0:' in decodedLine:
             print(decodedLine)
             x = re.search(r"([0-9]+\.*[0-9]*) fps,", decodedLine)
-            videoFPS = float(x.group(1))
-            return videoFPS
+            try:
+                videoFPS = float(x.group(1))
+                return videoFPS
+            except:
+                continue
+    return None
+
 
 def getFPSaccurate(inputPath):
     '''
