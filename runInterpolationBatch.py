@@ -44,5 +44,5 @@ encoderConfig.setNvencGPUID(selectedGPUs[0])
 
 # Batch interpolation code
 batchInterpolateFolder(args.inputDirectory, args.mode, args.fpsTarget, args.clearpngs, args.nonlocalpngs,
-                       args.scenechangeSensitivity, args.mpdecimateSensitivity, 'changeme', True, True, args.autoencode,
+                       args.scenechangeSensitivity, args.mpdecimateSensitivity, encoderConfig, True, True, args.autoencode,
                        args.blocksize)
