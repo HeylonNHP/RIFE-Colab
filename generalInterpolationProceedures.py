@@ -489,6 +489,9 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
                          '-profile', encoderConfig.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(encoderConfig.getEncodingCRF())]
         ffmpegSelected = GlobalValues().getFFmpegPath()
 
+    if encoderConfig.FFmpegOutputFPSEnabled():
+        encoderPreset = encoderPreset + ['-r',str(encoderConfig.FFmpegOutputFPSValue())]
+
     if mode == 1:
         inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']
     if mode == 3 or mode == 4:
@@ -663,6 +666,10 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
     # Generate output name
     outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-', str(interpolationFactor), 'x-mode', str(mode),
                                '-rife-',inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
+    # If limit output FPS is enabled
+    if encoderConfig.FFmpegOutputFPSEnabled():
+        outputVideoNameSegments[0] = '{:.2f}'.format(encoderConfig.FFmpegOutputFPSValue())
+
     outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
 
     if step2:

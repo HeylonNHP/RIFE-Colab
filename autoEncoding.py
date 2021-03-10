@@ -239,6 +239,10 @@ def generateEncodingPreset(encoderConfig:EncoderConfig):
                           '-profile', encoderConfig.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq', str(encoderConfig.getEncodingCRF())]
     else:
         encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset', encoderConfig.getEncodingPreset(), '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
+
+    if encoderConfig.FFmpegOutputFPSEnabled():
+        encodingPreset = encodingPreset + ['-r',str(encoderConfig.FFmpegOutputFPSValue())]
+
     return encodingPreset
 
 def confirmSuccessfulOutput(outputFile):

@@ -73,7 +73,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <attribute name="title">
@@ -243,6 +243,13 @@
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
+           <item row="8" column="0" colspan="2">
+            <widget class="Line" name="line_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
            <item row="6" column="0">
             <widget class="QLabel" name="label_4">
              <property name="text">
@@ -386,7 +393,7 @@ Slow to calculate FPS when enabled</string>
              </property>
             </widget>
            </item>
-           <item row="8" column="0" colspan="2">
+           <item row="9" column="0" colspan="2">
             <layout class="QGridLayout" name="gridLayout_10">
              <item row="2" column="1">
               <widget class="QSpinBox" name="batchthreadsNumber">
@@ -522,11 +529,41 @@ May slightly affect quality in some scenarios</string>
             </widget>
            </item>
            <item row="7" column="0" colspan="2">
-            <widget class="Line" name="line_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-            </widget>
+            <layout class="QHBoxLayout" name="mode3OptionsPanel">
+             <item>
+              <widget class="QRadioButton" name="mode3UseInterpolationFactor">
+               <property name="text">
+                <string>Use interpolation factor</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QRadioButton" name="mode3UseTargetFPS">
+               <property name="text">
+                <string>Use target FPS:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="mode3TargetFPS">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>10000000000000000905969664.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="value">
+                <double>60.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -550,15 +587,6 @@ May slightly affect quality in some scenarios</string>
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Less is higher quality&lt;br&gt;
-More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
            <item row="4" column="1">
             <widget class="QDoubleSpinBox" name="crfoutNumber">
              <property name="minimum">
@@ -575,7 +603,33 @@ More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Less is higher quality&lt;br&gt;
+More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Begin encoding the output while interpolation is still running&lt;br&gt;
+Saves space for interpolated png frames (Good for low space disks)&lt;br&gt;
+May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
             <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
              <property name="minimum">
               <number>1</number>
@@ -585,13 +639,6 @@ More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
              <property name="value">
               <number>3000</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_15">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
@@ -605,17 +652,16 @@ More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_10">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Begin encoding the output while interpolation is still running&lt;br&gt;
-Saves space for interpolated png frames (Good for low space disks)&lt;br&gt;
-May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Use NVENC -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Enabled - Use Nvidia's hardware video encoder (Fast, less quality)&lt;br&gt;
+Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="6" column="1">
             <widget class="QCheckBox" name="autoencodeCheck">
              <property name="text">
               <string>Enable auto encoding</string>
@@ -629,20 +675,18 @@ May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Use NVENC -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Enabled - Use Nvidia's hardware video encoder (Fast, less quality)&lt;br&gt;
-Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
+           <item row="7" column="0">
             <widget class="QLabel" name="label_11">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding block size -&lt;/span&gt;&lt;/p&gt;
 &lt;p&gt;Higher block size saves less disk space&lt;br&gt;Lower block size potentially reduces encoding quality/compression&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>&lt;b&gt;Output colourspace -&lt;/b&gt;</string>
              </property>
             </widget>
            </item>
@@ -654,27 +698,6 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
 H.264 - Faster, less quality/size, much better support, max res: 4K
 &lt;br&gt;
 H.265 - Slower, better quality/size, worse support, max res: 8K</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QComboBox" name="outputEncoderSelectComboBox">
-             <item>
-              <property name="text">
-               <string>H.264</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>H.265</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_28">
-             <property name="text">
-              <string>&lt;b&gt;Output colourspace -&lt;/b&gt;</string>
              </property>
             </widget>
            </item>
@@ -696,6 +719,60 @@ H.265 - Slower, better quality/size, worse support, max res: 8K</string>
               </property>
              </item>
             </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QComboBox" name="outputEncoderSelectComboBox">
+             <item>
+              <property name="text">
+               <string>H.264</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>H.265</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="5" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <item>
+              <widget class="QLabel" name="label_30">
+               <property name="text">
+                <string>&lt;b&gt;Limit output FPS -&lt;/b&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="enableLimitFPScheck">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Enable</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="limitFPSnumber">
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="maximum">
+                <double>10000000000000000000.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.001000000000000</double>
+               </property>
+               <property name="value">
+                <double>60.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>

@@ -13,6 +13,9 @@ class EncoderConfig:
     availableEncodingPresetsNvenc = ['fast','medium','slow','lossless']
     crfRange = [0,51]
 
+    enableFFmpegOutputFPS = False
+    FFmpegOutputFPS = 60
+
     def __init__(self):
         pass
 
@@ -54,6 +57,10 @@ class EncoderConfig:
     def setPixelFormat(self,pixelFormat:str):
         self.pixelFormat = pixelFormat
 
+    def setFFmpegOutputFPS(self,enable:bool,value:float):
+        self.enableFFmpegOutputFPS = enable
+        self.FFmpegOutputFPS = value
+
 
     def getNvencGPUID(self):
         return self.nvencGPUID
@@ -80,3 +87,8 @@ class EncoderConfig:
                 return 'libx264'
             else:
                 return 'libx265'
+
+    def FFmpegOutputFPSEnabled(self):
+        return self.enableFFmpegOutputFPS
+    def FFmpegOutputFPSValue(self):
+        return self.FFmpegOutputFPS

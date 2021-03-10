@@ -40,6 +40,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         self.setupUi(self)  # Initialize a design
         # uic.loadUi("main_gui.ui", self)
 
+        self.mode3ExtraOptionsEnable(False)
+
         self.verticalLayout_6.setAlignment(Qt.AlignTop)
         self.verticalLayout_5.setAlignment(Qt.AlignTop)
         self.verticalLayout_4.setAlignment(Qt.AlignTop)
@@ -58,6 +60,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         self.accountForDuplicateFramesCheckbox.stateChanged.connect(self.updateVideoFPSstats)
         self.useAccurateFPSCheckbox.stateChanged.connect(self.updateVideoFPSstats)
         self.modeSelect.currentTextChanged.connect(self.updateVideoFPSstats)
+        self.modeSelect.currentTextChanged.connect(self.checkCurrentMode)
 
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
         self.progressBarUpdateSignal.connect(self.updateUIprogress)
@@ -103,6 +106,18 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.extractFramesButton.setEnabled(True)
             self.interpolateFramesButton.setEnabled(True)
             self.encodeOutputButton.setEnabled(True)
+
+    def mode3ExtraOptionsEnable(self,enable:bool):
+        self.mode3UseInterpolationFactor.setHidden(not enable)
+        self.mode3UseTargetFPS.setHidden(not enable)
+        self.mode3TargetFPS.setHidden(not enable)
+    def checkCurrentMode(self):
+        mode: int = int(self.modeSelect.currentText())
+        if mode == 3:
+            self.mode3ExtraOptionsEnable(True)
+        else:
+            self.mode3ExtraOptionsEnable(False)
+
 
     def inputBoxTextChanged(self):
         if not self.batchProcessingMode:
@@ -204,6 +219,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         usenvenc = bool(self.nvencCheck.isChecked())
         useAutoencode = bool(self.autoencodeCheck.isChecked())
         blocksize = int(self.autoencodeBlocksizeNumber.value())
+        limitFPSenabled:bool = bool(self.enableLimitFPScheck.isChecked())
+        limitFPSvalue:float = float(self.limitFPSnumber.value())
 
         targetFPS = float(self.targetFPSnumber.value())
 
@@ -236,6 +253,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         else:
             encoderConfig.enableH265(True)
             encoderConfig.setEncodingProfile('main')
+        if limitFPSenabled:
+            encoderConfig.setFFmpegOutputFPS(limitFPSenabled,limitFPSvalue)
 
         encoderConfig.setPixelFormat(outputColourspace)
 
@@ -338,6 +357,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['autoencodingblocksize'] = int(self.autoencodeBlocksizeNumber.value())
         settingsDict['outputEncoderSelection'] = int(self.outputEncoderSelectComboBox.currentIndex())
         settingsDict['outputPixelFormat'] = int(self.colourspaceSelectionComboBox.currentIndex())
+        settingsDict['limitFPSEnable'] = bool(self.enableLimitFPScheck.isChecked())
+        settingsDict['limitFPSValue'] = float(self.limitFPSnumber.value())
 
         settingsDict['batchtargetfps'] = float(self.targetFPSnumber.value())
 
@@ -388,6 +409,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.outputEncoderSelectComboBox.setCurrentIndex(settingsDict['outputEncoderSelection'])
         if 'outputPixelFormat' in settingsDict:
             self.colourspaceSelectionComboBox.setCurrentIndex(settingsDict['outputPixelFormat'])
+        if 'limitFPSEnable' in settingsDict:
+            self.enableLimitFPScheck.setChecked(settingsDict['limitFPSEnable'])
+        if 'limitFPSValue' in settingsDict:
+            self.limitFPSnumber.setValue(settingsDict['limitFPSValue'])
 
         if 'batchtargetfps' in settingsDict:
             self.targetFPSnumber.setValue(settingsDict['batchtargetfps'])
