@@ -45,7 +45,8 @@ def setupRIFE(installPath, GPUID):
 import time
 
 
-def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, outputFrame:FrameFile, scenechangeSensitivity=0.2):
+def rifeInterpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, outputFrame: FrameFile,
+                    scenechangeSensitivity=0.2, scale=0.5):
     global useHalfPrecision
     img0 = img0frame.getImageData()
     img1 = img1frame.getImageData()
@@ -57,8 +58,9 @@ def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, out
     img0 = imgs[:-1]
     img1 = imgs[1:]
 
-    ph = ((h - 1) // 64 + 1) * 64
-    pw = ((w - 1) // 64 + 1) * 64
+    tmp = max(32, int(32 / scale))
+    ph = ((h - 1) // tmp + 1) * tmp
+    pw = ((w - 1) // tmp + 1) * tmp
     padding = (0, pw - w, 0, ph - h)
     p = (F.interpolate(img0, (16, 16), mode='bilinear', align_corners=False)
          - F.interpolate(img1, (16, 16), mode='bilinear', align_corners=False)).abs().mean()
@@ -73,7 +75,7 @@ def rifeInterpolate(device, model, img0frame:FrameFile, img1frame:FrameFile, out
     if p > scenechangeSensitivity:
         mid = img0
     else:
-        mid = model.inference(img0, img1, True)
+        mid = model.inference(img0, img1, scale)
 
     item = (mid[:, :, :h, :w] * 255.).byte().cpu().detach().numpy().transpose(0, 2, 3, 1)[0]
     outputFrame.setImageData(item)
