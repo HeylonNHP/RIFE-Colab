@@ -480,6 +480,8 @@ def main():
     pal.setColor(QPalette.BrightText, QColor(255, 0, 0))
     pal.setColor(QPalette.Highlight, QColor(125, 125, 200))
     pal.setColor(QPalette.HighlightedText, QColor(255 - baseIntensity, 255 - baseIntensity, 255 - baseIntensity))
+    pal.setColor(QPalette.Dark, QColor(baseIntensity, baseIntensity, baseIntensity))
+    pal.setColor(QPalette.Light, QColor(255-baseIntensity, 255-baseIntensity, 255-baseIntensity))
     app.setPalette(pal)
 
     sys.excepthook = excepthook
