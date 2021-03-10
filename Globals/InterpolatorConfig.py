@@ -10,6 +10,9 @@ class InterpolatorConfig:
     _accountForDuplicateFrames = False
     _UhdScaleFactor: float = 0.5
 
+    _mode3TargetFPSEnabled: bool = False
+    _mode3TargetFPSValue: float = 60
+
     def setInterpolationFactor(self,interpolationFactor:int):
         self._interpolationFactor = interpolationFactor
 
@@ -72,3 +75,13 @@ class InterpolatorConfig:
 
     def getUhdScale(self):
         return self._UhdScaleFactor
+
+    def setMode3TargetFPS(self,enable:bool,value:float):
+        self._mode3TargetFPSEnabled = enable
+        self._mode3TargetFPSValue = value
+
+    def getMode3TargetFPSEnabled(self):
+        return self._mode3TargetFPSEnabled
+    def getMode3TargetFPSValue(self):
+        return self._mode3TargetFPSValue
+

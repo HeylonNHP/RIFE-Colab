@@ -660,11 +660,18 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
         if not step2 and not step3:
             return
 
-    # Get outputFPS
-    outputFPS = getOutputFPS(inputFile,mode,interpolationFactor,useAccurateFPS,accountForDuplicateFrames,mpdecimateSensitivity)
+    # Get outputFPS - Use mode 3 target FPS unless not mode 3 or not enabled
+    outputFPS = interpolatorConfig.getMode3TargetFPSValue()
+    if not interpolatorConfig.getMode3TargetFPSEnabled() or not mode == 3:
+        outputFPS = getOutputFPS(inputFile, mode, interpolationFactor, useAccurateFPS, accountForDuplicateFrames,
+                                 mpdecimateSensitivity)
+
+    interpolationFactorFileLabel = [str(interpolationFactor),'x']
+    if interpolatorConfig.getMode3TargetFPSEnabled() and mode == 3:
+        interpolationFactorFileLabel = ['TargetFPS']
 
     # Generate output name
-    outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-', str(interpolationFactor), 'x-mode', str(mode),
+    outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-']+ interpolationFactorFileLabel +['-mode', str(mode),
                                '-rife-',inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
     # If limit output FPS is enabled
     if encoderConfig.FFmpegOutputFPSEnabled():

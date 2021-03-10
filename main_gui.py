@@ -221,6 +221,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         blocksize = int(self.autoencodeBlocksizeNumber.value())
         limitFPSenabled:bool = bool(self.enableLimitFPScheck.isChecked())
         limitFPSvalue:float = float(self.limitFPSnumber.value())
+        mode3TargetFPSEnabled: bool = bool(self.mode3UseTargetFPS.isChecked())
+        mode3TargetFPSValue: float = float(self.mode3TargetFPS.value())
 
         targetFPS = float(self.targetFPSnumber.value())
 
@@ -269,6 +271,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         interpolatorConfig.setNonlocalPngs(nonlocalpngs)
         interpolatorConfig.setScenechangeSensitivity(scenechangeSensitivity)
         interpolatorConfig.setUhdScale(UhdScaleFactor)
+        interpolatorConfig.setMode3TargetFPS(mode3TargetFPSEnabled,mode3TargetFPSValue)
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
@@ -350,6 +353,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['useHalfPrecisionFloats'] = bool(self.enableHalfPrecisionFloatsCheck.isChecked())
         settingsDict['UHDscaleFactor'] = float(self.UHDscaleNumber.value())
 
+        settingsDict['mode3UseInterpolationFactor'] = bool(self.mode3UseInterpolationFactor.isChecked())
+        settingsDict['mode3UseTargetFPS'] = bool(self.mode3UseTargetFPS.isChecked())
+        settingsDict['mode3TargetFPS'] = float(self.mode3TargetFPS.value())
+
         settingsDict['loopoutput'] = bool(self.loopoutputCheck.isChecked())
         settingsDict['usenvenc'] = bool(self.nvencCheck.isChecked())
         settingsDict['crfout'] = float(self.crfoutNumber.value())
@@ -394,6 +401,13 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.enableHalfPrecisionFloatsCheck.setChecked(settingsDict['useHalfPrecisionFloats'])
         if 'UHDscaleFactor' in settingsDict:
             self.UHDscaleNumber.setValue(settingsDict['UHDscaleFactor'])
+
+        if 'mode3UseInterpolationFactor' in settingsDict:
+            self.mode3UseInterpolationFactor.setChecked(settingsDict['mode3UseInterpolationFactor'])
+        if 'mode3UseTargetFPS' in settingsDict:
+            self.mode3UseTargetFPS.setChecked(settingsDict['mode3UseTargetFPS'])
+        if 'mode3TargetFPS' in settingsDict:
+            self.mode3TargetFPS.setValue(settingsDict['mode3TargetFPS'])
 
         if 'loopoutput' in settingsDict:
             self.loopoutputCheck.setChecked(settingsDict['loopoutput'])
