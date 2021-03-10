@@ -258,7 +258,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     threads: list = []
     for i in range(0, batchSize):
         for gpuID in gpuList:
-            rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,))
+            rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,interpolatorConfig,))
             threads.append(rifeThread)
             rifeThread.start()
         time.sleep(5)
@@ -276,7 +276,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     # If all threads crashed before the end of interpolation - TODO: Cycle through all GPUs
     while not len(framesQueue) == 0:
         print("Starting backup thread")
-        rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,))
+        rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,interpolatorConfig,))
         rifeThread.start()
         time.sleep(5)
         rifeThread.join()
@@ -310,11 +310,13 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
 
 inFrameGetLock = threading.Lock()
 
-def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queue, inFramesList:list, gpuid):
+def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queue, inFramesList: list, gpuid,
+                            interpolatorConfig):
     '''
     Loads frames from queue (Or from HDD if frame not in queue) to interpolate,
     based on frames specified in inFramesList
     Puts frameLists in output queue to save
+    :param interpolatorConfig:
     '''
     device, model = setupRIFE(installPath, gpuid)
     while True:
@@ -384,7 +386,7 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 midFrame = FrameFile(queuedFrame.middleFrame)
 
                 midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
-                                           queuedFrame.scenechangeSensitivity)
+                                           queuedFrame.scenechangeSensitivity,scale=interpolatorConfig.getUhdScale())
                 listOfCompletedFrames.append(midFrame)
                 # outFramesQueue.put(midFrame)
         except Exception as e:
