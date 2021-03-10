@@ -218,6 +218,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         outputColourspace: str = self.colourspaceSelectionComboBox.currentText()
 
+        UhdScaleFactor: float = self.UHDscaleNumber.value()
+
         setUseHalfPrecision(useHalfPrecisionChecked)
 
         if usenvenc:
@@ -247,6 +249,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         interpolatorConfig.setUseAccurateFPS(accurateFPS)
         interpolatorConfig.setNonlocalPngs(nonlocalpngs)
         interpolatorConfig.setScenechangeSensitivity(scenechangeSensitivity)
+        interpolatorConfig.setUhdScale(UhdScaleFactor)
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(

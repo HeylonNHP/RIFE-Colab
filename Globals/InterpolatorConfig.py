@@ -8,6 +8,7 @@ class InterpolatorConfig:
     _mpdecimateSensitivity = "64*12,64*8,0.33"
     _useAccurateFPS = True
     _accountForDuplicateFrames = False
+    _UhdScaleFactor: float = 0.5
 
     def setInterpolationFactor(self,interpolationFactor:int):
         self._interpolationFactor = interpolationFactor
@@ -65,3 +66,9 @@ class InterpolatorConfig:
 
     def getAccountForDuplicateFrames(self):
         return self._accountForDuplicateFrames
+
+    def setUhdScale(self,scaleFactor:float):
+        self._UhdScaleFactor = scaleFactor
+
+    def getUhdScale(self):
+        return self._UhdScaleFactor
