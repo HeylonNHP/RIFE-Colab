@@ -19,6 +19,8 @@ from Globals.GlobalValues import GlobalValues
 from Globals.EncoderConfig import EncoderConfig
 from EventHandling import Event
 
+from tqdm import tqdm
+
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -49,6 +51,8 @@ gpuIDsList = [0]
 
 interpolationProgressUpdate = Event.Event()
 currentSavingPNGRanges:list = []
+
+progressBar = None
 
 def subscribeTointerpolationProgressUpdate(function):
     interpolationProgressUpdate.append(function)
@@ -104,6 +108,7 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     Equivalent to DAINAPP Step 2
     :param outputFPS:
     '''
+    global progressBar
     global gpuIDsList
     global gpuBatchSize
     os.chdir(installPath + '/arXiv2020RIFE/')
@@ -233,6 +238,8 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
             # count += interpolationFactor
             framesQueue.append(queuedFrameList)
 
+    progressBar = tqdm(total=len(files))
+
     inFramesList: list = []
     loadPNGThread = threading.Thread(target=queueThreadLoadFrame,args=(origFramesFolder,inFramesList,))
     loadPNGThread.start()
@@ -287,6 +294,10 @@ def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mod
     interpolationProgress.progressMessage = "Interpolation finished"
     interpolationProgressUpdate(interpolationProgress)
 
+    # End progress bar
+    progressBar.close()
+
+    # Return output FPS
     return [outputFPS]
 
 inFrameGetLock = threading.Lock()
@@ -304,7 +315,10 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
             freeVRAM(model,device)
             break
         currentQueuedFrameList: QueuedFrameList = framesQueue.popleft()
-        print(currentQueuedFrameList.interpolationProgress.progressMessage)
+
+        # Comment out printing progress message - using TQDM now
+        # print(currentQueuedFrameList.interpolationProgress.progressMessage)
+
         # Raise event
         interpolationProgressUpdate(currentQueuedFrameList.interpolationProgress)
         listOfAllFramesInterpolate: list = currentQueuedFrameList.frameList
@@ -391,6 +405,10 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 if str(inFramesList[i]) == currentQueuedFrameList.startFrame:
                     inFramesList.pop(i)
                     break
+
+        # Update progress bar
+        global progressBar
+        progressBar.update(1)
     print("END")
 
 def freeVRAM(model, device):
