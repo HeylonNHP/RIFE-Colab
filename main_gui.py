@@ -237,18 +237,26 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         encoderConfig.setPixelFormat(outputColourspace)
 
+        interpolatorConfig = InterpolatorConfig()
+        interpolatorConfig.setMode(mode)
+        interpolatorConfig.setClearPngs(clearpngs)
+        interpolatorConfig.setLoopable(loopable)
+        interpolatorConfig.setAccountForDuplicateFrames(accountForDuplicatesInFPS)
+        interpolatorConfig.setInterpolationFactor(interpolationFactor)
+        interpolatorConfig.setMpdecimateSensitivity(mpdecimateSensitivity)
+        interpolatorConfig.setUseAccurateFPS(accurateFPS)
+        interpolatorConfig.setNonlocalPngs(nonlocalpngs)
+        interpolatorConfig.setScenechangeSensitivity(scenechangeSensitivity)
+
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
-        inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
-        scenechangeSensitivity, mpdecimateSensitivity, useAutoencode, blocksize, targetFPS, accurateFPS,
-        accountForDuplicatesInFPS, step1, step2, step3,encoderConfig ,afterInterpolationAction))
+        inputFile, interpolatorConfig, useAutoencode, blocksize, targetFPS, step1, step2, step3,encoderConfig ,afterInterpolationAction))
 
         interpolateThread.start()
 
-    def runAllInterpolationStepsThread(self, inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
-                                       scenechangeSensitivity, mpdecimateSensitivity, useAutoencode, blocksize,
-                                       targetFPS, useAccurateFPS, accountForDuplicateFrames, step1, step2, step3,
-                                       encoderConfig:EncoderConfig, afterInterpolationIsFinishedActionChoice=0):
+    def runAllInterpolationStepsThread(self, inputFile, interpolatorConfig: InterpolatorConfig, useAutoencode, blocksize, targetFPS, step1,
+                                       step2, step3, encoderConfig: EncoderConfig,
+                                       afterInterpolationIsFinishedActionChoice=0):
 
         batchProcessing = self.batchProcessingMode
 
@@ -259,13 +267,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.encodeOutputButtonEnabledSignal.emit(False)
 
         if not batchProcessing:
-            performAllSteps(inputFile, interpolationFactor, loopable, mode, clearpngs, nonlocalpngs,
-                            scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoencode, blocksize,
-                            useAccurateFPS, accountForDuplicateFrames, step1=step1, step2=step2, step3=step3)
+            performAllSteps(inputFile, interpolatorConfig, encoderConfig, useAutoencode, blocksize, step1=step1, step2=step2,
+                            step3=step3)
         else:
-            batchInterpolateFolder(inputFile, mode, targetFPS, clearpngs, nonlocalpngs, scenechangeSensitivity,
-                                   mpdecimateSensitivity, encoderConfig, useAccurateFPS, accountForDuplicateFrames,
-                                   useAutoencode, blocksize)
+            batchInterpolateFolder(inputFile, interpolatorConfig, targetFPS, encoderConfig, useAutoencode, blocksize)
 
         self.runAllStepsButtonEnabledSignal.emit(True)
         if not batchProcessing:

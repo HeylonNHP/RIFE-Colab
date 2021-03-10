@@ -54,17 +54,23 @@ if bool(args.useNvenc):
     encoderConfig.setEncodingPreset('slow')
 encoderConfig.setNvencGPUID(selectedGPUs[0])
 
+interpolatorConfig = InterpolatorConfig()
+
+interpolatorConfig.setMode(args.mode)
+interpolatorConfig.setClearPngs(args.clearpngs)
+interpolatorConfig.setLoopable(args.loopable)
+
+interpolatorConfig.setInterpolationFactor(args.interpolationFactor)
+interpolatorConfig.setMpdecimateSensitivity(args.mpdecimateSensitivity)
+
+interpolatorConfig.setNonlocalPngs(args.nonlocalpngs)
+interpolatorConfig.setScenechangeSensitivity(args.scenechangeSensitivity)
+
 if args.step1:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, encoderConfig, step1=True,
-                    step2=False, step3=False)
+    performAllSteps(args.inputFile, interpolatorConfig, encoderConfig, step1=True, step2=False, step3=False)
 
 if args.step2:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, "Changeme", step1=False,
-                    step2=True, step3=False)
+    performAllSteps(args.inputFile, interpolatorConfig, encoderConfig, step1=False, step2=True, step3=False)
 
 if args.step3:
-    performAllSteps(args.inputFile, args.interpolationFactor, args.loopable, args.mode, args.clearpngs,
-                    args.nonlocalpngs, args.scenechangeSensitivity, args.mpdecimateSensitivity, "Changeme", step1=False,
-                    step2=False, step3=True)
+    performAllSteps(args.inputFile, interpolatorConfig, encoderConfig, step1=False, step2=False, step3=True)

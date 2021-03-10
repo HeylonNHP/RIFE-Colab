@@ -42,7 +42,17 @@ if bool(args.useNvenc):
     encoderConfig.setEncodingPreset('slow')
 encoderConfig.setNvencGPUID(selectedGPUs[0])
 
+interpolatorConfig = InterpolatorConfig()
+
+interpolatorConfig.setMode(args.mode)
+interpolatorConfig.setClearPngs(args.clearpngs)
+interpolatorConfig.setLoopable(args.loopable)
+
+interpolatorConfig.setInterpolationFactor(args.interpolationFactor)
+interpolatorConfig.setMpdecimateSensitivity(args.mpdecimateSensitivity)
+
+interpolatorConfig.setNonlocalPngs(args.nonlocalpngs)
+interpolatorConfig.setScenechangeSensitivity(args.scenechangeSensitivity)
+
 # Batch interpolation code
-batchInterpolateFolder(args.inputDirectory, args.mode, args.fpsTarget, args.clearpngs, args.nonlocalpngs,
-                       args.scenechangeSensitivity, args.mpdecimateSensitivity, encoderConfig, True, True, args.autoencode,
-                       args.blocksize)
+batchInterpolateFolder(args.inputDirectory, interpolatorConfig, args.fpsTarget, encoderConfig, args.autoencode, args.blocksize)

@@ -17,6 +17,7 @@ from FFmpegFunctions import *
 from frameChooser import chooseFrames
 from Globals.GlobalValues import GlobalValues
 from Globals.EncoderConfig import EncoderConfig
+from Globals.InterpolatorConfig import InterpolatorConfig
 from EventHandling import Event
 
 from tqdm import tqdm
@@ -103,14 +104,21 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
              '0', '-frame_pts', 'true', '-vf', mpdecimate, '-qscale:v', '1', 'original_frames/%15d.png'])
 
 
-def runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode, scenechangeSensitivity, outputFPS):
+def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outputFPS):
     '''
     Equivalent to DAINAPP Step 2
+    :param interpolatorConfig:
     :param outputFPS:
     '''
     global progressBar
     global gpuIDsList
     global gpuBatchSize
+
+    interpolationFactor = interpolatorConfig.getInterpolationFactor()
+    loopable = interpolatorConfig.getLoopable()
+    mode = interpolatorConfig.getMode()
+    scenechangeSensitivity = interpolatorConfig.getScenechangeSensitivity()
+
     os.chdir(installPath + '/arXiv2020RIFE/')
     origFramesFolder = projectFolder + '/' + "original_frames"
     interpFramesFolder = projectFolder + '/' + "interpolated_frames"
@@ -609,14 +617,25 @@ def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurat
     else:
         return getFPS(inputFile) * interpolationFactor
 
-def performAllSteps(inputFile, interpolationFactor, loopable, mode, clearPNGs, nonLocalPNGs, scenechangeSensitivity,
-                    mpdecimateSensitivity, encoderConfig:EncoderConfig, useAutoEncode=False, autoEncodeBlockSize=3000,
-                    useAccurateFPS=True, accountForDuplicateFrames=False, step1=True, step2=True, step3=True):
+def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderConfig: EncoderConfig,
+                    useAutoEncode=False, autoEncodeBlockSize=3000, step1=True, step2=True, step3=True):
     '''
     Perform all interpolation steps; extract, interpolate, encode
     Options to run individual steps
+    :param interpolatorConfig:
     :param encoderConfig:
     '''
+
+    interpolationFactor = interpolatorConfig.getInterpolationFactor()
+    loopable = interpolatorConfig.getLoopable()
+    mode = interpolatorConfig.getMode()
+    clearPNGs = interpolatorConfig.getClearPngs()
+    nonLocalPNGs = interpolatorConfig.getNonlocalPngs()
+    scenechangeSensitivity = interpolatorConfig.getScenechangeSensitivity()
+    mpdecimateSensitivity = interpolatorConfig.getMpdecimateSensitivity()
+    useAccurateFPS = interpolatorConfig.getUseAccurateFPS()
+    accountForDuplicateFrames = interpolatorConfig.getAccountForDuplicateFrames()
+
     global useH265
     # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
@@ -662,8 +681,7 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, clearPNGs, n
                 time.sleep(1)
 
 
-        outParams = runInterpolator(inputFile, projectFolder, interpolationFactor, loopable, mode,
-                                    scenechangeSensitivity, outputFPS)
+        outParams = runInterpolator(projectFolder, interpolatorConfig, outputFPS)
         print('---INTERPOLATION DONE---')
         interpolationDone[0] = True
         if useAutoEncode:
@@ -679,15 +697,21 @@ def performAllSteps(inputFile, interpolationFactor, loopable, mode, clearPNGs, n
             shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
 
-def batchInterpolateFolder(inputDirectory, mode, fpsTarget, clearpngs, nonlocalpngs, scenechangeSensitivity,
-                           mpdecimateSensitivity, encoderConfig:EncoderConfig, useAccurateFPS=True, accountForDuplicateFrames=True,
-                           useAutoEncode=False, autoEncodeBlockSize=3000):
+def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfig, fpsTarget,
+                           encoderConfig: EncoderConfig, useAutoEncode=False, autoEncodeBlockSize=3000):
     '''
     Batch process a folder to a specified fpsTarget
     Using performAllSteps on each file
     Checks to see if each input file isn't already above fpsTarget
+    :param interpolatorConfig:
     :param encoderConfig:
     '''
+
+    mode = interpolatorConfig.getMode()
+    mpdecimateSensitivity = interpolatorConfig.getMpdecimateSensitivity()
+    useAccurateFPS = interpolatorConfig.getUseAccurateFPS()
+    accountForDuplicateFrames = interpolatorConfig.getAccountForDuplicateFrames()
+
     files = []
     # r=root, d=directories, f = files
     for r, d, f in os.walk(inputDirectory):
@@ -714,13 +738,9 @@ def batchInterpolateFolder(inputDirectory, mode, fpsTarget, clearpngs, nonlocalp
             print("looping?", '[l]' in inputVideoFile)
             if '[l]' in inputVideoFile:
                 print("LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), True, mode, clearpngs, nonlocalpngs,
-                                scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoEncode,
-                                autoEncodeBlockSize, useAccurateFPS, accountForDuplicateFrames)
+                performAllSteps(inputVideoFile, interpolatorConfig, encoderConfig, useAutoEncode, autoEncodeBlockSize)
             else:
                 print("DON'T LOOP")
-                performAllSteps(inputVideoFile, (2 ** exponent), False, mode, clearpngs, nonlocalpngs,
-                                scenechangeSensitivity, mpdecimateSensitivity, encoderConfig, useAutoEncode,
-                                autoEncodeBlockSize, useAccurateFPS, accountForDuplicateFrames)
+                performAllSteps(inputVideoFile, interpolatorConfig, encoderConfig, useAutoEncode, autoEncodeBlockSize)
         except:
             traceback.print_exc()
