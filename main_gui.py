@@ -60,6 +60,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         self.accountForDuplicateFramesCheckbox.stateChanged.connect(self.updateVideoFPSstats)
         self.useAccurateFPSCheckbox.stateChanged.connect(self.updateVideoFPSstats)
         self.modeSelect.currentTextChanged.connect(self.updateVideoFPSstats)
+        self.mode3TargetFPS.valueChanged.connect(self.updateVideoFPSstats)
+        self.mode3UseTargetFPS.toggled.connect(self.updateVideoFPSstats)
+        self.mode3UseInterpolationFactor.toggled.connect(self.updateVideoFPSstats)
+
         self.modeSelect.currentTextChanged.connect(self.checkCurrentMode)
 
         subscribeTointerpolationProgressUpdate(self.getProgressUpdate)
@@ -168,7 +172,10 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         print(videoFPS)
         self.VideostatsInputFPStext.setText(str(videoFPS))
-        self.VideostatsOutputFPStext.setText(str(videoFPS * float(self.interpolationFactorSelect.currentText())))
+        if mode == 3 and self.mode3UseTargetFPS.isChecked():
+            self.VideostatsOutputFPStext.setText(str(self.mode3TargetFPS.value()))
+        else:
+            self.VideostatsOutputFPStext.setText(str(videoFPS * float(self.interpolationFactorSelect.currentText())))
 
     def runStep1(self):
         self.runAllInterpolationSteps(step1=True, step2=False, step3=False)
