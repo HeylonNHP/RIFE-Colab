@@ -329,6 +329,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['gpuids'] = str(self.gpuidsSelect.currentText())
         settingsDict['batchthreads'] = int(self.batchthreadsNumber.value())
         settingsDict['useHalfPrecisionFloats'] = bool(self.enableHalfPrecisionFloatsCheck.isChecked())
+        settingsDict['UHDscaleFactor'] = float(self.UHDscaleNumber.value())
 
         settingsDict['loopoutput'] = bool(self.loopoutputCheck.isChecked())
         settingsDict['usenvenc'] = bool(self.nvencCheck.isChecked())
@@ -370,6 +371,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.batchthreadsNumber.setValue(settingsDict['batchthreads'])
         if 'useHalfPrecisionFloats' in settingsDict:
             self.enableHalfPrecisionFloatsCheck.setChecked(settingsDict['useHalfPrecisionFloats'])
+        if 'UHDscaleFactor' in settingsDict:
+            self.UHDscaleNumber.setValue(settingsDict['UHDscaleFactor'])
 
         if 'loopoutput' in settingsDict:
             self.loopoutputCheck.setChecked(settingsDict['loopoutput'])
