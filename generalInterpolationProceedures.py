@@ -46,6 +46,9 @@ from rifeFunctions import downloadRIFE
 downloadRIFE(installPath, onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
+from flavrInterpolationFunctions import *
+
+downloadFLAVRmodel(installPath)
 
 gpuBatchSize = 2
 gpuIDsList = [0]
@@ -318,7 +321,11 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
     Puts frameLists in output queue to save
     :param interpolatorConfig:
     '''
-    device, model = setupRIFE(installPath, gpuid)
+    device,model = None,None
+    if interpolatorConfig.getInterpolator() == "RIFE":
+        device, model = setupRIFE(installPath, gpuid)
+    elif interpolatorConfig.getInterpolator() == "FLAVR":
+        device, model = setupFLAVR(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
         if len(framesQueue) == 0:
@@ -385,8 +392,16 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 # Initialise the mid frame with the output path
                 midFrame = FrameFile(queuedFrame.middleFrame)
 
-                midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
-                                           queuedFrame.scenechangeSensitivity,scale=interpolatorConfig.getUhdScale())
+                if interpolatorConfig.getInterpolator() == "RIFE":
+                    midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
+                                               queuedFrame.scenechangeSensitivity,
+                                               scale=interpolatorConfig.getUhdScale())
+                elif interpolatorConfig.getInterpolator() == "FLAVR":
+                    midFrame = FLAVRinterpolat(device, model, beginFrame, endFrame, midFrame,
+                                               queuedFrame.scenechangeSensitivity,
+                                               scale=interpolatorConfig.getUhdScale())
+
+
                 listOfCompletedFrames.append(midFrame)
                 # outFramesQueue.put(midFrame)
         except Exception as e:
@@ -670,9 +685,12 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
     if interpolatorConfig.getMode3TargetFPSEnabled() and mode == 3:
         interpolationFactorFileLabel = ['TargetFPS']
 
+    #Interpolation AI name
+    interpolationAIname = '-' + interpolatorConfig.getInterpolator().lower() + '-'
+
     # Generate output name
     outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-']+ interpolationFactorFileLabel +['-mode', str(mode),
-                               '-rife-',inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
+                               interpolationAIname,inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
     # If limit output FPS is enabled
     if encoderConfig.FFmpegOutputFPSEnabled():
         outputVideoNameSegments[0] = '{:.2f}'.format(encoderConfig.FFmpegOutputFPSValue())

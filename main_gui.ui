@@ -37,7 +37,7 @@
          </font>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.19&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.20&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -484,6 +484,13 @@ May slightly affect quality in some scenarios</string>
                </property>
               </widget>
              </item>
+             <item row="3" column="0" colspan="4">
+              <widget class="Line" name="line_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
              <item row="0" column="2">
               <widget class="QLabel" name="label_6">
                <property name="text">
@@ -512,11 +519,25 @@ May slightly affect quality in some scenarios</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="4">
-              <widget class="Line" name="line_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+             <item row="4" column="2">
+              <widget class="QLabel" name="label_31">
+               <property name="text">
+                <string>&lt;b&gt;Interpolation AI -&lt;/b&gt;</string>
                </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QComboBox" name="InterpolationAIComboBox">
+               <item>
+                <property name="text">
+                 <string>RIFE</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>FLAVR</string>
+                </property>
+               </item>
               </widget>
              </item>
             </layout>

@@ -1,4 +1,6 @@
 class InterpolatorConfig:
+    _interpolators = ["RIFE","FLAVR"]
+    _interpolator = "RIFE"
     _interpolationFactor = 2
     _loopable = False
     _mode = 1
@@ -84,4 +86,10 @@ class InterpolatorConfig:
         return self._mode3TargetFPSEnabled
     def getMode3TargetFPSValue(self):
         return self._mode3TargetFPSValue
+
+    def setInterpolator(self,interpolator:str):
+        self._interpolator = interpolator
+
+    def getInterpolator(self):
+        return self._interpolator
 

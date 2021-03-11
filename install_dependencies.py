@@ -37,24 +37,35 @@ def extractArchive(archiveFile,exclusions:list = []):
 def mainInstall():
     pathCWD = os.path.realpath(__file__)
     pathCWD = pathCWD[:pathCWD.rindex(os.path.sep)]
-    pathCWD += os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'model' + os.path.sep
-    print(pathCWD)
+    pathCWDrifemodel = pathCWD + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'model' + os.path.sep
+    print(pathCWDrifemodel)
 
-    rifeCodeFiles = os.listdir(pathCWD)
+    rifeCodeFiles = os.listdir(pathCWDrifemodel)
 
     for file in rifeCodeFiles:
-        if not os.path.isfile(pathCWD + file):
+        if not os.path.isfile(pathCWDrifemodel + file):
             continue
-        print(pathCWD + file)
-        fileObj = open(pathCWD + file,'r')
+        print(pathCWDrifemodel + file)
+        fileObj = open(pathCWDrifemodel + file,'r')
 
         fileStr = fileObj.read()
         fileObj.close()
         fileStr = fileStr.replace('from model.','from arXiv2020RIFE.model.')
 
-        outFileObj = open(pathCWD + file,'w')
+        outFileObj = open(pathCWDrifemodel + file,'w')
         outFileObj.write(fileStr)
         outFileObj.close()
+
+    pathCWDrifemodel = pathCWD + os.path.sep + 'FLAVR' + os.path.sep + 'model1' + os.path.sep
+
+    FLAVR_arch_file = open(pathCWDrifemodel + 'FLAVR_arch.py','r')
+    fileStr = FLAVR_arch_file.read()
+    FLAVR_arch_file.close()
+    fileStr = fileStr.replace('unet_3D = importlib.import_module(".resnet_3D" , "model1")','import FLAVR.model1.resnet_3D as unet_3D')
+    FLAVR_arch_file = open(pathCWDrifemodel + 'FLAVR_arch.py','w')
+    FLAVR_arch_file.write(fileStr)
+    FLAVR_arch_file.close()
+
 
     #return
 

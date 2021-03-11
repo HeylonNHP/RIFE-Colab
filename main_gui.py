@@ -17,6 +17,9 @@ from Globals.EncoderConfig import EncoderConfig
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
+#sys.path.insert(0, os.getcwd() + os.path.sep + 'FLAVR')
+#sys.path.append(os.getcwd() + os.path.sep + 'FLAVR')
+#print(sys.path)
 from generalInterpolationProceedures import *
 
 
@@ -230,6 +233,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         limitFPSvalue:float = float(self.limitFPSnumber.value())
         mode3TargetFPSEnabled: bool = bool(self.mode3UseTargetFPS.isChecked())
         mode3TargetFPSValue: float = float(self.mode3TargetFPS.value())
+        interpolationAI: str = str(self.InterpolationAIComboBox.currentText())
 
         targetFPS = float(self.targetFPSnumber.value())
 
@@ -279,6 +283,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         interpolatorConfig.setScenechangeSensitivity(scenechangeSensitivity)
         interpolatorConfig.setUhdScale(UhdScaleFactor)
         interpolatorConfig.setMode3TargetFPS(mode3TargetFPSEnabled,mode3TargetFPSValue)
+        interpolatorConfig.setInterpolator(interpolationAI)
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
@@ -359,6 +364,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['batchthreads'] = int(self.batchthreadsNumber.value())
         settingsDict['useHalfPrecisionFloats'] = bool(self.enableHalfPrecisionFloatsCheck.isChecked())
         settingsDict['UHDscaleFactor'] = float(self.UHDscaleNumber.value())
+        settingsDict['interpolationAIchoice'] = int(self.InterpolationAIComboBox.currentIndex())
 
         settingsDict['mode3UseInterpolationFactor'] = bool(self.mode3UseInterpolationFactor.isChecked())
         settingsDict['mode3UseTargetFPS'] = bool(self.mode3UseTargetFPS.isChecked())
@@ -408,6 +414,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.enableHalfPrecisionFloatsCheck.setChecked(settingsDict['useHalfPrecisionFloats'])
         if 'UHDscaleFactor' in settingsDict:
             self.UHDscaleNumber.setValue(settingsDict['UHDscaleFactor'])
+        if 'interpolationAIchoice' in settingsDict:
+            self.InterpolationAIComboBox.setCurrentIndex(settingsDict['interpolationAIchoice'])
 
         if 'mode3UseInterpolationFactor' in settingsDict:
             self.mode3UseInterpolationFactor.setChecked(settingsDict['mode3UseInterpolationFactor'])
