@@ -754,9 +754,11 @@ def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfi
             print("looping?", '[l]' in inputVideoFile)
             if '[l]' in inputVideoFile:
                 print("LOOP")
+                interpolatorConfig.setLoopable(True)
                 performAllSteps(inputVideoFile, interpolatorConfig, encoderConfig, useAutoEncode, autoEncodeBlockSize)
             else:
                 print("DON'T LOOP")
+                interpolatorConfig.setLoopable(False)
                 performAllSteps(inputVideoFile, interpolatorConfig, encoderConfig, useAutoEncode, autoEncodeBlockSize)
         except:
             traceback.print_exc()
