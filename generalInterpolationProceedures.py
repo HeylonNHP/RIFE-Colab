@@ -750,6 +750,7 @@ def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfi
                     exponent += 1
             else:
                 continue
+            interpolatorConfig.setInterpolationFactor(int(2 ** exponent))
             # use [l] to denote whether the file is a loopable video
             print("looping?", '[l]' in inputVideoFile)
             if '[l]' in inputVideoFile:
