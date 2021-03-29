@@ -6,6 +6,19 @@ import torchvision
 sys.path.insert(0, os.getcwd() + os.path.sep + 'FLAVR')
 print(sys.path)
 
+def downloadFLAVRmodel(installPath):
+    FLAVRfolder = installPath + os.path.sep + 'FLAVR'
+    FLAVRmodelPath = FLAVRfolder + os.path.sep + 'FLAVR_2x.pth'
+    try:
+        os.mkdir(FLAVRfolder)
+    except:
+        if not os.path.exists(FLAVRfolder):
+            print("Can't make FLAVR folder")
+        return
+    if not os.path.exists(FLAVRmodelPath):
+        download_file_from_google_drive('1XFk9YZP9llTeporF-t_Au1dI-VhDQppG', FLAVRmodelPath)
+downloadFLAVRmodel(os.getcwd())
+
 import torch
 import cv2
 import numpy as np
@@ -23,11 +36,6 @@ nbr_frame = 4
 
 useHalfPrecision: bool = False
 setupFLAVRthreadLock = threading.Lock()
-
-def downloadFLAVRmodel(installPath):
-    FLAVRmodelPath = installPath + os.path.sep + 'FLAVR' + os.path.sep + 'FLAVR_2x.pth'
-    if not os.path.exists(FLAVRmodelPath):
-        download_file_from_google_drive('1XFk9YZP9llTeporF-t_Au1dI-VhDQppG', FLAVRmodelPath)
 
 def setupFLAVR(installPath, GPUID):
     global useHalfPrecision
