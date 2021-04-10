@@ -16,8 +16,22 @@ class EncoderConfig:
     enableFFmpegOutputFPS = False
     FFmpegOutputFPS = 60
 
+    # Looping
+    preferredLoopLength = 10
+    maxLoopLength = 15
+    # Enable looping the output
+    loopRepetitionsEnabled = True
+
     def __init__(self):
         pass
+
+    def setLoopingOptions(self,preferredLength:float, maxLength:float, loopingEnabled:bool):
+        self.preferredLoopLength = preferredLength
+        self.maxLoopLength = maxLength
+        self.loopRepetitionsEnabled = loopingEnabled
+
+    def getLoopingOptions(self):
+        return [self.preferredLoopLength,self.maxLoopLength,self.loopRepetitionsEnabled]
 
     def setNvencGPUID(self,gpuid:int):
         if not gpuid < 0:

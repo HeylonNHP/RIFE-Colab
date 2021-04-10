@@ -219,7 +219,12 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
                 return
 
         interpolationFactor = int(self.interpolationFactorSelect.currentText())
+
         loopable = bool(self.loopoutputCheck.isChecked())
+        loopRepetitions = bool(self.loopOutputRepeatedLoopsCheck.isChecked())
+        loopPreferredLength = float(self.loopOutputPreferredLengthNumber.value())
+        loopMaxLength = float(self.loopOutputMaxLengthNumber.value())
+
         mode = int(self.modeSelect.currentText())
         crfout = int(self.crfoutNumber.value())
         clearpngs = bool(self.clearpngsCheck.isChecked())
@@ -271,6 +276,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             encoderConfig.setFFmpegOutputFPS(limitFPSenabled,limitFPSvalue)
 
         encoderConfig.setPixelFormat(outputColourspace)
+        encoderConfig.setLoopingOptions(loopPreferredLength,loopMaxLength,loopRepetitions)
 
         interpolatorConfig = InterpolatorConfig()
         interpolatorConfig.setMode(mode)
@@ -374,6 +380,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['mode3TargetFPS'] = float(self.mode3TargetFPS.value())
 
         settingsDict['loopoutput'] = bool(self.loopoutputCheck.isChecked())
+        settingsDict['loopablePreferredLength'] = float(self.loopOutputPreferredLengthNumber.value())
+        settingsDict['loopableMaxLength'] = float(self.loopOutputMaxLengthNumber.value())
+        settingsDict['loopRepetitionsEnabled'] = bool(self.loopOutputRepeatedLoopsCheck.isChecked())
         settingsDict['usenvenc'] = bool(self.nvencCheck.isChecked())
         settingsDict['crfout'] = float(self.crfoutNumber.value())
         settingsDict['useautoencoding'] = bool(self.autoencodeCheck.isChecked())
@@ -431,6 +440,12 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         if 'loopoutput' in settingsDict:
             self.loopoutputCheck.setChecked(settingsDict['loopoutput'])
+        if 'loopablePreferredLength' in settingsDict:
+            self.loopOutputPreferredLengthNumber.setValue(settingsDict['loopablePreferredLength'])
+        if 'loopableMaxLength' in settingsDict:
+            self.loopOutputMaxLengthNumber.setValue(settingsDict['loopableMaxLength'])
+        if 'loopRepetitionsEnabled' in settingsDict:
+            self.loopOutputRepeatedLoopsCheck.setChecked(settingsDict['loopRepetitionsEnabled'])
         if 'usenvenc' in settingsDict:
             self.nvencCheck.setChecked(settingsDict['usenvenc'])
         if 'crfout' in settingsDict:

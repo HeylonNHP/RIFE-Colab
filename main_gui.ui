@@ -622,7 +622,16 @@ May slightly affect quality in some scenarios</string>
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
-           <item row="4" column="1">
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Less is higher quality&lt;br&gt;
+More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
             <widget class="QDoubleSpinBox" name="crfoutNumber">
              <property name="minimum">
               <double>-10.000000000000000</double>
@@ -638,16 +647,7 @@ May slightly affect quality in some scenarios</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Output quality level (CRF) -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Less is higher quality&lt;br&gt;
-More is lower quality&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
+           <item row="7" column="0">
             <widget class="QLabel" name="label_10">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding -&lt;/span&gt;&lt;/p&gt;
@@ -657,14 +657,33 @@ May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_15">
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_8">
              <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Use NVENC -&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Enabled - Use Nvidia's hardware video encoder (Fast, less quality)&lt;br&gt;
+Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
            <item row="7" column="1">
+            <widget class="QCheckBox" name="autoencodeCheck">
+             <property name="text">
+              <string>Enable auto encoding</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QCheckBox" name="nvencCheck">
+             <property name="text">
+              <string>Enable NVENC</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
             <widget class="QSpinBox" name="autoencodeBlocksizeNumber">
              <property name="minimum">
               <number>1</number>
@@ -677,40 +696,14 @@ May slightly lower encoding quality&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="nvencCheck">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_28">
              <property name="text">
-              <string>Enable NVENC</string>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
+              <string>&lt;b&gt;Output colourspace -&lt;/b&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Use NVENC -&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;Enabled - Use Nvidia's hardware video encoder (Fast, less quality)&lt;br&gt;
-Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QCheckBox" name="autoencodeCheck">
-             <property name="text">
-              <string>Enable auto encoding</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="loopoutputCheck">
-             <property name="text">
-              <string>Enable</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
+           <item row="8" column="0">
             <widget class="QLabel" name="label_11">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Auto encoding block size -&lt;/span&gt;&lt;/p&gt;
@@ -718,25 +711,7 @@ Disabled - Use x264 (Slow, more quality)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</st
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_28">
-             <property name="text">
-              <string>&lt;b&gt;Output colourspace -&lt;/b&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_27">
-             <property name="text">
-              <string>&lt;b&gt;Output encoder -&lt;/b&gt;
-&lt;br&gt;
-H.264 - Faster, less quality/size, much better support, max res: 4K
-&lt;br&gt;
-H.265 - Slower, better quality/size, worse support, max res: 8K</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
+           <item row="4" column="1">
             <widget class="QComboBox" name="colourspaceSelectionComboBox">
              <item>
               <property name="text">
@@ -755,7 +730,7 @@ H.265 - Slower, better quality/size, worse support, max res: 8K</string>
              </item>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="3" column="1">
             <widget class="QComboBox" name="outputEncoderSelectComboBox">
              <item>
               <property name="text">
@@ -769,7 +744,18 @@ H.265 - Slower, better quality/size, worse support, max res: 8K</string>
              </item>
             </widget>
            </item>
-           <item row="5" column="0" colspan="2">
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>&lt;b&gt;Output encoder -&lt;/b&gt;
+&lt;br&gt;
+H.264 - Faster, less quality/size, much better support, max res: 4K
+&lt;br&gt;
+H.265 - Slower, better quality/size, worse support, max res: 8K</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0" colspan="2">
             <layout class="QHBoxLayout" name="horizontalLayout_7">
              <item>
               <widget class="QLabel" name="label_30">
@@ -804,6 +790,80 @@ H.265 - Slower, better quality/size, worse support, max res: 8K</string>
                </property>
                <property name="value">
                 <double>60.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="1" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label_15">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Loop output -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="loopoutputCheck">
+               <property name="text">
+                <string>Enable</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_32">
+               <property name="text">
+                <string>&lt;b&gt;Duration range (seconds)-&lt;/b&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="loopOutputPreferredLengthNumber">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <double>999999999999.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>10.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_33">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>&lt;b&gt;-&lt;/b&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="loopOutputMaxLengthNumber">
+               <property name="decimals">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <double>999999999999.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>15.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="loopOutputRepeatedLoopsCheck">
+               <property name="text">
+                <string>Enable repeated loops</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>

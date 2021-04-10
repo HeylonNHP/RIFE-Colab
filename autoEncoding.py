@@ -1,3 +1,5 @@
+import math
+
 from frameChooser import chooseFramesList
 from runAndPrintOutput import *
 import os
@@ -6,6 +8,7 @@ import threading
 from Globals.GlobalValues import GlobalValues
 from Globals.EncoderConfig import EncoderConfig
 ffmpegPath = GlobalValues().getFFmpegPath()
+from FFmpegFunctions import *
 
 def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
                              currentSavingPNGRanges, encoderConfig:EncoderConfig, blockSize=1000):
@@ -89,8 +92,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = run([ffmpegPath,'-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c:v','copy', outputFile])
-    #p2.wait()
+    executeConcatAndGenerateOutput(concatFilePath, inputFile, outputFile, encoderConfig)
 
     if not confirmSuccessfulOutput(outputFile):
         print("Something went wrong generating concatenated output - Not Deleting temp files")
@@ -212,8 +214,7 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
     concatFile = open(concatFilePath,'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    p2 = run([ffmpegPath,'-y','-f','concat','-safe','0','-i',concatFilePath,'-i',inputFile,'-map','0','-map','1:a?','-c:v','copy', outputFile])
-    #p2.wait()
+    executeConcatAndGenerateOutput(concatFilePath,inputFile,outputFile,encoderConfig)
 
     totalDuration = 0
     for duration in blockDurations:
@@ -230,6 +231,44 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
     for i in range(1,blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
+
+def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:str,encoderConfig:EncoderConfig):
+    loopEnabled = encoderConfig.getLoopingOptions()[2]
+    preferredLoopLength = encoderConfig.getLoopingOptions()[0]
+    maxLoopLength = encoderConfig.getLoopingOptions()[1]
+
+    if loopEnabled:
+        print("Loop enabled")
+        inputLength = getLength(inputFile)
+        print("Length", inputLength, "Preferred:",preferredLoopLength,"Max:",maxLoopLength,
+              "Can loop:", (maxLoopLength / float(inputLength) < 2))
+        # Looping enabled
+        if (maxLoopLength / float(inputLength) > 2):
+            print("Loop long enough")
+            # Looping the video won't extend it beyond maxLoopLength
+            loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
+
+            # Generate looped audio
+            command = [ffmpegPath, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
+            runAndPrintOutput(command)
+
+            audioInput = []
+            if os.path.exists('loop.flac'):
+                audioInput = ['-i', 'loop.flac', '-map', '0', '-map', '1']
+
+            command = [ffmpegPath,'-y','-f','concat','-safe', '0','-stream_loop',str(loopCount), '-i', concatFilePath]
+            command = command + audioInput + ['-c:v','copy',outputFile]
+
+            print(command)
+            p2 = run(command)
+
+
+            return
+
+    p2 = run(
+        [ffmpegPath, '-y', '-f', 'concat', '-safe', '0', '-i', concatFilePath, '-i', inputFile, '-map', '0', '-map',
+         '1:a?', '-c:v', 'copy', outputFile])
+
 
 def generateEncodingPreset(encoderConfig:EncoderConfig):
     encodingPreset = []

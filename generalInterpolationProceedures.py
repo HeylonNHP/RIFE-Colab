@@ -504,8 +504,9 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     '''
     print("---Encoding output---")
     os.chdir(projectFolder)
-    maxLoopLength = 15
-    preferredLoopLength = 10
+    maxLoopLength = encoderConfig.getLoopingOptions()[1]
+    preferredLoopLength = encoderConfig.getLoopingOptions()[0]
+    loopable = encoderConfig.getLoopingOptions()[2]
     inputLength = getLength(inputFile)
 
     inputFFmpeg = ""
