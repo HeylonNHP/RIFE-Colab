@@ -8,6 +8,7 @@ class InterpolatorConfig:
     _nonLocalPngs = True
     _scenechangeSensitivity = 0.20
     _mpdecimateSensitivity = "64*12,64*8,0.33"
+    _enableMpdecimate = True
     _useAccurateFPS = True
     _accountForDuplicateFrames = False
     _UhdScaleFactor: float = 0.5
@@ -53,6 +54,12 @@ class InterpolatorConfig:
 
     def getScenechangeSensitivity(self):
         return self._scenechangeSensitivity
+
+    def enableMpdecimate(self,enable):
+        self._enableMpdecimate = enable
+
+    def getMpdecimatedEnabled(self):
+        return self._enableMpdecimate
 
     def setMpdecimateSensitivity(self,sensitivity:str):
         self._mpdecimateSensitivity = sensitivity

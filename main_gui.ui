@@ -91,29 +91,21 @@
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
           </property>
-          <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0" columnstretch="0,0" rowminimumheight="0,0,0" columnminimumwidth="0,0">
+          <layout class="QGridLayout" name="gridLayout_4" rowstretch="0,0,0,0" columnstretch="0,0" rowminimumheight="0,0,0,0" columnminimumwidth="0,0">
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
            <property name="horizontalSpacing">
             <number>6</number>
            </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mpdecimate (Mode 3/4) -&lt;/span&gt;
-&lt;br&gt;Duplicate frame removal strength (high,low,frac)&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
+           <item row="2" column="0">
             <widget class="QLabel" name="label_13">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Non local PNGs - &lt;/span&gt;(Store PNGs in a temp folder)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
+           <item row="3" column="1">
             <widget class="QCheckBox" name="clearpngsCheck">
              <property name="text">
               <string>Enable</string>
@@ -123,14 +115,14 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
+           <item row="3" column="0">
             <widget class="QLabel" name="label_14">
              <property name="text">
               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Clear PNGs after interpolation finished -&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
+           <item row="2" column="1">
             <widget class="QCheckBox" name="nonlocalpngsCheck">
              <property name="text">
               <string>Enable</string>
@@ -140,12 +132,34 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="mpdecimateText">
-             <property name="text">
-              <string>64*12,64*8,0.33</string>
-             </property>
-            </widget>
+           <item row="0" column="0" colspan="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <item>
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Mpdecimate (Mode 3/4) -&lt;/span&gt;
+&lt;br&gt;Duplicate frame removal strength (high,low,frac)&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="mpdecimateText">
+               <property name="text">
+                <string>64*12,64*8,0.33</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="mpdecimateEnableCheck">
+               <property name="text">
+                <string>Enable</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </widget>
@@ -467,7 +481,7 @@ May slightly affect quality in some scenarios</string>
                 <double>0.010000000000000</double>
                </property>
                <property name="value">
-                <double>0.500000000000000</double>
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>

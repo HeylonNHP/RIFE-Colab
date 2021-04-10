@@ -95,9 +95,10 @@ def setUseH265(enable: bool):
     useH265 = enable
 
 
-def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,64*8,0.33"):
+def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: InterpolatorConfig, mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
     Equivalent to DAINAPP Step 1
+    :param interpolatorConfig:
     '''
     os.chdir(projectFolder)
     if os.path.exists("original_frames"):
@@ -109,11 +110,15 @@ def extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity="64*12,6
         runAndPrintOutput(
             [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', 'original_frames/%15d.png'])
     elif mode == 3 or mode == 4:
-        hi, lo, frac = mpdecimateSensitivity.split(",")
-        mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
+        mpdecimateOptions = []
+        if interpolatorConfig.getMpdecimatedEnabled():
+            hi, lo, frac = mpdecimateSensitivity.split(",")
+            mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
+            mpdecimateOptions += ['-vf']
+            mpdecimateOptions += [mpdecimate]
         runAndPrintOutput(
             [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', str(GlobalValues.timebase), '-vsync',
-             '0', '-frame_pts', 'true', '-vf', mpdecimate, '-qscale:v', '1', 'original_frames/%15d.png'])
+             '0', '-frame_pts', 'true']+mpdecimateOptions+['-qscale:v', '1', 'original_frames/%15d.png'])
 
 
 def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outputFPS):
@@ -680,7 +685,7 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
         if os.path.exists(projectFolder + '/' + 'interpolated_frames'):
             shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
-        extractFrames(inputFile, projectFolder, mode, mpdecimateSensitivity)
+        extractFrames(inputFile, projectFolder, mode, interpolatorConfig, mpdecimateSensitivity)
         if not step2 and not step3:
             return
 

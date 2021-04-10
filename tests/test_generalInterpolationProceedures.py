@@ -8,9 +8,9 @@ inputFile = r'D:\Videos\test\2020-08-10 18.38.30.mov'
 
 def test_extract_frames():
     mode = 3
-    extractFrames(inputFile,inputFolder,mode)
+    extractFrames(inputFile, inputFolder, mode, ChangeMe)
     mode = 1
-    extractFrames(inputFile, inputFolder, mode)
+    extractFrames(inputFile, inputFolder, mode, ChangeMe)
 
     framesFolder = inputFolder + r'\original_frames'
     generateLoopContinuityFrame(framesFolder)
@@ -18,7 +18,7 @@ def test_extract_frames():
 
 def test_createOutput():
     mode = 1
-    extractFrames(inputFile,inputFolder,mode)
+    extractFrames(inputFile, inputFolder, mode, ChangeMe)
     shutil.move(inputFolder + os.path.sep + 'original_frames',
                 inputFolder + os.path.sep + 'interpolated_frames')
     createOutput(inputFile,inputFolder,'out-unittest.mp4',getFPSaccurate(inputFile),
@@ -26,7 +26,7 @@ def test_createOutput():
 
     shutil.rmtree(inputFolder + os.path.sep + 'interpolated_frames')
     mode = 3
-    extractFrames(inputFile, inputFolder, mode)
+    extractFrames(inputFile, inputFolder, mode, ChangeMe)
     shutil.move(inputFolder + os.path.sep + 'original_frames',
                 inputFolder + os.path.sep + 'interpolated_frames')
     createOutput(inputFile, inputFolder, 'out-unittest.mp4', getFPSaccurate(inputFile),

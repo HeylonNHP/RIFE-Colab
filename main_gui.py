@@ -226,6 +226,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         nonlocalpngs = bool(self.nonlocalpngsCheck.isChecked())
         scenechangeSensitivity = float(self.scenechangeSensitivityNumber.value())
         mpdecimateSensitivity = str(self.mpdecimateText.text())
+        mpdecimateEnabled = bool(self.mpdecimateEnableCheck.isChecked())
         usenvenc = bool(self.nvencCheck.isChecked())
         useAutoencode = bool(self.autoencodeCheck.isChecked())
         blocksize = int(self.autoencodeBlocksizeNumber.value())
@@ -284,6 +285,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         interpolatorConfig.setUhdScale(UhdScaleFactor)
         interpolatorConfig.setMode3TargetFPS(mode3TargetFPSEnabled,mode3TargetFPSValue)
         interpolatorConfig.setInterpolator(interpolationAI)
+        interpolatorConfig.enableMpdecimate(mpdecimateEnabled)
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolateThread = threading.Thread(target=self.runAllInterpolationStepsThread, args=(
@@ -354,6 +356,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         settingsDict['mpdecimate'] = str(self.mpdecimateText.text())
         settingsDict['nonlocalpngs'] = bool(self.nonlocalpngsCheck.isChecked())
         settingsDict['clearpngs'] = bool(self.clearpngsCheck.isChecked())
+        settingsDict['enableMpdecimate'] = bool(self.mpdecimateEnableCheck.isChecked())
 
         settingsDict['useaccuratefps'] = bool(self.useAccurateFPSCheckbox.isChecked())
         settingsDict['accountforduplicateframes'] = bool(self.accountForDuplicateFramesCheckbox.isChecked())
@@ -395,6 +398,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.nonlocalpngsCheck.setChecked(settingsDict['nonlocalpngs'])
         if 'clearpngs' in settingsDict:
             self.clearpngsCheck.setChecked(settingsDict['clearpngs'])
+        if 'enableMpdecimate' in settingsDict:
+            self.mpdecimateEnableCheck.setChecked(settingsDict['enableMpdecimate'])
 
         if 'useaccuratefps' in settingsDict:
             self.useAccurateFPSCheckbox.setChecked(settingsDict['useaccuratefps'])
