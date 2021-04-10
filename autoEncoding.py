@@ -238,13 +238,9 @@ def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:s
     maxLoopLength = encoderConfig.getLoopingOptions()[1]
 
     if loopEnabled:
-        print("Loop enabled")
         inputLength = getLength(inputFile)
-        print("Length", inputLength, "Preferred:",preferredLoopLength,"Max:",maxLoopLength,
-              "Can loop:", (maxLoopLength / float(inputLength) < 2))
         # Looping enabled
         if (maxLoopLength / float(inputLength) > 2):
-            print("Loop long enough")
             # Looping the video won't extend it beyond maxLoopLength
             loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
 
@@ -259,7 +255,6 @@ def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:s
             command = [ffmpegPath,'-y','-f','concat','-safe', '0','-stream_loop',str(loopCount), '-i', concatFilePath]
             command = command + audioInput + ['-c:v','copy',outputFile]
 
-            print(command)
             p2 = run(command)
 
 
