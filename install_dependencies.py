@@ -34,6 +34,12 @@ def extractArchive(archiveFile,exclusions:list = []):
             print('If not, please do so now before hitting enter: https://www.7-zip.org/a/7z1900-x64.exe')
             input('...')
 
+def prependArray(arr:list,prependString:str):
+    arr = arr.copy()
+    for i in range(0,len(arr)):
+        arr[i] = prependString + arr[i]
+    return arr
+
 def mainInstall():
     pathCWD = os.path.realpath(__file__)
     pathCWD = pathCWD[:pathCWD.rindex(os.path.sep)]
@@ -41,20 +47,20 @@ def mainInstall():
     pathCWDrifetrainlog = pathCWD + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log' + os.path.sep
     print(pathCWDrifemodel)
 
-    rifeCodeFiles = os.listdir(pathCWDrifemodel)
-    rifeCodeFiles += os.listdir(pathCWDrifetrainlog)
+    rifeCodeFiles = prependArray(os.listdir(pathCWDrifemodel),pathCWDrifemodel)
+    rifeCodeFiles += prependArray(os.listdir(pathCWDrifetrainlog),pathCWDrifetrainlog)
 
     for file in rifeCodeFiles:
-        if not os.path.isfile(pathCWDrifemodel + file):
+        if not os.path.isfile(file):
             continue
-        print(pathCWDrifemodel + file)
-        fileObj = open(pathCWDrifemodel + file,'r')
+        print(file)
+        fileObj = open(file,'r')
 
         fileStr = fileObj.read()
         fileObj.close()
         fileStr = fileStr.replace('from model.','from arXiv2020RIFE.model.')
 
-        outFileObj = open(pathCWDrifemodel + file,'w')
+        outFileObj = open(file,'w')
         outFileObj.write(fileStr)
         outFileObj.close()
 
