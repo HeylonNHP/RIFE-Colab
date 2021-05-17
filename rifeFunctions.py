@@ -40,5 +40,7 @@ def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
             os.mkdir(installPath + '/arXiv2020RIFE/train_log')
         for data in glob.glob("*.pkl"):
             shutil.move(data, installPath + "/arXiv2020RIFE/train_log/")
+        shutil.move('IFNet_HDv3.py',installPath+'/arXiv2020RIFE/train_log/IFNet_HDv3.py')
+        shutil.move('RIFE_HDv3.py',installPath+'/arXiv2020RIFE/train_log/RIFE_HDv3.py')
 
         os.remove(installPath+"/RIFE_trained_model_new.zip")
