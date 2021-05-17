@@ -38,9 +38,11 @@ def mainInstall():
     pathCWD = os.path.realpath(__file__)
     pathCWD = pathCWD[:pathCWD.rindex(os.path.sep)]
     pathCWDrifemodel = pathCWD + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'model' + os.path.sep
+    pathCWDrifetrainlog = pathCWD + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log' + os.path.sep
     print(pathCWDrifemodel)
 
     rifeCodeFiles = os.listdir(pathCWDrifemodel)
+    rifeCodeFiles += os.listdir(pathCWDrifetrainlog)
 
     for file in rifeCodeFiles:
         if not os.path.isfile(pathCWDrifemodel + file):
