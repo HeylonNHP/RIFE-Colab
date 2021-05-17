@@ -5,7 +5,8 @@ import cv2
 import torch
 import argparse
 from torch.nn import functional as F
-from arXiv2020RIFE.model.RIFE_HDv2 import Model
+#from arXiv2020RIFE.model.RIFE_HDv2 import Model
+from arXiv2020RIFE.train_log.RIFE_HDv3 import Model
 import numpy as np
 from queue import Queue
 import gc
