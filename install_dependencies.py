@@ -59,6 +59,8 @@ def mainInstall():
         fileStr = fileObj.read()
         fileObj.close()
         fileStr = fileStr.replace('from model.','from arXiv2020RIFE.model.')
+        fileStr = fileStr.replace('from train_log.','from arXiv2020RIFE.train_log.')
+
 
         outFileObj = open(file,'w')
         outFileObj.write(fileStr)
