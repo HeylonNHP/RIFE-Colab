@@ -245,6 +245,8 @@ def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:s
             loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
 
             # Generate looped audio
+            if os.path.exists('loop.flac'):
+                os.remove('loop.flac')
             command = [ffmpegPath, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
             runAndPrintOutput(command)
 
