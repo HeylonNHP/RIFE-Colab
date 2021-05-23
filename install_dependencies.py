@@ -20,6 +20,7 @@ def extractArchive(archiveFile,exclusions:list = []):
     if os.name == 'nt':
         sevenZip = r"C:\Program Files\7-Zip\7z.exe"
 
+    # TODO: Use prependArray()
     sevenZipExclusions = []
     for exclusion in exclusions:
         sevenZipExclusions.append('-xr!' + exclusion)

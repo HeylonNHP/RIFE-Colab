@@ -21,9 +21,10 @@ def setupRIFE(installPath, GPUID):
     global useHalfPrecision
     with setupRifeThreadLock:
         try:
+            # TODO: Potentially use model.Device instead? (Line 41)
             torch.cuda.set_device(GPUID)
         except:
-            pass
+            print("Could net set CUDA device. Attempted CUDA device:",GPUID)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if torch.cuda.is_available():
@@ -42,8 +43,6 @@ def setupRIFE(installPath, GPUID):
         model.eval()
         model.device()
         return device,model
-
-import time
 
 
 def rifeInterpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, outputFrame: FrameFile,

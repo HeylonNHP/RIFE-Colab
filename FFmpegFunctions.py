@@ -89,9 +89,9 @@ def getFPSaccurate(inputPath):
         return float(num)/float(den)
 
 def getLength(inputPath):
-    '''
+    """
     Get the duration of a video in seconds as a float
-    '''
+    """
     lengthSeconds = 0.0
     result = subprocess.run([ffmpegLocation, '-i',inputPath], stderr=subprocess.PIPE)
     lines = result.stderr.splitlines()

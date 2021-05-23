@@ -7,12 +7,14 @@ import time
 import threading
 from Globals.GlobalValues import GlobalValues
 from Globals.EncoderConfig import EncoderConfig
+
 ffmpegPath = GlobalValues().getFFmpegPath()
 from FFmpegFunctions import *
 
+
 def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
-                             currentSavingPNGRanges, encoderConfig:EncoderConfig, blockSize=1000):
-    '''
+                             currentSavingPNGRanges, encoderConfig: EncoderConfig, blockSize=1000):
+    """
 
     :param encoderConfig:
     :param currentSavingPNGRanges:
@@ -20,7 +22,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
     :param interpolationDone: First index is interpolation state, second index is output fps
     :param blockSize: Size of chunk to autoencode
     :return:
-    '''
+    """
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
     blockFramesFilePath = projectFolder + os.path.sep + 'blockFrames.txt'
@@ -46,7 +48,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
         interpolatedFrames.sort()
 
         filesInBlock = []
-        for i in range(0,blockSize):
+        for i in range(0, blockSize):
             filesInBlock.append(interpolatedFrames[i])
 
         # If the save thread hasn't finished saving PNGs into this block range - Wait
@@ -58,7 +60,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
         blockDuration = ((1.0 / outputFPS) * len(filesInBlock))
         blockDurationsList.append(blockDuration)
 
-        blockFramesFile = open(blockFramesFilePath,'w')
+        blockFramesFile = open(blockFramesFilePath, 'w')
 
         framesFileString = ""
         for file in filesInBlock:
@@ -70,26 +72,27 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
 
         encodingPreset = generateEncodingPreset(encoderConfig)
 
-        ffmpegCommand = [ffmpegPath,'-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
+        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-vsync', '1', '-r', str(outputFPS), '-f', 'concat',
+                         '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
         p1 = run(ffmpegCommand)
-        #p1.wait()
+        # p1.wait()
         blockCount += 1
-        #Remove auto-encoded frames
+        # Remove auto-encoded frames
         for file in filesInBlock:
             os.remove(interpolatedFramesFolder + os.path.sep + file)
         os.remove(blockFramesFilePath)
 
-    #Interpolation finished, combine blocks
+    # Interpolation finished, combine blocks
     concatFileLines = ""
-    for i in range(1,blockCount):
+    for i in range(1, blockCount):
         line = "file '" + projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv' + "'\n"
-        line += 'duration ' + str(blockDurationsList[i-1]) + '\n'
+        line += 'duration ' + str(blockDurationsList[i - 1]) + '\n'
         concatFileLines += line
     concatFilePath = 'autoConcat.txt'
-    concatFile = open(concatFilePath,'w')
+    concatFile = open(concatFilePath, 'w')
     concatFile.write(concatFileLines)
     concatFile.close()
     executeConcatAndGenerateOutput(concatFilePath, inputFile, outputFile, encoderConfig)
@@ -98,12 +101,13 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
         print("Something went wrong generating concatenated output - Not Deleting temp files")
         return
 
-    for i in range(1,blockCount):
+    for i in range(1, blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
+
 def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outputFile, interpolationDone, outputFPS,
-                              currentSavingPNGRanges, encoderConfig:EncoderConfig, blockSize=3000):
+                              currentSavingPNGRanges, encoderConfig: EncoderConfig, blockSize=3000):
     print("PROJECT FOLDER", projectFolder)
     interpolatedFramesFolder = projectFolder + os.path.sep + 'interpolated_frames'
 
@@ -135,7 +139,6 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
 
         interpolatedFrames.sort()
 
-
         '''Last frame from last block is kept for use by chooseFramesList
         If the only frame left is the frame kept from the last block
         Then we are finished encoding autoencode blocks'''
@@ -148,7 +151,7 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
             filesInBlock.append(interpolatedFrames[i])
 
         # If the save thread hasn't finished saving PNGs into this block range - Wait
-        if confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock,currentSavingPNGRanges) == False:
+        if confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock, currentSavingPNGRanges) == False:
             time.sleep(1)
             continue
 
@@ -159,15 +162,18 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
             nextBlockStartTime = int(interpolatedFrames[blockSize][:-4])
         except:
             # If frame from next block doesn't exist (I.E. this is the last block) generate time from last frame pair in current block
-            nextBlockStartTime = int(interpolatedFrames[blockSize-1][:-4]) + (int(interpolatedFrames[blockSize-1][:-4])-int(interpolatedFrames[blockSize-2][:-4]))
+            nextBlockStartTime = int(interpolatedFrames[blockSize - 1][:-4]) + (
+                        int(interpolatedFrames[blockSize - 1][:-4]) - int(interpolatedFrames[blockSize - 2][:-4]))
 
-        currentLength = nextBlockStartTime-int(filesInBlock[1][:-4])
+        currentLength = nextBlockStartTime - int(filesInBlock[1][:-4])
         totalLength += currentLength
-        print('Auto encode block',blockCount,len(filesInBlock), str(nextBlockStartTime-int(filesInBlock[1][:-4]))+'ms',
-              "Before",filesInBlock[0],"Start",filesInBlock[1],'End',filesInBlock[-1])
+        print('Auto encode block', blockCount, len(filesInBlock),
+              str(nextBlockStartTime - int(filesInBlock[1][:-4])) + 'ms',
+              "Before", filesInBlock[0], "Start", filesInBlock[1], 'End', filesInBlock[-1])
 
         # Chose frames for use in output (Downsampling to target FPS)
-        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock,outputFPS,currentTime,currentCount)
+        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock, outputFPS, currentTime,
+                                                                                  currentCount)
 
         # blockDurations.append(blockDuration)
         blockDurations.append(currentLength)
@@ -186,53 +192,55 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         # Build ffmpeg command and run ffmpeg
         encodingPreset = generateEncodingPreset(encoderConfig)
 
-        ffmpegCommand = [ffmpegPath,'-y','-loglevel','quiet','-vsync','1','-r',str(outputFPS),'-f', 'concat', '-safe', '0', '-i', blockFramesFilePath]
+        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-vsync', '1', '-r', str(outputFPS), '-f', 'concat',
+                         '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
 
         p1 = run(ffmpegCommand)
 
         blockCount += 1
-        #Remove auto-encoded frames in current block
+        # Remove auto-encoded frames in current block
         lastFrameFile = filesInBlock[-1]
         for file in filesInBlock:
             # Don't delete last frame file in block, as it is used by chooseFramesList in next block
             if file == lastFrameFile:
-                print("KEEP THIS FRAME",file)
+                print("KEEP THIS FRAME", file)
                 continue
             deleteFile = interpolatedFramesFolder + os.path.sep + file
             os.remove(deleteFile)
         os.remove(blockFramesFilePath)
 
-    #Interpolation finished, combine blocks
+    # Interpolation finished, combine blocks
     concatFileLines = ""
-    for i in range(1,blockCount):
+    for i in range(1, blockCount):
         line = "file '" + projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv' + "'\n"
-        line += 'duration ' + str((blockDurations[i-1])/float(GlobalValues.timebase)) + '\n'
+        line += 'duration ' + str((blockDurations[i - 1]) / float(GlobalValues.timebase)) + '\n'
         concatFileLines += line
     concatFilePath = projectFolder + os.path.sep + 'autoConcat.txt'
-    concatFile = open(concatFilePath,'w')
+    concatFile = open(concatFilePath, 'w')
     concatFile.write(concatFileLines)
     concatFile.close()
-    executeConcatAndGenerateOutput(concatFilePath,inputFile,outputFile,encoderConfig)
+    executeConcatAndGenerateOutput(concatFilePath, inputFile, outputFile, encoderConfig)
 
     totalDuration = 0
     for duration in blockDurations:
         totalDuration += duration
 
-    #print(str(totalDuration))
-    #print('Test length',totalLength)
+    # print(str(totalDuration))
+    # print('Test length',totalLength)
 
     if not confirmSuccessfulOutput(outputFile):
         print("Something went wrong generating concatenated output - Not Deleting temp files")
         return
 
     # Remove blocks and concat file - Output is already created, don't need these anymore
-    for i in range(1,blockCount):
+    for i in range(1, blockCount):
         os.remove(projectFolder + os.path.sep + 'autoblock' + str(i) + '.mkv')
     os.remove(concatFilePath)
 
-def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:str,encoderConfig:EncoderConfig):
+
+def executeConcatAndGenerateOutput(concatFilePath: str, inputFile: str, outputFile: str, encoderConfig: EncoderConfig):
     loopEnabled = encoderConfig.getLoopingOptions()[2]
     preferredLoopLength = encoderConfig.getLoopingOptions()[0]
     maxLoopLength = encoderConfig.getLoopingOptions()[1]
@@ -254,11 +262,11 @@ def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:s
             if os.path.exists('loop.flac'):
                 audioInput = ['-i', 'loop.flac', '-map', '0', '-map', '1']
 
-            command = [ffmpegPath,'-y','-f','concat','-safe', '0','-stream_loop',str(loopCount), '-i', concatFilePath]
-            command = command + audioInput + ['-c:v','copy',outputFile]
+            command = [ffmpegPath, '-y', '-f', 'concat', '-safe', '0', '-stream_loop', str(loopCount), '-i',
+                       concatFilePath]
+            command = command + audioInput + ['-c:v', 'copy', outputFile]
 
             p2 = run(command)
-
 
             return
 
@@ -267,19 +275,23 @@ def executeConcatAndGenerateOutput(concatFilePath:str,inputFile:str,outputFile:s
          '1:a?', '-c:v', 'copy', outputFile])
 
 
-def generateEncodingPreset(encoderConfig:EncoderConfig):
+def generateEncodingPreset(encoderConfig: EncoderConfig):
     encodingPreset = []
 
     if encoderConfig.nvencEnabled():
-        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu', str(encoderConfig.getNvencGPUID()), '-preset', encoderConfig.getEncodingPreset(),
-                          '-profile', encoderConfig.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq', str(encoderConfig.getEncodingCRF())]
+        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu',
+                          str(encoderConfig.getNvencGPUID()), '-preset', encoderConfig.getEncodingPreset(),
+                          '-profile', encoderConfig.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq',
+                          str(encoderConfig.getEncodingCRF())]
     else:
-        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset', encoderConfig.getEncodingPreset(), '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
+        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset',
+                          encoderConfig.getEncodingPreset(), '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
 
     if encoderConfig.FFmpegOutputFPSEnabled():
-        encodingPreset = encodingPreset + ['-r',str(encoderConfig.FFmpegOutputFPSValue())]
+        encodingPreset = encodingPreset + ['-r', str(encoderConfig.FFmpegOutputFPSValue())]
 
     return encodingPreset
+
 
 def confirmSuccessfulOutput(outputFile):
     # Check exists
@@ -291,19 +303,22 @@ def confirmSuccessfulOutput(outputFile):
 
     return True
 
-def confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock:list,currentSavingPNGRanges:list):
+
+def confirmCurrentSavingPNGRangesNotInAutoBlockRange(filesInBlock: list, currentSavingPNGRanges: list):
+    """ Ensure we're not trying to generate a new autoblock from PNG files that are still in the process of being
+    saved """
     maxTimecodeInBlock = int(max(filesInBlock)[:-4])
 
     for frameRange in currentSavingPNGRanges:
-        start:str = frameRange[0]
-        end:str = frameRange[1]
+        start: str = frameRange[0]
+        end: str = frameRange[1]
 
         # Strip out path
-        start = start[start.rindex('/')+1:-4]
-        end = end[end.rindex('/')+1:-4]
+        start = start[start.rindex('/') + 1:-4]
+        end = end[end.rindex('/') + 1:-4]
 
-        startInt:int = int(start)
-        endInt:int = int(end)
+        startInt: int = int(start)
+        endInt: int = int(end)
 
         if startInt <= maxTimecodeInBlock or endInt <= maxTimecodeInBlock:
             '''If there are frames still being saved within the current block
