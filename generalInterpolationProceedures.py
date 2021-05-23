@@ -6,6 +6,7 @@ import traceback
 from queue import Queue
 import collections
 import threading
+import time
 
 from QueuedFrames.SaveFramesList import SaveFramesList
 from QueuedFrames.queuedFrameList import *
@@ -13,7 +14,7 @@ from QueuedFrames.queuedFrame import *
 from QueuedFrames.FrameFile import *
 import autoEncoding
 
-from runAndPrintOutput import runAndPrintOutput
+from runAndPrintOutput import run_and_print_output
 from FFmpegFunctions import *
 from frameChooser import chooseFrames
 from Globals.GlobalValues import GlobalValues
@@ -107,7 +108,7 @@ def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: Interpolat
         os.mkdir("original_frames")
 
     if mode == 1:
-        runAndPrintOutput(
+        run_and_print_output(
             [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', 'original_frames/%15d.png'])
     elif mode == 3 or mode == 4:
         mpdecimateOptions = []
@@ -116,7 +117,7 @@ def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: Interpolat
             mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
             mpdecimateOptions += ['-vf']
             mpdecimateOptions += [mpdecimate]
-        runAndPrintOutput(
+        run_and_print_output(
             [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', str(GlobalValues.timebase), '-vsync',
              '0', '-frame_pts', 'true']+mpdecimateOptions+['-qscale:v', '1', 'original_frames/%15d.png'])
 
@@ -539,14 +540,14 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         command = command + ['-i', str(inputFile), '-map', '0', '-map', '1:a?', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2']
         command = command + encoderPreset + [str(outputVideo)]
 
-        runAndPrintOutput(command)
+        run_and_print_output(command)
     else:
         loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
         loopCount = str(loopCount)
         # print('Loop', loopCount)
 
         command = [FFMPEG4, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
-        runAndPrintOutput(command)
+        run_and_print_output(command)
 
         audioInput = []
         if os.path.exists('loop.flac'):

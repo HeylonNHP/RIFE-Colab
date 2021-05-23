@@ -256,7 +256,7 @@ def executeConcatAndGenerateOutput(concatFilePath: str, inputFile: str, outputFi
             if os.path.exists('loop.flac'):
                 os.remove('loop.flac')
             command = [ffmpegPath, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
-            runAndPrintOutput(command)
+            run_and_print_output(command)
 
             audioInput = []
             if os.path.exists('loop.flac'):
