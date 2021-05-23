@@ -27,8 +27,6 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings("ignore")
 
-useH265: bool = False
-
 FFMPEG4 = GlobalValues().getFFmpegPath()
 GPUID = 0
 nvencPreset = 'p7'
@@ -90,10 +88,6 @@ def setGPUinterpolationOptions(batchSize: int, _gpuIDsList: list):
     global gpuBatchSize
     gpuIDsList = _gpuIDsList
     gpuBatchSize = batchSize
-
-def setUseH265(enable: bool):
-    global useH265
-    useH265 = enable
 
 
 def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: InterpolatorConfig, mpdecimateSensitivity="64*12,64*8,0.33"):
@@ -672,7 +666,6 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
     useAccurateFPS = interpolatorConfig.getUseAccurateFPS()
     accountForDuplicateFrames = interpolatorConfig.getAccountForDuplicateFrames()
 
-    global useH265
     # Get project folder path and make it if it doesn't exist
     projectFolder = inputFile[:inputFile.rindex(os.path.sep)]
     if nonLocalPNGs:
