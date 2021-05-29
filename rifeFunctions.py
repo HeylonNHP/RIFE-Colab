@@ -2,14 +2,16 @@ from googleDriveDownloader import *
 import shutil
 import glob
 import os
+from Globals.BuildConfig import BuildConfig
 
 RIFEPATH = 'arXiv2020RIFE'
 
 def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
     # Run if not previously setup
     os.chdir(installPath)
-    if not os.path.exists('arXiv2020RIFE'):
-        os.system(r'git clone https://github.com/hzwer/arXiv2020-RIFE arXiv2020RIFE')
+    if not BuildConfig.isPyInstallerBuild():
+        if not os.path.exists('arXiv2020RIFE'):
+            os.system(r'git clone https://github.com/hzwer/arXiv2020-RIFE arXiv2020RIFE')
 
     # Check model files are downloaded
     modelFiles = ['contextnet.pkl','flownet.pkl','unet.pkl']

@@ -3,6 +3,7 @@ import subprocess
 import sys
 import addInstalldirToPath
 from addInstalldirToPath import *
+from Globals.BuildConfig import BuildConfig
 
 REQUIRED_PACKAGES = ['numpy>=1.16', 'tqdm>=4.35.0', 'opencv-python>=4.1.2', 'pyqt5', 'requests']
 
@@ -77,8 +78,8 @@ def mainInstall():
     FLAVR_arch_file.write(fileStr)
     FLAVR_arch_file.close()
 
-
-    #return
+    if BuildConfig.isPyInstallerBuild():
+        return
 
     for package in REQUIRED_PACKAGES:
         install(package)
