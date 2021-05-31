@@ -78,7 +78,7 @@ def mainInstall():
     FLAVR_arch_file.write(fileStr)
     FLAVR_arch_file.close()
 
-    if BuildConfig.isPyInstallerBuild():
+    if BuildConfig().isPyInstallerBuild():
         return
 
     for package in REQUIRED_PACKAGES:

@@ -9,7 +9,7 @@ RIFEPATH = 'arXiv2020RIFE'
 def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
     # Run if not previously setup
     os.chdir(installPath)
-    if not BuildConfig.isPyInstallerBuild():
+    if not BuildConfig().isPyInstallerBuild():
         if not os.path.exists('arXiv2020RIFE'):
             os.system(r'git clone https://github.com/hzwer/arXiv2020-RIFE arXiv2020RIFE')
 
