@@ -55,6 +55,8 @@ def mainInstall():
     for file in rifeCodeFiles:
         if not os.path.isfile(file):
             continue
+        if '.pkl' in file:
+            continue
         print(file)
         fileObj = open(file,'r')
 
