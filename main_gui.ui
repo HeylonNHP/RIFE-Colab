@@ -37,7 +37,7 @@
          </font>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.22&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.23&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -969,6 +969,9 @@ Requires 7-zip to be installed before updating</string>
             <widget class="QCheckBox" name="saveGUIstateCheck">
              <property name="text">
               <string>Enable</string>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
