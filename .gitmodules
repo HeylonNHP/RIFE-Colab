@@ -1,0 +1,3 @@
+[submodule "arXiv2020RIFE"]
+	path = arXiv2020RIFE
+	url = https://github.com/hzwer/Practical-RIFE.git

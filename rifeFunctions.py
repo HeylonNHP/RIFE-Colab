@@ -11,7 +11,7 @@ def downloadRIFE(installPath,onWindows, forceDownloadModels=False):
     os.chdir(installPath)
     if not BuildConfig().isPyInstallerBuild():
         if not os.path.exists('arXiv2020RIFE'):
-            os.system(r'git clone https://github.com/hzwer/arXiv2020-RIFE arXiv2020RIFE')
+            os.system(r'git clone https://github.com/hzwer/Practical-RIFE arXiv2020RIFE')
 
     # Check model files are downloaded
     modelFiles = ['contextnet.pkl','flownet.pkl','unet.pkl']
