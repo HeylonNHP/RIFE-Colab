@@ -70,16 +70,6 @@ def mainInstall():
         outFileObj.write(fileStr)
         outFileObj.close()
 
-    pathCWDrifemodel = pathCWD + os.path.sep + 'FLAVR' + os.path.sep + 'model1' + os.path.sep
-
-    FLAVR_arch_file = open(pathCWDrifemodel + 'FLAVR_arch.py','r')
-    fileStr = FLAVR_arch_file.read()
-    FLAVR_arch_file.close()
-    fileStr = fileStr.replace('unet_3D = importlib.import_module(".resnet_3D" , "model1")','import FLAVR.model1.resnet_3D as unet_3D')
-    FLAVR_arch_file = open(pathCWDrifemodel + 'FLAVR_arch.py','w')
-    FLAVR_arch_file.write(fileStr)
-    FLAVR_arch_file.close()
-
     if BuildConfig().isPyInstallerBuild():
         return
 

@@ -1,25 +1,22 @@
 # https://raevskymichail.medium.com/python-gui-building-a-simple-application-with-pyqt-and-qt-designer-e9f8cda76246
-import sys
-# from PyQt5 import QtWidgets
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import *
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-import mainGuiUi
+import glob
+import json
 # from PyQt5 import uic
 import os
-import json
-import glob
-import threading
-import addInstalldirToPath
+import sys
+
+# from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+
+import mainGuiUi
 from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
-from Globals.EncoderConfig import EncoderConfig
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
-#sys.path.insert(0, os.getcwd() + os.path.sep + 'FLAVR')
-#sys.path.append(os.getcwd() + os.path.sep + 'FLAVR')
-#print(sys.path)
+
 from generalInterpolationProceedures import *
 
 

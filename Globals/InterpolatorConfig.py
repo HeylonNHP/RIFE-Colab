@@ -1,5 +1,5 @@
 class InterpolatorConfig:
-    _interpolators = ["RIFE","FLAVR"]
+    _interpolators = ["RIFE"]
     _interpolator = "RIFE"
     _interpolationFactor = 2
     _loopable = False

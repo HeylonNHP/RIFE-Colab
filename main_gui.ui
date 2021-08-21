@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>934</width>
-    <height>731</height>
+    <height>797</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
          </font>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.23&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.23.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -545,11 +545,6 @@ May slightly affect quality in some scenarios</string>
                <item>
                 <property name="text">
                  <string>RIFE</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>FLAVR</string>
                 </property>
                </item>
               </widget>

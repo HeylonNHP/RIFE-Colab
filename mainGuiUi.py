@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main_gui.ui'
+# Form implementation generated from reading ui file 'C:\Users\Heylon\Documents\git\RIFEcolab\main_gui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(934, 731)
+        MainWindow.resize(934, 797)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -248,7 +248,6 @@ class Ui_MainWindow(object):
         self.gridLayout_10.addWidget(self.label_31, 4, 2, 1, 1)
         self.InterpolationAIComboBox = QtWidgets.QComboBox(self.groupBox)
         self.InterpolationAIComboBox.setObjectName("InterpolationAIComboBox")
-        self.InterpolationAIComboBox.addItem("")
         self.InterpolationAIComboBox.addItem("")
         self.gridLayout_10.addWidget(self.InterpolationAIComboBox, 4, 3, 1, 1)
         self.gridLayout_2.addLayout(self.gridLayout_10, 9, 0, 1, 2)
@@ -530,7 +529,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "RIFE Colab GUI"))
-        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.23</p></body></html>"))
+        self.label.setText(_translate("MainWindow", "<html><head/><body><p>RIFE Colab GUI 0.23.1</p></body></html>"))
         self.inputLabel.setText(_translate("MainWindow", "Input file"))
         self.browseInputButton.setText(_translate("MainWindow", "Browse"))
         self.groupBox_3.setTitle(_translate("MainWindow", "Frame extraction options"))
@@ -588,7 +587,6 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "<html><head/><body><p><span style=\" font-weight:600;\">Scene change sensitivity -</span></p><p>Lower is more sensitivity<br/>Higher is less sensitivity</p></body></html>"))
         self.label_31.setText(_translate("MainWindow", "<b>Interpolation AI -</b>"))
         self.InterpolationAIComboBox.setItemText(0, _translate("MainWindow", "RIFE"))
-        self.InterpolationAIComboBox.setItemText(1, _translate("MainWindow", "FLAVR"))
         self.mode3UseInterpolationFactor.setText(_translate("MainWindow", "Use interpolation factor"))
         self.mode3UseTargetFPS.setText(_translate("MainWindow", "Use target FPS:"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Interpolation"))

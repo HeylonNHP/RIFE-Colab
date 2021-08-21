@@ -46,17 +46,6 @@ from rifeFunctions import downloadRIFE
 downloadRIFE(installPath, onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
-# from flavrInterpolationFunctions import *
-
-
-flavrFunctions = None
-try:
-    import flavrInterpolationFunctions as flavrF
-    flavrFunctions = flavrF
-except:
-    pass
-#flavrFunctions = importlib.import_module("flavrInterpolationFunctions")
-#flavrFunctions.downloadFLAVRmodel(os.getcwd())
 
 gpuBatchSize = 2
 gpuIDsList = [0]
@@ -333,8 +322,6 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
     device,model = None,None
     if interpolatorConfig.getInterpolator() == "RIFE":
         device, model = setupRIFE(installPath, gpuid)
-    elif interpolatorConfig.getInterpolator() == "FLAVR":
-        device, model = flavrFunctions.setupFLAVR(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
         if len(framesQueue) == 0:
@@ -403,10 +390,6 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
 
                 if interpolatorConfig.getInterpolator() == "RIFE":
                     midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
-                                               queuedFrame.scenechangeSensitivity,
-                                               scale=interpolatorConfig.getUhdScale())
-                elif interpolatorConfig.getInterpolator() == "FLAVR":
-                    midFrame = flavrFunctions.FLAVRinterpolat(device, model, beginFrame, endFrame, midFrame,
                                                queuedFrame.scenechangeSensitivity,
                                                scale=interpolatorConfig.getUhdScale())
 
