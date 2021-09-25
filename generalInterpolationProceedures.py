@@ -722,6 +722,8 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
             shutil.rmtree(projectFolder + '/' + 'original_frames')
             shutil.rmtree(projectFolder + '/' + 'interpolated_frames')
 
+    print("Created output file: {}".format(outputVideoName))
+
 
 def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfig, fpsTarget,
                            encoderConfig: EncoderConfig, useAutoEncode=False, autoEncodeBlockSize=3000):
