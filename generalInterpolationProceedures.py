@@ -284,7 +284,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
         rifeThread.join()
         backupThreadStartCount += 1
     if(interpolatorConfig.getBackupThreadStartLimit() != -1 and interpolatorConfig.getBackupThreadStartLimit() <= backupThreadStartCount):
-        return
+        return [-1]
 
     # Wait for loading thread to exit
     loadPNGThread.join()
@@ -712,6 +712,10 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
 
 
         outParams = runInterpolator(projectFolder, interpolatorConfig, outputFPS)
+        if outParams[0] == -1:
+            # Batch threads hit their restart limit - just DIE
+            return
+
         print('---INTERPOLATION DONE---')
         interpolationDone[0] = True
         if useAutoEncode:
