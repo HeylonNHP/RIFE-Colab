@@ -275,12 +275,14 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
         rifeThread.join()
 
     # If all threads crashed before the end of interpolation - TODO: Cycle through all GPUs
-    while not len(framesQueue) == 0:
+    backupThreadStartCount = 0
+    while not len(framesQueue) == 0 and (interpolatorConfig.getBackupThreadStartLimit() == -1 or interpolatorConfig.getBackupThreadStartLimit() > backupThreadStartCount):
         print("Starting backup thread")
         rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,interpolatorConfig,))
         rifeThread.start()
         time.sleep(5)
         rifeThread.join()
+        backupThreadStartCount += 1
 
     # Wait for loading thread to exit
     loadPNGThread.join()
