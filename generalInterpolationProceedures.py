@@ -283,6 +283,8 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
         time.sleep(5)
         rifeThread.join()
         backupThreadStartCount += 1
+    if(interpolatorConfig.getBackupThreadStartLimit() != -1 and interpolatorConfig.getBackupThreadStartLimit() <= backupThreadStartCount):
+        return
 
     # Wait for loading thread to exit
     loadPNGThread.join()
