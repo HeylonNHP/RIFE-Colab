@@ -17,6 +17,7 @@ class InterpolatorConfig:
     _mode3TargetFPSValue: float = 60
 
     _backupThreadStartLimit = -1
+    _exitOnBackupThreadLimit = False
 
     def setInterpolationFactor(self,interpolationFactor:int):
         self._interpolationFactor = interpolationFactor
@@ -106,3 +107,7 @@ class InterpolatorConfig:
         self._backupThreadStartLimit = limit
     def getBackupThreadStartLimit(self):
         return self._backupThreadStartLimit
+    def setExitOnBackupThreadLimit(self,exit:bool):
+        self._exitOnBackupThreadLimit = exit
+    def getExitOnBackupThreadLimit(self):
+        return self._exitOnBackupThreadLimit

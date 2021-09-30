@@ -6,6 +6,7 @@ parser.add_argument('-if', dest='interpolationFactor', type=int, default=2)
 parser.add_argument('-targetfpsmode',dest='mode3targetfpsenabled',type=str2bool,default=False)
 parser.add_argument('-targetfps',dest='mode3targetfps',type=float,default=60)
 parser.add_argument('-maxBatchBackupThreadRestarts', dest='maxBatchBackupThreadRestarts',type=int)
+parser.add_argument('-exitOnMaxBatchBackupThreadRestarts', dest='exitOnMaxBatchBackupThreadRestarts',type=str2bool,default=False)
 parser.add_argument('-loop', dest='loopable', type=str2bool, default=False)
 parser.add_argument('-mode', dest='mode', type=int, default=3)
 parser.add_argument('-crf', dest='crfout', type=int, default=20)
@@ -57,6 +58,7 @@ else:
 
 if(args.maxBatchBackupThreadRestarts is not None):
     interpolatorConfig.setBackupThreadStartLimit(args.maxBatchBackupThreadRestarts)
+interpolatorConfig.setExitOnBackupThreadLimit(args.exitOnMaxBatchBackupThreadRestarts)
 
 interpolatorConfig.setMpdecimateSensitivity(args.mpdecimateSensitivity)
 

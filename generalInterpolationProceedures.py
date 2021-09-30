@@ -2,6 +2,7 @@ import importlib
 import math
 import os
 import shutil
+import sys
 import traceback
 from queue import Queue
 import collections
@@ -283,7 +284,9 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
         time.sleep(5)
         rifeThread.join()
         backupThreadStartCount += 1
-    if(interpolatorConfig.getBackupThreadStartLimit() != -1 and interpolatorConfig.getBackupThreadStartLimit() <= backupThreadStartCount):
+    if interpolatorConfig.getBackupThreadStartLimit() != -1 and interpolatorConfig.getBackupThreadStartLimit() <= backupThreadStartCount:
+        if interpolatorConfig.getExitOnBackupThreadLimit():
+            sys.exit()
         return [-1]
 
     # Wait for loading thread to exit
