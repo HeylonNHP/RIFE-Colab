@@ -168,7 +168,7 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         currentLength = nextBlockStartTime - int(filesInBlock[1][:-4])
         totalLength += currentLength
         print('Auto encode block', blockCount, len(filesInBlock),
-              str(nextBlockStartTime - int(filesInBlock[1][:-4])) + 'ms',
+              str((nextBlockStartTime - int(filesInBlock[1][:-4]))/(GlobalValues.timebase/1000)) + 'ms',
               "Before", filesInBlock[0], "Start", filesInBlock[1], 'End', filesInBlock[-1])
 
         # Chose frames for use in output (Downsampling to target FPS)
