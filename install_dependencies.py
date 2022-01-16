@@ -49,6 +49,12 @@ def mainInstall():
     pathCWDrifetrainlog = pathCWD + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log' + os.path.sep
     print(pathCWDrifemodel)
 
+    if not os.path.exists(pathCWDrifemodel):
+        os.mkdir(pathCWDrifemodel)
+
+    if not os.path.exists(pathCWDrifetrainlog):
+        os.mkdir(pathCWDrifetrainlog)
+
     rifeCodeFiles = prependArray(os.listdir(pathCWDrifemodel),pathCWDrifemodel)
     rifeCodeFiles += prependArray(os.listdir(pathCWDrifetrainlog),pathCWDrifetrainlog)
 
@@ -116,8 +122,8 @@ def mainInstall():
             ffprobeExists = True
         except:
             print("Can't find ffmpeg/ffprobe - Downloading")
-            downloadFile(r'https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2021-02-06-12-33/ffmpeg-n4.3.1-221-gd08bcbffff-win64-gpl-4.3.zip','ffmpeg.zip')
-            extractArchive('ffmpeg.zip',['doc'])
+            downloadFile(r'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n5.0-latest-win64-gpl-5.0.zip', 'ffmpeg.zip')
+            extractArchive('ffmpeg.zip', ['doc'])
 
     print('----DEPENDENCY INSTALLATION COMPLETE----')
 
