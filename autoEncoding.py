@@ -163,12 +163,12 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         except:
             # If frame from next block doesn't exist (I.E. this is the last block) generate time from last frame pair in current block
             nextBlockStartTime = int(interpolatedFrames[blockSize - 1][:-4]) + (
-                        int(interpolatedFrames[blockSize - 1][:-4]) - int(interpolatedFrames[blockSize - 2][:-4]))
+                    int(interpolatedFrames[blockSize - 1][:-4]) - int(interpolatedFrames[blockSize - 2][:-4]))
 
         currentLength = nextBlockStartTime - int(filesInBlock[1][:-4])
         totalLength += currentLength
         print('Auto encode block', blockCount, len(filesInBlock),
-              str((nextBlockStartTime - int(filesInBlock[1][:-4]))/(GlobalValues.timebase/1000)) + 'ms',
+              str((nextBlockStartTime - int(filesInBlock[1][:-4])) / (GlobalValues.timebase / 1000)) + 'ms',
               "Before", filesInBlock[0], "Start", filesInBlock[1], 'End', filesInBlock[-1])
 
         # Chose frames for use in output (Downsampling to target FPS)
@@ -246,7 +246,7 @@ def executeConcatAndGenerateOutput(concatFilePath: str, inputFile: str, outputFi
     maxLoopLength = encoderConfig.getLoopingOptions()[1]
 
     if loopEnabled:
-        inputLength = getLength(inputFile)
+        inputLength = get_length(inputFile)
         # Looping enabled
         if (maxLoopLength / float(inputLength) > 2):
             # Looping the video won't extend it beyond maxLoopLength

@@ -63,7 +63,7 @@ def subscribeTointerpolationProgressUpdate(function):
 def setFFmpeg4Path(path):
     global FFMPEG4
     FFMPEG4 = path
-    setFFmpegLocation(FFMPEG4)
+    set_ffmpeg_location(FFMPEG4)
 
 
 def setNvencSettings(nvencGpuID, preset):
@@ -492,7 +492,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
     maxLoopLength = encoderConfig.getLoopingOptions()[1]
     preferredLoopLength = encoderConfig.getLoopingOptions()[0]
     loopable = encoderConfig.getLoopingOptions()[2]
-    inputLength = getLength(inputFile)
+    inputLength = get_length(inputFile)
 
     inputFFmpeg = ""
 
@@ -630,12 +630,12 @@ def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurat
     AccountForDuplicateFrames runs mpdecimate and calculates FPS with duplicates removed
     '''
     if (mode == 3 or mode == 4) and accountForDuplicateFrames:
-        return (getFrameCount(inputFile, True, mpdecimateSensitivity) / getLength(inputFile)) * interpolationFactor
+        return (get_frame_count(inputFile, True, mpdecimateSensitivity) / get_length(inputFile)) * interpolationFactor
 
     if useAccurateFPS:
-        return getFPSaccurate(inputFile) * interpolationFactor
+        return get_fps_accurate(inputFile) * interpolationFactor
     else:
-        return getFPS(inputFile) * interpolationFactor
+        return get_fps(inputFile) * interpolationFactor
 
 def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderConfig: EncoderConfig,
                     useAutoEncode=False, autoEncodeBlockSize=3000, step1=True, step2=True, step3=True):
