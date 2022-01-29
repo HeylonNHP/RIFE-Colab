@@ -21,7 +21,7 @@ from generalInterpolationProceedures import *
 
 
 def grab_latest_rife_model():
-    downloadRIFE(installPath, onWindows, forceDownloadModels=True)
+    download_rife(installPath, onWindows, force_download_models=True)
 
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):

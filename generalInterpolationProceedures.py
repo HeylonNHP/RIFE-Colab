@@ -42,9 +42,9 @@ else:
     onWindows = False
 
 # Get and initialise RIFE
-from rifeFunctions import downloadRIFE
+from rifeFunctions import download_rife
 
-downloadRIFE(installPath, onWindows)
+download_rife(installPath, onWindows)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 
