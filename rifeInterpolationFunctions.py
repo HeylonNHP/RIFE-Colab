@@ -1,30 +1,28 @@
 import os
-#os.chdir('arXiv2020-RIFE/')
-import shutil
-import cv2
-import torch
-import argparse
-from torch.nn import functional as F
-#from arXiv2020RIFE.model.RIFE_HDv2 import Model
-from arXiv2020RIFE.train_log.RIFE_HDv3 import Model
-import numpy as np
-from queue import Queue
-import gc
 import threading
+
+import numpy as np
+# os.chdir('arXiv2020-RIFE/')
+import torch
+# from arXiv2020RIFE.model.RIFE_HDv2 import Model
+from arXiv2020RIFE.train_log.RIFE_HDv3 import Model
+from torch.nn import functional as F
+
 from QueuedFrames.FrameFile import FrameFile
 
 useHalfPrecision: bool = False
 
 setupRifeThreadLock = threading.Lock()
 
-def setupRIFE(installPath, GPUID):
+
+def setup_rife(install_path, gpu_id):
     global useHalfPrecision
     with setupRifeThreadLock:
         try:
             # TODO: Potentially use model.Device instead? (Line 41)
-            torch.cuda.set_device(GPUID)
+            torch.cuda.set_device(gpu_id)
         except:
-            print("Could net set CUDA device. Attempted CUDA device:",GPUID)
+            print("Could net set CUDA device. Attempted CUDA device:", gpu_id)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
         if torch.cuda.is_available():
@@ -39,22 +37,22 @@ def setupRIFE(installPath, GPUID):
             print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
 
         model = Model()
-        model.load_model(installPath + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
+        model.load_model(install_path + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
         model.eval()
         model.device()
-        return device,model
+        return device, model
 
 
-def rifeInterpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, outputFrame: FrameFile,
-                    scenechangeSensitivity=0.2, scale=0.5):
+def rife_interpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, output_frame: FrameFile,
+                     scenechange_sensitivity=0.2, scale=0.5):
     global useHalfPrecision
     img0 = img0frame.getImageData()
     img1 = img1frame.getImageData()
 
     h, w, _ = img0.shape
-    imgList = [img0, img1]
+    img_list = [img0, img1]
 
-    imgs = torch.from_numpy(np.transpose(imgList, (0, 3, 1, 2))).to(device, non_blocking=True).float() / 255.
+    imgs = torch.from_numpy(np.transpose(img_list, (0, 3, 1, 2))).to(device, non_blocking=True).float() / 255.
     img0 = imgs[:-1]
     img1 = imgs[1:]
 
@@ -71,16 +69,16 @@ def rifeInterpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, o
         img0 = F.pad(img0, padding)
         img1 = F.pad(img1, padding)
 
-    mid = None
-    if p > scenechangeSensitivity:
+    if p > scenechange_sensitivity:
         mid = img0
     else:
         mid = model.inference(img0, img1, scale)
 
     item = (mid[:, :, :h, :w] * 255.).byte().cpu().detach().numpy().transpose(0, 2, 3, 1)[0]
-    outputFrame.setImageData(item)
-    return outputFrame
+    output_frame.setImageData(item)
+    return output_frame
 
-def setUseHalfPrecision(enable:bool):
+
+def set_use_half_precision(enable: bool):
     global useHalfPrecision
     useHalfPrecision = enable

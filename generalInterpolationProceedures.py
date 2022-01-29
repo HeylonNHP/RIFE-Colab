@@ -328,7 +328,7 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
     '''
     device,model = None,None
     if interpolatorConfig.getInterpolator() == "RIFE":
-        device, model = setupRIFE(installPath, gpuid)
+        device, model = setup_rife(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
         if len(framesQueue) == 0:
@@ -396,9 +396,9 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 midFrame = FrameFile(queuedFrame.middleFrame)
 
                 if interpolatorConfig.getInterpolator() == "RIFE":
-                    midFrame = rifeInterpolate(device, model, beginFrame, endFrame, midFrame,
-                                               queuedFrame.scenechangeSensitivity,
-                                               scale=interpolatorConfig.getUhdScale())
+                    midFrame = rife_interpolate(device, model, beginFrame, endFrame, midFrame,
+                                                queuedFrame.scenechangeSensitivity,
+                                                scale=interpolatorConfig.getUhdScale())
 
 
                 listOfCompletedFrames.append(midFrame)

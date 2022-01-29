@@ -257,7 +257,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         uhd_scale_factor: float = self.UHDscaleNumber.value()
 
-        setUseHalfPrecision(use_half_precision_checked)
+        set_use_half_precision(use_half_precision_checked)
 
         if use_nvenc:
             encoder_config.enableNvenc(True)
