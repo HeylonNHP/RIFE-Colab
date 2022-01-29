@@ -1,6 +1,6 @@
 import math
 
-from frameChooser import chooseFramesList
+from frameChooser import choose_frames_list
 from runAndPrintOutput import *
 import os
 import time
@@ -172,8 +172,8 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
               "Before", filesInBlock[0], "Start", filesInBlock[1], 'End', filesInBlock[-1])
 
         # Chose frames for use in output (Downsampling to target FPS)
-        chosenFrames, blockDuration, currentTime, currentCount = chooseFramesList(filesInBlock, outputFPS, currentTime,
-                                                                                  currentCount)
+        chosenFrames, blockDuration, currentTime, currentCount = choose_frames_list(filesInBlock, outputFPS, currentTime,
+                                                                                    currentCount)
 
         # blockDurations.append(blockDuration)
         blockDurations.append(currentLength)

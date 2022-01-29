@@ -17,7 +17,7 @@ import autoEncoding
 
 from runAndPrintOutput import run_and_print_output
 from FFmpegFunctions import *
-from frameChooser import chooseFrames
+from frameChooser import choose_frames
 from Globals.GlobalValues import GlobalValues
 from Globals.EncoderConfig import EncoderConfig
 from Globals.InterpolatorConfig import InterpolatorConfig
@@ -511,7 +511,7 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
         inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']
     if mode == 3 or mode == 4:
         # generateTimecodesFile(projectFolder)
-        chooseFrames(projectFolder + os.path.sep + "interpolated_frames", outputFPS)
+        choose_frames(projectFolder + os.path.sep + "interpolated_frames", outputFPS)
         inputFFmpeg = ['-vsync', '1', '-r', str(outputFPS), '-f', 'concat', '-safe', '0', '-i',
                        'interpolated_frames/framesCFR.txt']
 

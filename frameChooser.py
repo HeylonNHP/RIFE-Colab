@@ -1,99 +1,76 @@
 import os
 from Globals.GlobalValues import GlobalValues
 
-def chooseFrames(framesFolder, desiredFPS):
-    frameFiles = os.listdir(framesFolder)
-    frameFiles.sort()
-    lastFile = int(frameFiles[-1][:-4])
-    desiredFrameSpacing = (1 / desiredFPS) * GlobalValues.timebase
-    timecodesFileString = ""
-    currentTime = desiredFrameSpacing
+
+def choose_frames(frames_folder, desired_fps):
+    frame_files = os.listdir(frames_folder)
+    frame_files.sort()
+    last_file = int(frame_files[-1][:-4])
+    desired_frame_spacing = (1 / desired_fps) * GlobalValues.timebase
+    timecodes_file_string = ""
+    current_time = desired_frame_spacing
     count = 1
-    currentListIndex = 0
-    while (currentTime - desiredFrameSpacing) <= lastFile:
-        currentFrame = int(frameFiles[currentListIndex][:-4])
+    current_list_index = 0
+    while (current_time - desired_frame_spacing) <= last_file:
+        current_frame = int(frame_files[current_list_index][:-4])
 
         while not (
-                currentFrame >= round(currentTime - desiredFrameSpacing)):  # and currentFrame <= round(currentTime)):
-            if not currentListIndex >= len(frameFiles) - 1:
-                currentListIndex += 1
+                current_frame >= round(current_time - desired_frame_spacing)):  # and current_frame <= round(current_time)):
+            if not current_list_index >= len(frame_files) - 1:
+                current_list_index += 1
             else:
                 break
 
-            # print(currentListIndex, 'LI', currentFrame, 'CU', count, 'count')
-            # print('sanity Check', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
-            currentFrame = int(frameFiles[currentListIndex][:-4])
+            current_frame = int(frame_files[current_list_index][:-4])
 
-        # print('sanity Check SUCCEEDED', currentFrame, '>', (currentTime - desiredFrameSpacing), 'and', currentFrame, '<=', currentTime)
         # Build timecodes file
-        frameFile = framesFolder + os.path.sep + frameFiles[currentListIndex]
-
-        timecodesFileString += ("file '" + frameFile + "'\n")
+        frame_file = frames_folder + os.path.sep + frame_files[current_list_index]
+        timecodes_file_string += ("file '" + frame_file + "'\n")
 
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
-    print(timecodesFileString)
-    outFile = open(framesFolder + os.path.sep + 'framesCFR.txt', 'w')
-    outFile.write(timecodesFileString)
-    outFile.close()
+        current_time = ((1 / desired_fps) * count) * GlobalValues.timebase
+    print(timecodes_file_string)
+    out_file = open(frames_folder + os.path.sep + 'framesCFR.txt', 'w')
+    out_file.write(timecodes_file_string)
+    out_file.close()
 
 
-def chooseFramesList(frameFiles, desiredFPS,startTime=0,startCount=0):
-    """testFilePath = 'test.txt'
-    testFileString = ""
-    try:
-        testFile = open(testFilePath,'r')
-        testFileString = testFile.read()
-        testFile.close()
-    except:
-        pass
+def choose_frames_list(frame_files, desired_fps, start_time=0, start_count=0):
+    chosen_frame_list: list = []
 
-    testFile = open(testFilePath,'w')"""
+    # frameFiles = os.listdir(framesFolder)
+    frame_files.sort()
 
-    chosenFrameList: list = []
+    last_file_number = int(frame_files[-1][:-4])
+    desired_frame_spacing = (1 / desired_fps) * GlobalValues.timebase
 
-    #frameFiles = os.listdir(framesFolder)
-    frameFiles.sort()
-
-    lastFileNumber = int(frameFiles[-1][:-4])
-    desiredFrameSpacing = (1 / desiredFPS) * GlobalValues.timebase
-
-    currentTime = desiredFrameSpacing
+    current_time = desired_frame_spacing
     count = 1
-    if not startTime == 0:
-        currentTime = startTime
-    if not startCount == 0:
-        count = startCount
+    if not start_time == 0:
+        current_time = start_time
+    if not start_count == 0:
+        count = start_count
 
-    currentListIndex = 0
-
-    """testFileString += 'Video clip: '"""
+    current_list_index = 0
 
     # For when the first frame doesn't start from 0ms
     # Advance current time to the first frame's timecode
-    while currentTime < int(frameFiles[0][:-4]):
+    while current_time < int(frame_files[0][:-4]):
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
+        current_time = ((1 / desired_fps) * count) * GlobalValues.timebase
 
-    """testFileString += 'Start time: ' + str(currentTime)"""
-
-    while (currentTime - desiredFrameSpacing) <= lastFileNumber:
-        currentFrame = int(frameFiles[currentListIndex][:-4])
-        while currentFrame < round(currentTime - desiredFrameSpacing):
-            if currentListIndex < len(frameFiles) - 1:
-                currentListIndex += 1
+    while (current_time - desired_frame_spacing) <= last_file_number:
+        current_frame = int(frame_files[current_list_index][:-4])
+        while current_frame < round(current_time - desired_frame_spacing):
+            if current_list_index < len(frame_files) - 1:
+                current_list_index += 1
             else:
                 break
-            currentFrame = int(frameFiles[currentListIndex][:-4])
-        frameFile = frameFiles[currentListIndex]
-        chosenFrameList.append(frameFile)
+            current_frame = int(frame_files[current_list_index][:-4])
+        frame_file = frame_files[current_list_index]
+        chosen_frame_list.append(frame_file)
 
         count += 1
-        currentTime = ((1 / desiredFPS) * count) * GlobalValues.timebase
-    """testFileString += ' End time: ' + str(currentTime)
-    testFileString += ' Start frame: ' + chosenFrameList[0] + ' End frame: ' + chosenFrameList[-1]
-    testFileString += ' Duration: ' + str((int(chosenFrameList[-1][:-4]) - int(chosenFrameList[0][:-4])))
-    testFileString += '\n'
-    testFile.write(testFileString)
-    testFile.close()"""
-    return chosenFrameList, (int(frameFiles[-1][:-4]) - int(frameFiles[0][:-4])), currentTime, count
+        current_time = ((1 / desired_fps) * count) * GlobalValues.timebase
+
+    return chosen_frame_list, (int(frame_files[-1][:-4]) - int(frame_files[0][:-4])), current_time, count
