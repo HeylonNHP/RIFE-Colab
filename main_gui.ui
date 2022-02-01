@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>934</width>
-    <height>797</height>
+    <height>848</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1029,6 +1029,32 @@ Requires 7-zip to be installed before updating</string>
          </widget>
         </item>
         <item>
+         <widget class="QGroupBox" name="groupBox_10">
+          <property name="title">
+           <string>Maximum interpolation thread restarts</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_11">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="threadRestartsMaxCheckbox">
+             <property name="text">
+              <string>Enable</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="threadRestartsMaxSpinBox">
+             <property name="maximum">
+              <number>999999999</number>
+             </property>
+             <property name="value">
+              <number>10</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
          <widget class="QGroupBox" name="groupBox_9">
           <property name="title">
            <string>After interpolation is complete</string>
@@ -1122,7 +1148,7 @@ Requires 7-zip to be installed before updating</string>
      <x>0</x>
      <y>0</y>
      <width>934</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

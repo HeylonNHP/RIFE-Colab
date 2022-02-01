@@ -293,6 +293,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         interpolator_config.setMode3TargetFPS(mode3_target_fps_enabled, mode3_target_fps_value)
         interpolator_config.setInterpolator(interpolation_ai)
         interpolator_config.enableMpdecimate(mpdecimate_enabled)
+        interpolator_config.setExitOnBackupThreadLimit(bool(self.threadRestartsMaxCheckbox.isChecked()))
+        interpolator_config.setBackupThreadStartLimit(int(self.threadRestartsMaxSpinBox.value()))
 
         # Exceptions are hidden on the PYQt5 thread - Run interpolator on separate thread to see them
         interpolate_thread = threading.Thread(target=self.run_all_interpolation_steps_thread, args=(
@@ -389,7 +391,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
                          'limitFPSValue': float(self.limitFPSnumber.value()),
                          'batchtargetfps': float(self.targetFPSnumber.value()),
                          'saveguistate': bool(self.saveGUIstateCheck.isChecked()),
-                         'systemPowerOption': int(self.systemPowerOptionsComboBox.currentIndex())}
+                         'systemPowerOption': int(self.systemPowerOptionsComboBox.currentIndex()),
+                         'limitBackupThreadRestarts': (
+                         bool(self.threadRestartsMaxCheckbox.isChecked()), int(self.threadRestartsMaxSpinBox.value()))}
 
         return settings_dict
 
@@ -464,6 +468,11 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         if 'systemPowerOption' in settings_dict:
             self.systemPowerOptionsComboBox.setCurrentIndex(settings_dict['systemPowerOption'])
+
+        if 'limitBackupThreadRestarts' in settings_dict:
+            limit_backup_thread_restarts = settings_dict['limitBackupThreadRestarts']
+            self.threadRestartsMaxCheckbox.setChecked(limit_backup_thread_restarts[0])
+            self.threadRestartsMaxSpinBox.setValue(limit_backup_thread_restarts[1])
 
     def save_settings_file(self, filename: str):
         settings_dict = self.get_current_ui_settings()
