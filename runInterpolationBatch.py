@@ -36,7 +36,7 @@ selectedGPUs = [int(i) for i in selectedGPUs]
 setGPUinterpolationOptions(args.batchSize, selectedGPUs)
 
 encoderConfig = EncoderConfig()
-encoderConfig.setEncodingCRF(float(args.crfout))
+encoderConfig.setEncodingCRF(float(args.crf))
 if bool(args.useNvenc):
     encoderConfig.enableNvenc(True)
     encoderConfig.setEncodingPreset('slow')
@@ -46,13 +46,14 @@ interpolatorConfig = InterpolatorConfig()
 
 interpolatorConfig.setMode(args.mode)
 interpolatorConfig.setClearPngs(args.clearpngs)
-interpolatorConfig.setLoopable(args.loopable)
+encoderConfig.setLoopingOptions(10, 15, True)
 
-interpolatorConfig.setInterpolationFactor(args.interpolationFactor)
 interpolatorConfig.setMpdecimateSensitivity(args.mpdecimateSensitivity)
 
 interpolatorConfig.setNonlocalPngs(args.nonlocalpngs)
 interpolatorConfig.setScenechangeSensitivity(args.scenechangeSensitivity)
+
+interpolatorConfig.setMode3TargetFPS(True, 60)
 
 # Batch interpolation code
 batchInterpolateFolder(args.inputDirectory, interpolatorConfig, args.fpsTarget, encoderConfig, args.autoencode,
