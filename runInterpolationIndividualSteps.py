@@ -1,5 +1,15 @@
 from str2bool import *
 import argparse
+import os
+import sys
+import addInstalldirToPath
+
+# Why should we need to add the submodule to the path, just for the RIFE import to work
+# Thanks for being consistently terrible, python
+sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
+
+from generalInterpolationProceedures import *
+
 parser = argparse.ArgumentParser(description='Interpolation for video input')
 parser.add_argument('-i', dest='inputFile', type=str, default=None)
 parser.add_argument('-if', dest='interpolationFactor', type=int, default=2)
@@ -22,22 +32,12 @@ parser.add_argument('-step3', dest='step3', action='store_true')
 parser.set_defaults(step3=False)
 args = parser.parse_args()
 
-import os
-import sys
-import addInstalldirToPath
-
-# Why should we need to add the submodule to the path, just for the RIFE import to work
-# Thanks for being consistently terrible, python
-sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
-
-from generalInterpolationProceedures import *
-
 selectedGPUs = str(args.gpuid).split(",")
 selectedGPUs = [int(i) for i in selectedGPUs]
 
-setGPUinterpolationOptions(args.batchSize,selectedGPUs)
+setGPUinterpolationOptions(args.batchSize, selectedGPUs)
 
-print('Step1',args.step1,'Step2',args.step2,'Step3',args.step3)
+print('Step1', args.step1, 'Step2', args.step2, 'Step3', args.step3)
 
 projectFolder = args.inputFile[:args.inputFile.rindex(os.path.sep)]
 if args.nonlocalpngs:
