@@ -753,10 +753,10 @@ def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfi
     accountForDuplicateFrames = interpolatorConfig.getAccountForDuplicateFrames()
 
     files = []
-    # r=root, d=directories, f = files
-    for r, d, f in os.walk(inputDirectory):
-        for file in f:
-            files.append(os.path.join(r, file))
+
+    for root, directories, files in os.walk(inputDirectory):
+        for file in files:
+            files.append(os.path.join(root, file))
 
     files.sort()
 
