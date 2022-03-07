@@ -752,15 +752,15 @@ def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfi
     useAccurateFPS = interpolatorConfig.getUseAccurateFPS()
     accountForDuplicateFrames = interpolatorConfig.getAccountForDuplicateFrames()
 
-    files = []
+    input_files = []
 
     for root, directories, files in os.walk(inputDirectory):
         for file in files:
-            files.append(os.path.join(root, file))
+            input_files.append(os.path.join(root, file))
 
-    files.sort()
+    input_files.sort()
 
-    for inputVideoFile in files:
+    for inputVideoFile in input_files:
         try:
             print(inputVideoFile)
 
