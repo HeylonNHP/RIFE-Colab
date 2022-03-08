@@ -55,6 +55,8 @@ interpolatorConfig.setScenechangeSensitivity(args.scenechangeSensitivity)
 
 interpolatorConfig.setMode3TargetFPS(True, 60)
 
+interpolatorConfig.setBackupThreadStartLimit(10)
+
 # Batch interpolation code
 batchInterpolateFolder(args.inputDirectory, interpolatorConfig, args.fpsTarget, encoderConfig, args.autoencode,
                        args.blocksize)
