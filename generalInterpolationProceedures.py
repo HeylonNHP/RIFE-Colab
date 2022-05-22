@@ -27,6 +27,7 @@ from EventHandling import Event
 from tqdm import tqdm
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 FFMPEG4 = GlobalValues().getFFmpegPath()
@@ -53,9 +54,10 @@ gpuBatchSize = 2
 gpuIDsList = [0]
 
 interpolationProgressUpdate = Event.Event()
-currentSavingPNGRanges:list = []
+currentSavingPNGRanges: list = []
 
 progressBar = None
+
 
 def subscribeTointerpolationProgressUpdate(function):
     interpolationProgressUpdate.append(function)
@@ -81,7 +83,8 @@ def setGPUinterpolationOptions(batchSize: int, _gpuIDsList: list):
     gpuBatchSize = batchSize
 
 
-def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: InterpolatorConfig, mpdecimateSensitivity="64*12,64*8,0.33"):
+def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: InterpolatorConfig,
+                  mpdecimateSensitivity="64*12,64*8,0.33"):
     '''
     Equivalent to DAINAPP Step 1
     :param interpolatorConfig:
@@ -103,8 +106,9 @@ def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: Interpolat
             mpdecimateOptions += ['-vf']
             mpdecimateOptions += [mpdecimate]
         run_and_print_output(
-            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r', str(GlobalValues.timebase), '-vsync',
-             '0', '-frame_pts', 'true']+mpdecimateOptions+['-qscale:v', '1', 'original_frames/%15d.png'])
+            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r',
+             str(GlobalValues.timebase), '-vsync',
+             '0', '-frame_pts', 'true'] + mpdecimateOptions + ['-qscale:v', '1', 'original_frames/%15d.png'])
 
 
 def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outputFPS):
@@ -136,7 +140,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     files = os.listdir(origFramesFolder)
     files.sort()
 
-    framesQueue:collections.deque = collections.deque()
+    framesQueue: collections.deque = collections.deque()
 
     if mode == 1:
 
@@ -158,7 +162,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
 
             interpolationProgress = InterpolationProgress()
             interpolationProgress.progressMessage = progressMessage
-            interpolationProgress.completedFrames = i+1
+            interpolationProgress.completedFrames = i + 1
             interpolationProgress.totalFrames = len(files)
             queuedFrameList.interpolationProgress = interpolationProgress
 
@@ -200,7 +204,8 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
             if mode == 3:
                 localInterpolationFactor = 2
 
-                while 1 / (((endFrameTime - beginFrameTime) / localInterpolationFactor) / GlobalValues.timebase) < modeModOutputFPS:
+                while 1 / (((
+                                    endFrameTime - beginFrameTime) / localInterpolationFactor) / GlobalValues.timebase) < modeModOutputFPS:
                     localInterpolationFactor = int(localInterpolationFactor * 2)
 
             progressMessage = "Interpolating frame: {} Of {} {:.2f}% Frame interp. factor {}x".format(i + 1, len(files),
@@ -221,7 +226,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
 
             interpolationProgress = InterpolationProgress()
             interpolationProgress.progressMessage = progressMessage
-            interpolationProgress.completedFrames = i+1
+            interpolationProgress.completedFrames = i + 1
             interpolationProgress.totalFrames = len(files)
             queuedFrameList.interpolationProgress = interpolationProgress
 
@@ -252,7 +257,7 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     progressBar = tqdm(total=len(files))
 
     inFramesList: list = []
-    loadPNGThread = threading.Thread(target=queueThreadLoadFrame,args=(origFramesFolder,inFramesList,))
+    loadPNGThread = threading.Thread(target=queueThreadLoadFrame, args=(origFramesFolder, inFramesList,))
     loadPNGThread.start()
 
     outFramesQueue: Queue = Queue(maxsize=32)
@@ -261,7 +266,8 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     threads: list = []
     for i in range(0, batchSize):
         for gpuID in gpuList:
-            rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,interpolatorConfig,))
+            rifeThread = threading.Thread(target=queueThreadInterpolator,
+                                          args=(framesQueue, outFramesQueue, inFramesList, gpuID, interpolatorConfig,))
             threads.append(rifeThread)
             rifeThread.start()
         time.sleep(5)
@@ -278,9 +284,11 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
 
     # If all threads crashed before the end of interpolation - TODO: Cycle through all GPUs
     backupThreadStartCount = 0
-    while not len(framesQueue) == 0 and (interpolatorConfig.getBackupThreadStartLimit() == -1 or interpolatorConfig.getBackupThreadStartLimit() > backupThreadStartCount):
+    while not len(framesQueue) == 0 and (
+            interpolatorConfig.getBackupThreadStartLimit() == -1 or interpolatorConfig.getBackupThreadStartLimit() > backupThreadStartCount):
         print("Starting backup thread")
-        rifeThread = threading.Thread(target=queueThreadInterpolator, args=(framesQueue, outFramesQueue, inFramesList, gpuID,interpolatorConfig,))
+        rifeThread = threading.Thread(target=queueThreadInterpolator,
+                                      args=(framesQueue, outFramesQueue, inFramesList, gpuID, interpolatorConfig,))
         rifeThread.start()
         time.sleep(5)
         rifeThread.join()
@@ -317,7 +325,9 @@ def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outpu
     # Return output FPS
     return [outputFPS]
 
+
 inFrameGetLock = threading.Lock()
+
 
 def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queue, inFramesList: list, gpuid,
                             interpolatorConfig):
@@ -327,13 +337,13 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
     Puts frameLists in output queue to save
     :param interpolatorConfig:
     '''
-    device,model = None,None
+    device, model = None, None
     if interpolatorConfig.getInterpolator() == "RIFE":
         device, model = setup_rife(installPath, gpuid)
     while True:
         listOfCompletedFrames = []
         if len(framesQueue) == 0:
-            freeVRAM(model,device)
+            freeVRAM(model, device)
             break
         currentQueuedFrameList: QueuedFrameList = framesQueue.popleft()
 
@@ -359,7 +369,7 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 # If the current frame pair uses an original_frame - Then grab it from RAM
                 if queuedFrame.beginFrame == currentQueuedFrameList.startFrameDest:
                     with inFrameGetLock:
-                        for i in range(0,len(inFramesList)):
+                        for i in range(0, len(inFramesList)):
                             if currentQueuedFrameList.startFrame == str(inFramesList[i]):
                                 beginFrame = inFramesList[i]
                                 break
@@ -378,11 +388,10 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 # If the current frame pair uses an original_frame - Then grab it from RAM
                 if queuedFrame.endFrame == currentQueuedFrameList.endFrameDest:
                     with inFrameGetLock:
-                        for i in range(0,len(inFramesList)):
+                        for i in range(0, len(inFramesList)):
                             if currentQueuedFrameList.endFrame == str(inFramesList[i]):
                                 endFrame = inFramesList[i]
                                 break
-
 
                 if endFrame is None:
                     for i in range(0, len(listOfCompletedFrames)):
@@ -401,7 +410,6 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                                                 queuedFrame.scenechangeSensitivity,
                                                 scale=interpolatorConfig.getUhdScale())
 
-
                 listOfCompletedFrames.append(midFrame)
                 # outFramesQueue.put(midFrame)
         except Exception as e:
@@ -413,12 +421,13 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
                 print(e)
 
             # Kill batch thread
-            freeVRAM(model,device)
+            freeVRAM(model, device)
             print("Freed VRAM from dead thread")
             break
 
         # Add interpolated frames to png save queue
-        outputFramesList:SaveFramesList = SaveFramesList(listOfCompletedFrames,currentQueuedFrameList.startFrameDest,currentQueuedFrameList.endFrameDest)
+        outputFramesList: SaveFramesList = SaveFramesList(listOfCompletedFrames, currentQueuedFrameList.startFrameDest,
+                                                          currentQueuedFrameList.endFrameDest)
 
         '''for midFrame1 in listOfCompletedFrames:
             outFramesQueue.put(midFrame1)'''
@@ -426,7 +435,7 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
 
         # Start frame is no-longer needed, remove from RAM
         with inFrameGetLock:
-            for i in range(0,len(inFramesList)):
+            for i in range(0, len(inFramesList)):
                 if str(inFramesList[i]) == currentQueuedFrameList.startFrame:
                     inFramesList.pop(i)
                     break
@@ -436,6 +445,7 @@ def queueThreadInterpolator(framesQueue: collections.deque, outFramesQueue: Queu
         progressBar.update(1)
     print("END")
 
+
 def freeVRAM(model, device):
     '''
     Attempts to free the RIFE model and GPU device from memory
@@ -444,6 +454,7 @@ def freeVRAM(model, device):
     del device
     gc.collect()
     torch.cuda.empty_cache()
+
 
 def queueThreadSaveFrame(outFramesQueue: Queue):
     '''
@@ -455,11 +466,11 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
             print("Got none - save thread")
             outFramesQueue.put(None)
             break
-        currentSavingPNGRange = [item.startOutputFrame,item.endOutputFrame]
+        currentSavingPNGRange = [item.startOutputFrame, item.endOutputFrame]
         currentSavingPNGRanges.append(currentSavingPNGRange)
 
         total, used, free = shutil.disk_usage(os.getcwd()[:os.getcwd().index(os.path.sep) + 1])
-        freeSpaceInMB = free / (2**20)
+        freeSpaceInMB = free / (2 ** 20)
         while freeSpaceInMB < 100:
             print("Running out of space on device")
             time.sleep(5)
@@ -468,14 +479,15 @@ def queueThreadSaveFrame(outFramesQueue: Queue):
         item.saveAllPNGsInList()
         currentSavingPNGRanges.remove(currentSavingPNGRange)
 
-def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
+
+def queueThreadLoadFrame(origFramesFolder: str, inFramesList: list):
     '''
     Loads png frames from disk and places them in a queue to be interpolated
     '''
     maxListLength = 128
     frameFilesList = os.listdir(origFramesFolder)
     frameFilesList.sort()
-    for i in range(0,len(frameFilesList)):
+    for i in range(0, len(frameFilesList)):
         while len(inFramesList) > maxListLength:
             time.sleep(0.01)
         frameFile = FrameFile(origFramesFolder + '/' + frameFilesList[i])
@@ -484,7 +496,7 @@ def queueThreadLoadFrame(origFramesFolder:str,inFramesList:list):
     print("LOADED ALL FRAMES - DONE")
 
 
-def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, encoderConfig:EncoderConfig):
+def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, encoderConfig: EncoderConfig):
     '''
     Equivalent to DAINAPP Step 3
     '''
@@ -497,16 +509,19 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
     inputFFmpeg = ""
 
-    encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset', encoderConfig.getEncodingPreset(),
+    encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset',
+                     encoderConfig.getEncodingPreset(),
                      '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
     ffmpegSelected = FFMPEG4
     if encoderConfig.nvencEnabled():
-        encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu', str(encoderConfig.getNvencGPUID()), '-preset', str(encoderConfig.getEncodingPreset()),
-                         '-profile', encoderConfig.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq', str(encoderConfig.getEncodingCRF())]
+        encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu',
+                         str(encoderConfig.getNvencGPUID()), '-preset', str(encoderConfig.getEncodingPreset()),
+                         '-profile', encoderConfig.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq',
+                         str(encoderConfig.getEncodingCRF())]
         ffmpegSelected = GlobalValues().getFFmpegPath()
 
     if encoderConfig.FFmpegOutputFPSEnabled():
-        encoderPreset = encoderPreset + ['-r',str(encoderConfig.FFmpegOutputFPSValue())]
+        encoderPreset = encoderPreset + ['-r', str(encoderConfig.FFmpegOutputFPSValue())]
 
     if mode == 1:
         inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']
@@ -541,13 +556,22 @@ def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mod
 
         command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
         command = command + inputFFmpeg
-        command = command + ['-pix_fmt', encoderConfig.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f', 'yuv4mpegpipe', '-']
+        command = command + ['-pix_fmt', encoderConfig.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f',
+                             'yuv4mpegpipe', '-']
         command2 = [ffmpegSelected, '-y', '-i', '-']
         command2 = command2 + audioInput + encoderPreset + [str(outputVideo)]
 
+        # Looping pipe
         pipe1 = subprocess.Popen(command, stdout=subprocess.PIPE)
-        output = subprocess.check_output(command2, stdin=pipe1.stdout)
+        output = ""
+        try:
+            output = subprocess.check_output(command2, shell=False, universal_newlines=True, stdin=pipe1.stdout,
+                                             stderr=subprocess.STDOUT)
+        except subprocess.CalledProcessError:
+            print(output)
         pipe1.wait()
+        # ---END looping pipe---
+
         if os.path.exists('loop.flac'):
             os.remove('loop.flac')
     print("---Finished Encoding---")
@@ -623,6 +647,7 @@ def generateTimecodesFile(projectFolder):
         float(averageDistance / float(GlobalValues.timebase))) + "\n")
     f.close()
 
+
 def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurateFPS: bool,
                  accountForDuplicateFrames: bool, mpdecimateSensitivity):
     '''
@@ -637,6 +662,7 @@ def getOutputFPS(inputFile: str, mode: int, interpolationFactor: int, useAccurat
         return get_fps_accurate(inputFile) * interpolationFactor
     else:
         return get_fps(inputFile) * interpolationFactor
+
 
 def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderConfig: EncoderConfig,
                     useAutoEncode=False, autoEncodeBlockSize=3000, step1=True, step2=True, step3=True):
@@ -681,16 +707,20 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
         outputFPS = getOutputFPS(inputFile, mode, interpolationFactor, useAccurateFPS, accountForDuplicateFrames,
                                  mpdecimateSensitivity)
 
-    interpolationFactorFileLabel = [str(interpolationFactor),'x']
+    interpolationFactorFileLabel = [str(interpolationFactor), 'x']
     if interpolatorConfig.getMode3TargetFPSEnabled() and mode == 3:
         interpolationFactorFileLabel = ['TargetFPS']
 
-    #Interpolation AI name
+    # Interpolation AI name
     interpolationAIname = '-' + interpolatorConfig.getInterpolator().lower() + '-'
 
     # Generate output name
-    outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-']+ interpolationFactorFileLabel +['-mode', str(mode),
-                               interpolationAIname,inputFile[inputFile.rindex(os.path.sep) + 1:inputFile.rindex('.')],'.mp4']
+    outputVideoNameSegments = ['{:.2f}'.format(outputFPS), 'fps-'] + interpolationFactorFileLabel + ['-mode', str(mode),
+                                                                                                     interpolationAIname,
+                                                                                                     inputFile[
+                                                                                                     inputFile.rindex(
+                                                                                                         os.path.sep) + 1:inputFile.rindex(
+                                                                                                         '.')], '.mp4']
     # If limit output FPS is enabled
     if encoderConfig.FFmpegOutputFPSEnabled():
         outputVideoNameSegments[0] = '{:.2f}'.format(encoderConfig.FFmpegOutputFPSValue())
@@ -698,7 +728,7 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
     outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
 
     if step2:
-        #Auto encoding
+        # Auto encoding
         interpolationDone = [False]
 
         autoEncodeThread = None
@@ -707,13 +737,16 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
             if the interpolator manages to start first'''
             waitForThreadStart = [False]
             if mode == 1:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread,args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,currentSavingPNGRanges,encoderConfig,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode1AutoEncoding_Thread, args=(
+                    waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS,
+                    currentSavingPNGRanges, encoderConfig, autoEncodeBlockSize,))
             elif mode == 3 or mode == 4:
-                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(waitForThreadStart, projectFolder,inputFile,outputVideoName,interpolationDone,outputFPS,currentSavingPNGRanges,encoderConfig,autoEncodeBlockSize,))
+                autoEncodeThread = threading.Thread(target=autoEncoding.mode34AutoEncoding_Thread, args=(
+                    waitForThreadStart, projectFolder, inputFile, outputVideoName, interpolationDone, outputFPS,
+                    currentSavingPNGRanges, encoderConfig, autoEncodeBlockSize,))
             autoEncodeThread.start()
             while waitForThreadStart[0] == False:
                 time.sleep(1)
-
 
         outParams = runInterpolator(projectFolder, interpolatorConfig, outputFPS)
         if outParams[0] == -1:
@@ -764,7 +797,8 @@ def batchInterpolateFolder(inputDirectory, interpolatorConfig: InterpolatorConfi
         try:
             print(inputVideoFile)
 
-            currentFPS = getOutputFPS(inputVideoFile,mode,1,useAccurateFPS,accountForDuplicateFrames,mpdecimateSensitivity)
+            currentFPS = getOutputFPS(inputVideoFile, mode, 1, useAccurateFPS, accountForDuplicateFrames,
+                                      mpdecimateSensitivity)
 
             # Attempt to interpolate everything to above 59fps
             targetFPS = fpsTarget
