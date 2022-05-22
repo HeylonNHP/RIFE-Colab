@@ -496,70 +496,68 @@ def queueThreadLoadFrame(origFramesFolder: str, inFramesList: list):
     print("LOADED ALL FRAMES - DONE")
 
 
-def createOutput(inputFile, projectFolder, outputVideo, outputFPS, loopable, mode, encoderConfig: EncoderConfig):
+def create_output(input_file, project_folder, output_video, output_fps, loopable, mode, encoder_config: EncoderConfig):
     '''
     Equivalent to DAINAPP Step 3
     '''
     print("---Encoding output---")
-    os.chdir(projectFolder)
-    maxLoopLength = encoderConfig.getLoopingOptions()[1]
-    preferredLoopLength = encoderConfig.getLoopingOptions()[0]
-    loopable = encoderConfig.getLoopingOptions()[2]
-    inputLength = get_length(inputFile)
+    os.chdir(project_folder)
+    max_loop_length = encoder_config.getLoopingOptions()[1]
+    preferred_loop_length = encoder_config.getLoopingOptions()[0]
+    loopable = encoder_config.getLoopingOptions()[2]
+    input_length = get_length(input_file)
 
-    inputFFmpeg = ""
+    input_ffmpeg = ""
 
-    encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset',
-                     encoderConfig.getEncodingPreset(),
-                     '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
-    ffmpegSelected = FFMPEG4
-    if encoderConfig.nvencEnabled():
-        encoderPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu',
-                         str(encoderConfig.getNvencGPUID()), '-preset', str(encoderConfig.getEncodingPreset()),
-                         '-profile', encoderConfig.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq',
-                         str(encoderConfig.getEncodingCRF())]
-        ffmpegSelected = GlobalValues().getFFmpegPath()
+    encoder_preset = ['-pix_fmt', encoder_config.getPixelFormat(), '-c:v', encoder_config.getEncoder(), '-preset',
+                      encoder_config.getEncodingPreset(),
+                      '-crf', '{}'.format(encoder_config.getEncodingCRF())]
+    ffmpeg_selected = FFMPEG4
+    if encoder_config.nvencEnabled():
+        encoder_preset = ['-pix_fmt', encoder_config.getPixelFormat(), '-c:v', encoder_config.getEncoder(), '-gpu',
+                          str(encoder_config.getNvencGPUID()), '-preset', str(encoder_config.getEncodingPreset()),
+                          '-profile', encoder_config.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq',
+                          str(encoder_config.getEncodingCRF())]
+        ffmpeg_selected = GlobalValues().getFFmpegPath()
 
-    if encoderConfig.FFmpegOutputFPSEnabled():
-        encoderPreset = encoderPreset + ['-r', str(encoderConfig.FFmpegOutputFPSValue())]
+    if encoder_config.FFmpegOutputFPSEnabled():
+        encoder_preset = encoder_preset + ['-r', str(encoder_config.FFmpegOutputFPSValue())]
 
     if mode == 1:
-        inputFFmpeg = ['-r', str(outputFPS), '-i', 'interpolated_frames/%15d.png']
+        input_ffmpeg = ['-r', str(output_fps), '-i', 'interpolated_frames/%15d.png']
     if mode == 3 or mode == 4:
         # generateTimecodesFile(projectFolder)
-        choose_frames(projectFolder + os.path.sep + "interpolated_frames", outputFPS)
-        inputFFmpeg = ['-vsync', '1', '-r', str(outputFPS), '-f', 'concat', '-safe', '0', '-i',
-                       'interpolated_frames/framesCFR.txt']
+        choose_frames(project_folder + os.path.sep + "interpolated_frames", output_fps)
+        input_ffmpeg = ['-vsync', '1', '-r', str(output_fps), '-f', 'concat', '-safe', '0', '-i',
+                        'interpolated_frames/framesCFR.txt']
 
-    if loopable == False or (maxLoopLength / float(inputLength) < 2):
+    if loopable == False or (max_loop_length / float(input_length) < 2):
         # Don't loop, too long input
-        # print('Dont loop', maxLoopLength / float(inputLength))
 
-        command = [ffmpegSelected, '-hide_banner', '-stats', '-loglevel', 'error', '-y']
-        command = command + inputFFmpeg
-        command = command + ['-i', str(inputFile), '-map', '0', '-map', '1:a?', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2']
-        command = command + encoderPreset + [str(outputVideo)]
+        command = [ffmpeg_selected, '-hide_banner', '-stats', '-loglevel', 'error', '-y']
+        command = command + input_ffmpeg
+        command = command + ['-i', str(input_file), '-map', '0', '-map', '1:a?', '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2']
+        command = command + encoder_preset + [str(output_video)]
 
         run_and_print_output(command)
     else:
-        loopCount = math.ceil(preferredLoopLength / float(inputLength)) - 1
-        loopCount = str(loopCount)
-        # print('Loop', loopCount)
+        loop_count = math.ceil(preferred_loop_length / float(input_length)) - 1
+        loop_count = str(loop_count)
 
-        command = [FFMPEG4, '-y', '-stream_loop', str(loopCount), '-i', str(inputFile), '-vn', 'loop.flac']
+        command = [FFMPEG4, '-y', '-stream_loop', str(loop_count), '-i', str(input_file), '-vn', 'loop.flac']
         run_and_print_output(command)
 
-        audioInput = []
+        audio_input = []
         if os.path.exists('loop.flac'):
-            audioInput = ['-i', 'loop.flac', '-map', '0', '-map', '1']
+            audio_input = ['-i', 'loop.flac', '-map', '0', '-map', '1']
             # print("Looped audio exists")
 
-        command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loopCount)]
-        command = command + inputFFmpeg
-        command = command + ['-pix_fmt', encoderConfig.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f',
+        command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loop_count)]
+        command = command + input_ffmpeg
+        command = command + ['-pix_fmt', encoder_config.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f',
                              'yuv4mpegpipe', '-']
-        command2 = [ffmpegSelected, '-y', '-i', '-']
-        command2 = command2 + audioInput + encoderPreset + [str(outputVideo)]
+        command2 = [ffmpeg_selected, '-y', '-i', '-']
+        command2 = command2 + audio_input + encoder_preset + [str(output_video)]
 
         # Looping pipe
         pipe1 = subprocess.Popen(command, stdout=subprocess.PIPE)
@@ -761,7 +759,7 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
 
     if step3:
         if not useAutoEncode:
-            createOutput(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, encoderConfig)
+            create_output(inputFile, projectFolder, outputVideoName, outputFPS, loopable, mode, encoderConfig)
 
         if clearPNGs:
             shutil.rmtree(projectFolder + '/' + 'original_frames')
