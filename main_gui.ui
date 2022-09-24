@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>934</width>
-    <height>848</height>
+    <width>709</width>
+    <height>731</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,7 +37,7 @@
          </font>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.23.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RIFE Colab GUI 0.24&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
        </widget>
       </item>
@@ -1147,8 +1147,8 @@ Requires 7-zip to be installed before updating</string>
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>934</width>
-     <height>22</height>
+     <width>709</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
