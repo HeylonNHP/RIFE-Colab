@@ -53,5 +53,6 @@ def download_rife(install_path, on_windows, force_download_models=False):
             shutil.move(data, install_path + "/arXiv2020RIFE/train_log/")
         shutil.move('IFNet_HDv3.py', install_path + '/arXiv2020RIFE/train_log/IFNet_HDv3.py')
         shutil.move('RIFE_HDv3.py', install_path + '/arXiv2020RIFE/train_log/RIFE_HDv3.py')
+        shutil.move('refine.py', install_path + '/arXiv2020RIFE/train_log/refine.py')
 
         os.remove(install_path + "/RIFE_trained_model_new.zip")
