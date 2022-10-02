@@ -516,7 +516,7 @@ def create_output(input_file, project_folder, output_video, output_fps, loopable
     if encoder_config.nvencEnabled():
         encoder_preset = ['-pix_fmt', encoder_config.getPixelFormat(), '-c:v', encoder_config.getEncoder(), '-gpu',
                           str(encoder_config.getNvencGPUID()), '-preset', str(encoder_config.getEncodingPreset()),
-                          '-profile', encoder_config.encodingProfile, '-rc', 'vbr', '-b:v', '0', '-cq',
+                          '-profile', encoder_config.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq',
                           str(encoder_config.getEncodingCRF())]
         ffmpeg_selected = GlobalValues().getFFmpegPath()
 
