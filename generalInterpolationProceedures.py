@@ -502,26 +502,26 @@ def create_output(input_file, project_folder, output_video, output_fps, loopable
     '''
     print("---Encoding output---")
     os.chdir(project_folder)
-    max_loop_length = encoder_config.getLoopingOptions()[1]
-    preferred_loop_length = encoder_config.getLoopingOptions()[0]
-    loopable = encoder_config.getLoopingOptions()[2]
+    max_loop_length = encoder_config.get_looping_options()[1]
+    preferred_loop_length = encoder_config.get_looping_options()[0]
+    loopable = encoder_config.get_looping_options()[2]
     input_length = get_length(input_file)
 
     input_ffmpeg = ""
 
-    encoder_preset = ['-pix_fmt', encoder_config.getPixelFormat(), '-c:v', encoder_config.getEncoder(), '-preset',
-                      encoder_config.getEncodingPreset(),
-                      '-crf', '{}'.format(encoder_config.getEncodingCRF())]
+    encoder_preset = ['-pix_fmt', encoder_config.get_pixel_format(), '-c:v', encoder_config.get_encoder(), '-preset',
+                      encoder_config.get_encoding_preset(),
+                      '-crf', '{}'.format(encoder_config.get_encoding_crf())]
     ffmpeg_selected = FFMPEG4
-    if encoder_config.nvencEnabled():
-        encoder_preset = ['-pix_fmt', encoder_config.getPixelFormat(), '-c:v', encoder_config.getEncoder(), '-gpu',
-                          str(encoder_config.getNvencGPUID()), '-preset', str(encoder_config.getEncodingPreset()),
-                          '-profile', encoder_config.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq',
-                          str(encoder_config.getEncodingCRF())]
+    if encoder_config.nvenc_enabled():
+        encoder_preset = ['-pix_fmt', encoder_config.get_pixel_format(), '-c:v', encoder_config.get_encoder(), '-gpu',
+                          str(encoder_config.get_nvenc_gpu_id()), '-preset', str(encoder_config.get_encoding_preset()),
+                          '-profile', encoder_config.get_encoding_profile(), '-rc', 'vbr', '-b:v', '0', '-cq',
+                          str(encoder_config.get_encoding_crf())]
         ffmpeg_selected = GlobalValues().getFFmpegPath()
 
-    if encoder_config.FFmpegOutputFPSEnabled():
-        encoder_preset = encoder_preset + ['-r', str(encoder_config.FFmpegOutputFPSValue())]
+    if encoder_config.ffmpeg_output_fps_enabled():
+        encoder_preset = encoder_preset + ['-r', str(encoder_config.ffmpeg_output_fps_value())]
 
     if mode == 1:
         input_ffmpeg = ['-r', str(output_fps), '-i', 'interpolated_frames/%15d.png']
@@ -554,7 +554,7 @@ def create_output(input_file, project_folder, output_video, output_fps, loopable
 
         command = [FFMPEG4, '-hide_banner', '-stats', '-loglevel', 'error', '-y', '-stream_loop', str(loop_count)]
         command = command + input_ffmpeg
-        command = command + ['-pix_fmt', encoder_config.getPixelFormat(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f',
+        command = command + ['-pix_fmt', encoder_config.get_pixel_format(), '-vf', 'pad=ceil(iw/2)*2:ceil(ih/2)*2', '-f',
                              'yuv4mpegpipe', '-']
         command2 = [ffmpeg_selected, '-y', '-i', '-']
         command2 = command2 + audio_input + encoder_preset + [str(output_video)]
@@ -720,8 +720,8 @@ def performAllSteps(inputFile, interpolatorConfig: InterpolatorConfig, encoderCo
                                                                                                          os.path.sep) + 1:inputFile.rindex(
                                                                                                          '.')], '.mp4']
     # If limit output FPS is enabled
-    if encoderConfig.FFmpegOutputFPSEnabled():
-        outputVideoNameSegments[0] = '{:.2f}'.format(encoderConfig.FFmpegOutputFPSValue())
+    if encoderConfig.ffmpeg_output_fps_enabled():
+        outputVideoNameSegments[0] = '{:.2f}'.format(encoderConfig.ffmpeg_output_fps_value())
 
     outputVideoName = inputFile[:inputFile.rindex(os.path.sep) + 1] + ''.join(outputVideoNameSegments)
 

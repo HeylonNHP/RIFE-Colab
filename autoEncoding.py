@@ -241,9 +241,9 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
 
 
 def executeConcatAndGenerateOutput(concatFilePath: str, inputFile: str, outputFile: str, encoderConfig: EncoderConfig):
-    loopEnabled = encoderConfig.getLoopingOptions()[2]
-    preferredLoopLength = encoderConfig.getLoopingOptions()[0]
-    maxLoopLength = encoderConfig.getLoopingOptions()[1]
+    loopEnabled = encoderConfig.get_looping_options()[2]
+    preferredLoopLength = encoderConfig.get_looping_options()[0]
+    maxLoopLength = encoderConfig.get_looping_options()[1]
 
     if loopEnabled:
         inputLength = get_length(inputFile)
@@ -278,17 +278,17 @@ def executeConcatAndGenerateOutput(concatFilePath: str, inputFile: str, outputFi
 def generateEncodingPreset(encoderConfig: EncoderConfig):
     encodingPreset = []
 
-    if encoderConfig.nvencEnabled():
-        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-gpu',
-                          str(encoderConfig.getNvencGPUID()), '-preset', encoderConfig.getEncodingPreset(),
-                          '-profile', encoderConfig.getEncodingProfile(), '-rc', 'vbr', '-b:v', '0', '-cq',
-                          str(encoderConfig.getEncodingCRF())]
+    if encoderConfig.nvenc_enabled():
+        encodingPreset = ['-pix_fmt', encoderConfig.get_pixel_format(), '-c:v', encoderConfig.get_encoder(), '-gpu',
+                          str(encoderConfig.get_nvenc_gpu_id()), '-preset', encoderConfig.get_encoding_preset(),
+                          '-profile', encoderConfig.get_encoding_profile(), '-rc', 'vbr', '-b:v', '0', '-cq',
+                          str(encoderConfig.get_encoding_crf())]
     else:
-        encodingPreset = ['-pix_fmt', encoderConfig.getPixelFormat(), '-c:v', encoderConfig.getEncoder(), '-preset',
-                          encoderConfig.getEncodingPreset(), '-crf', '{}'.format(encoderConfig.getEncodingCRF())]
+        encodingPreset = ['-pix_fmt', encoderConfig.get_pixel_format(), '-c:v', encoderConfig.get_encoder(), '-preset',
+                          encoderConfig.get_encoding_preset(), '-crf', '{}'.format(encoderConfig.get_encoding_crf())]
 
-    if encoderConfig.FFmpegOutputFPSEnabled():
-        encodingPreset = encodingPreset + ['-r', str(encoderConfig.FFmpegOutputFPSValue())]
+    if encoderConfig.ffmpeg_output_fps_enabled():
+        encodingPreset = encodingPreset + ['-r', str(encoderConfig.ffmpeg_output_fps_value())]
 
     return encodingPreset
 

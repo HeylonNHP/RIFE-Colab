@@ -48,11 +48,11 @@ if args.nonlocalpngs:
 fpsDataFilePath = projectFolder + os.path.sep + 'fpsout.txt'
 
 encoderConfig = EncoderConfig()
-encoderConfig.setEncodingCRF(float(args.crfout))
+encoderConfig.set_encoding_crf(float(args.crfout))
 if bool(args.useNvenc):
-    encoderConfig.enableNvenc(True)
-    encoderConfig.setEncodingPreset('slow')
-encoderConfig.setNvencGPUID(selectedGPUs[0])
+    encoderConfig.enable_nvenc(True)
+    encoderConfig.set_encoding_preset('slow')
+encoderConfig.set_nvenc_gpu_id(selectedGPUs[0])
 
 interpolatorConfig = InterpolatorConfig()
 

@@ -200,7 +200,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         encoder_config: EncoderConfig = EncoderConfig()
 
-        encoder_config.setNvencGPUID(selected_gpus[0])
+        encoder_config.set_nvenc_gpu_id(selected_gpus[0])
 
         # setNvencSettings(selected_gpus[0], 'slow')
 
@@ -260,24 +260,24 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         set_use_half_precision(use_half_precision_checked)
 
         if use_nvenc:
-            encoder_config.enableNvenc(True)
-            encoder_config.setEncodingPreset('slow')
-            encoder_config.setEncodingCRF(crf_out + 10)
+            encoder_config.enable_nvenc(True)
+            encoder_config.set_encoding_preset('slow')
+            encoder_config.set_encoding_crf(crf_out + 10)
         else:
-            encoder_config.setEncodingPreset('veryslow')
-            encoder_config.setEncodingCRF(crf_out)
+            encoder_config.set_encoding_preset('veryslow')
+            encoder_config.set_encoding_crf(crf_out)
 
         if output_encoder_selection == 0:
-            encoder_config.enableH265(False)
-            encoder_config.setEncodingProfile('high')
+            encoder_config.enable_h265(False)
+            encoder_config.set_encoding_profile('high')
         else:
-            encoder_config.enableH265(True)
-            encoder_config.setEncodingProfile('main')
+            encoder_config.enable_h265(True)
+            encoder_config.set_encoding_profile('main')
         if limit_fps_enabled:
-            encoder_config.setFFmpegOutputFPS(limit_fps_enabled, limit_fps_value)
+            encoder_config.set_ffmpeg_output_fps(limit_fps_enabled, limit_fps_value)
 
-        encoder_config.setPixelFormat(output_colourspace)
-        encoder_config.setLoopingOptions(loop_preferred_length, loop_max_length, loop_repetitions)
+        encoder_config.set_pixel_format(output_colourspace)
+        encoder_config.set_looping_options(loop_preferred_length, loop_max_length, loop_repetitions)
 
         interpolator_config = InterpolatorConfig()
         interpolator_config.setMode(mode)

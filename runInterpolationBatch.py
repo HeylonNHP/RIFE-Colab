@@ -36,17 +36,17 @@ selectedGPUs = [int(i) for i in selectedGPUs]
 setGPUinterpolationOptions(args.batchSize, selectedGPUs)
 
 encoderConfig = EncoderConfig()
-encoderConfig.setEncodingCRF(float(args.crf))
+encoderConfig.set_encoding_crf(float(args.crf))
 if bool(args.useNvenc):
-    encoderConfig.enableNvenc(True)
-    encoderConfig.setEncodingPreset('slow')
-encoderConfig.setNvencGPUID(selectedGPUs[0])
+    encoderConfig.enable_nvenc(True)
+    encoderConfig.set_encoding_preset('slow')
+encoderConfig.set_nvenc_gpu_id(selectedGPUs[0])
 
 interpolatorConfig = InterpolatorConfig()
 
 interpolatorConfig.setMode(args.mode)
 interpolatorConfig.setClearPngs(args.clearpngs)
-encoderConfig.setLoopingOptions(10, 15, True)
+encoderConfig.set_looping_options(10, 15, True)
 
 interpolatorConfig.setMpdecimateSensitivity(args.mpdecimateSensitivity)
 
