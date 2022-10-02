@@ -531,7 +531,7 @@ def create_output(input_file, project_folder, output_video, output_fps, loopable
         input_ffmpeg = ['-vsync', '1', '-r', str(output_fps), '-f', 'concat', '-safe', '0', '-i',
                         'interpolated_frames/framesCFR.txt']
 
-    if loopable == False or (max_loop_length / float(input_length) < 2):
+    if not loopable or (max_loop_length / float(input_length) < 2):
         # Don't loop, too long input
 
         command = [ffmpeg_selected, '-hide_banner', '-stats', '-loglevel', 'error', '-y']
