@@ -531,6 +531,10 @@ def create_output(input_file, project_folder, output_video, output_fps, loopable
         input_ffmpeg = ['-vsync', '1', '-r', str(output_fps), '-f', 'concat', '-safe', '0', '-i',
                         'interpolated_frames/framesCFR.txt']
 
+    # Audio codec
+    if encoder_config.get_lossless_encoding():
+        encoder_preset = encoder_preset + ['-c:a', 'alac']
+
     if not loopable or (max_loop_length / float(input_length) < 2):
         # Don't loop, too long input
 

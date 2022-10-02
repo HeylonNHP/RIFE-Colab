@@ -122,3 +122,6 @@ class EncoderConfig:
 
     def set_lossless_encoding(self, enable: bool):
         self._lossless = enable
+
+    def get_lossless_encoding(self):
+        return self._lossless

@@ -95,6 +95,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         self.inputFilePathText.textChanged.connect(self.input_box_text_changed)
 
+        self.enableLosslessEncodingCheck.stateChanged.connect(self.lossless_mode_check_change)
+
     def changed_tabs(self):
         if self.tabWidget.currentIndex() == 3:
             self.batchProcessingMode = True
@@ -114,6 +116,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.extractFramesButton.setEnabled(True)
             self.interpolateFramesButton.setEnabled(True)
             self.encodeOutputButton.setEnabled(True)
+
+    def lossless_mode_check_change(self):
+        self.crfoutNumber.setEnabled(not self.enableLosslessEncodingCheck.isChecked())
 
     def mode3_extra_options_enable(self, enable: bool):
         self.mode3UseInterpolationFactor.setHidden(not enable)
@@ -241,6 +246,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         mode3_target_fps_enabled: bool = bool(self.mode3UseTargetFPS.isChecked())
         mode3_target_fps_value: float = float(self.mode3TargetFPS.value())
         interpolation_ai: str = str(self.InterpolationAIComboBox.currentText())
+        losslessEncoding: bool = bool(self.enableLosslessEncodingCheck.isChecked())
 
         target_fps = float(self.targetFPSnumber.value())
 
@@ -276,6 +282,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         if limit_fps_enabled:
             encoder_config.set_ffmpeg_output_fps(limit_fps_enabled, limit_fps_value)
 
+        encoder_config.set_lossless_encoding(losslessEncoding)
         encoder_config.set_pixel_format(output_colourspace)
         encoder_config.set_looping_options(loop_preferred_length, loop_max_length, loop_repetitions)
 
@@ -393,7 +400,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
                          'saveguistate': bool(self.saveGUIstateCheck.isChecked()),
                          'systemPowerOption': int(self.systemPowerOptionsComboBox.currentIndex()),
                          'limitBackupThreadRestarts': (
-                         bool(self.threadRestartsMaxCheckbox.isChecked()), int(self.threadRestartsMaxSpinBox.value()))}
+                             bool(self.threadRestartsMaxCheckbox.isChecked()),
+                             int(self.threadRestartsMaxSpinBox.value())),
+                         'losslessEncodingEnabled': bool(self.enableLosslessEncodingCheck.isChecked())}
 
         return settings_dict
 
@@ -473,6 +482,9 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             limit_backup_thread_restarts = settings_dict['limitBackupThreadRestarts']
             self.threadRestartsMaxCheckbox.setChecked(limit_backup_thread_restarts[0])
             self.threadRestartsMaxSpinBox.setValue(limit_backup_thread_restarts[1])
+
+        if 'losslessEncodingEnabled' in settings_dict:
+            self.enableLosslessEncodingCheck.setChecked(settings_dict['losslessEncodingEnabled'])
 
     def save_settings_file(self, filename: str):
         settings_dict = self.get_current_ui_settings()
