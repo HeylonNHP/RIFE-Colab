@@ -16,6 +16,7 @@ class EncoderConfig:
 
     _enableFFmpegOutputFPS = False
     _FFmpegOutputFPS = 60
+    _lossless = False
 
     # Looping
     _preferredLoopLength = 10
@@ -86,12 +87,16 @@ class EncoderConfig:
         return self._useH265
 
     def get_encoding_preset(self):
+        if self._lossless and self._useNvenc:
+            return "lossless"
         return self._encodingPreset
 
     def get_encoding_profile(self):
         return self._encodingProfile
 
     def get_encoding_crf(self):
+        if self._lossless:
+            return 0
         return self._encodingCRF
 
     def get_pixel_format(self):
@@ -114,3 +119,6 @@ class EncoderConfig:
 
     def ffmpeg_output_fps_value(self):
         return self._FFmpegOutputFPS
+
+    def set_lossless_encoding(self, enable: bool):
+        self._lossless = enable
