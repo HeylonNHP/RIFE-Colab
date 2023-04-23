@@ -407,84 +407,48 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         return settings_dict
 
     def set_current_ui_settings(self, settings_dict: dict):
-        if 'mpdecimate' in settings_dict:
-            self.mpdecimateText.setText(settings_dict['mpdecimate'])
-        if 'nonlocalpngs' in settings_dict:
-            self.nonlocalpngsCheck.setChecked(settings_dict['nonlocalpngs'])
-        if 'clearpngs' in settings_dict:
-            self.clearpngsCheck.setChecked(settings_dict['clearpngs'])
-        if 'enableMpdecimate' in settings_dict:
-            self.mpdecimateEnableCheck.setChecked(settings_dict['enableMpdecimate'])
+        settings_mapping = {
+            'mpdecimate': self.mpdecimateText.setText,
+            'nonlocalpngs': self.nonlocalpngsCheck.setChecked,
+            'clearpngs': self.clearpngsCheck.setChecked,
+            'enableMpdecimate': self.mpdecimateEnableCheck.setChecked,
+            'useaccuratefps': self.useAccurateFPSCheckbox.setChecked,
+            'accountforduplicateframes': self.accountForDuplicateFramesCheckbox.setChecked,
+            'interpolationfactor': self.interpolationFactorSelect.setCurrentText,
+            'framehandlingmode': self.modeSelect.setCurrentIndex,
+            'scenechangesensitivity': self.scenechangeSensitivityNumber.setValue,
+            'gpuids': self.gpuidsSelect.setCurrentText,
+            'batchthreads': self.batchthreadsNumber.setValue,
+            'useHalfPrecisionFloats': self.enableHalfPrecisionFloatsCheck.setChecked,
+            'UHDscaleFactor': self.UHDscaleNumber.setValue,
+            'interpolationAIchoice': self.InterpolationAIComboBox.setCurrentIndex,
+            'mode3UseInterpolationFactor': self.mode3UseInterpolationFactor.setChecked,
+            'mode3UseTargetFPS': self.mode3UseTargetFPS.setChecked,
+            'mode3TargetFPS': self.mode3TargetFPS.setValue,
+            'loopoutput': self.loopoutputCheck.setChecked,
+            'loopablePreferredLength': self.loopOutputPreferredLengthNumber.setValue,
+            'loopableMaxLength': self.loopOutputMaxLengthNumber.setValue,
+            'loopRepetitionsEnabled': self.loopOutputRepeatedLoopsCheck.setChecked,
+            'usenvenc': self.nvencCheck.setChecked,
+            'crfout': self.crfoutNumber.setValue,
+            'useautoencoding': self.autoencodeCheck.setChecked,
+            'autoencodingblocksize': self.autoencodeBlocksizeNumber.setValue,
+            'outputEncoderSelection': self.outputEncoderSelectComboBox.setCurrentIndex,
+            'outputPixelFormat': self.colourspaceSelectionComboBox.setCurrentIndex,
+            'limitFPSEnable': self.enableLimitFPScheck.setChecked,
+            'limitFPSValue': self.limitFPSnumber.setValue,
+            'batchtargetfps': self.targetFPSnumber.setValue,
+            'saveguistate': self.saveGUIstateCheck.setChecked,
+            'systemPowerOption': self.systemPowerOptionsComboBox.setCurrentIndex,
+            'limitBackupThreadRestarts': self._set_limit_backup_thread_restarts
+        }
+        for key, value in settings_dict.items():
+            if key in settings_mapping:
+                settings_mapping[key](value)
 
-        if 'useaccuratefps' in settings_dict:
-            self.useAccurateFPSCheckbox.setChecked(settings_dict['useaccuratefps'])
-        if 'accountforduplicateframes' in settings_dict:
-            self.accountForDuplicateFramesCheckbox.setChecked(settings_dict['accountforduplicateframes'])
-        if 'interpolationfactor' in settings_dict:
-            self.interpolationFactorSelect.setCurrentText(settings_dict['interpolationfactor'])
-        if 'framehandlingmode' in settings_dict:
-            self.modeSelect.setCurrentIndex(settings_dict['framehandlingmode'])
-        if 'scenechangesensitivity' in settings_dict:
-            self.scenechangeSensitivityNumber.setValue(settings_dict['scenechangesensitivity'])
-        if 'gpuids' in settings_dict:
-            self.gpuidsSelect.setCurrentText(settings_dict['gpuids'])
-        if 'batchthreads' in settings_dict:
-            self.batchthreadsNumber.setValue(settings_dict['batchthreads'])
-        if 'useHalfPrecisionFloats' in settings_dict:
-            self.enableHalfPrecisionFloatsCheck.setChecked(settings_dict['useHalfPrecisionFloats'])
-        if 'UHDscaleFactor' in settings_dict:
-            self.UHDscaleNumber.setValue(settings_dict['UHDscaleFactor'])
-        if 'interpolationAIchoice' in settings_dict:
-            self.InterpolationAIComboBox.setCurrentIndex(settings_dict['interpolationAIchoice'])
-
-        if 'mode3UseInterpolationFactor' in settings_dict:
-            self.mode3UseInterpolationFactor.setChecked(settings_dict['mode3UseInterpolationFactor'])
-        if 'mode3UseTargetFPS' in settings_dict:
-            self.mode3UseTargetFPS.setChecked(settings_dict['mode3UseTargetFPS'])
-        if 'mode3TargetFPS' in settings_dict:
-            self.mode3TargetFPS.setValue(settings_dict['mode3TargetFPS'])
-
-        if 'loopoutput' in settings_dict:
-            self.loopoutputCheck.setChecked(settings_dict['loopoutput'])
-        if 'loopablePreferredLength' in settings_dict:
-            self.loopOutputPreferredLengthNumber.setValue(settings_dict['loopablePreferredLength'])
-        if 'loopableMaxLength' in settings_dict:
-            self.loopOutputMaxLengthNumber.setValue(settings_dict['loopableMaxLength'])
-        if 'loopRepetitionsEnabled' in settings_dict:
-            self.loopOutputRepeatedLoopsCheck.setChecked(settings_dict['loopRepetitionsEnabled'])
-        if 'usenvenc' in settings_dict:
-            self.nvencCheck.setChecked(settings_dict['usenvenc'])
-        if 'crfout' in settings_dict:
-            self.crfoutNumber.setValue(settings_dict['crfout'])
-        if 'useautoencoding' in settings_dict:
-            self.autoencodeCheck.setChecked(settings_dict['useautoencoding'])
-        if 'autoencodingblocksize' in settings_dict:
-            self.autoencodeBlocksizeNumber.setValue(settings_dict['autoencodingblocksize'])
-        if 'outputEncoderSelection' in settings_dict:
-            self.outputEncoderSelectComboBox.setCurrentIndex(settings_dict['outputEncoderSelection'])
-        if 'outputPixelFormat' in settings_dict:
-            self.colourspaceSelectionComboBox.setCurrentIndex(settings_dict['outputPixelFormat'])
-        if 'limitFPSEnable' in settings_dict:
-            self.enableLimitFPScheck.setChecked(settings_dict['limitFPSEnable'])
-        if 'limitFPSValue' in settings_dict:
-            self.limitFPSnumber.setValue(settings_dict['limitFPSValue'])
-
-        if 'batchtargetfps' in settings_dict:
-            self.targetFPSnumber.setValue(settings_dict['batchtargetfps'])
-
-        if 'saveguistate' in settings_dict:
-            self.saveGUIstateCheck.setChecked(settings_dict['saveguistate'])
-
-        if 'systemPowerOption' in settings_dict:
-            self.systemPowerOptionsComboBox.setCurrentIndex(settings_dict['systemPowerOption'])
-
-        if 'limitBackupThreadRestarts' in settings_dict:
-            limit_backup_thread_restarts = settings_dict['limitBackupThreadRestarts']
-            self.threadRestartsMaxCheckbox.setChecked(limit_backup_thread_restarts[0])
-            self.threadRestartsMaxSpinBox.setValue(limit_backup_thread_restarts[1])
-
-        if 'losslessEncodingEnabled' in settings_dict:
-            self.enableLosslessEncodingCheck.setChecked(settings_dict['losslessEncodingEnabled'])
+    def _set_limit_backup_thread_restarts(self, value):
+        self.threadRestartsMaxCheckbox.setChecked(value[0])
+        self.threadRestartsMaxSpinBox.setValue(value[1])
 
     def save_settings_file(self, filename: str):
         settings_dict = self.get_current_ui_settings()
