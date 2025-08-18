@@ -5,7 +5,7 @@ import addInstalldirToPath
 from addInstalldirToPath import *
 from Globals.BuildConfig import BuildConfig
 
-REQUIRED_PACKAGES = ['numpy>=1.16', 'tqdm>=4.35.0', 'opencv-python>=4.1.2', 'pyqt5', 'requests']
+REQUIRED_PACKAGES = ['numpy>=1.24.4', 'tqdm>=4.66.0', 'opencv-python>=4.10.0.84', 'pyqt5>=5.15.10', 'requests>=2.32.3']
 
 
 def install(package):
@@ -101,17 +101,17 @@ def main_install():
         print('Found torch', torch.__version__)
     except:
         # Install torch
-        print("Pytorch not found, getting 1.7.1 CUDA 11")
+        print("Pytorch not found, getting 1.13.1 CUDA 11.8")
         if os.name == 'nt':
             # On windows
             subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch===1.7.1+cu110', 'torchvision===0.8.2+cu110',
-                 'torchaudio===0.7.2', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
+                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu118', 'torchvision==0.14.1+cu118',
+                 'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
         else:
             # On linux
             subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch==1.7.1+cu110', 'torchvision==0.8.2+cu110',
-                 'torchaudio===0.7.2', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
+                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu118', 'torchvision==0.14.1+cu118',
+                 'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
 
     # Check ffmpeg
     ffmpeg_exists = False
