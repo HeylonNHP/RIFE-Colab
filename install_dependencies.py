@@ -101,16 +101,16 @@ def main_install():
         print('Found torch', torch.__version__)
     except:
         # Install torch
-        print("Pytorch not found, getting 1.13.1 CUDA 11.8")
+        print("Pytorch not found, getting 1.13.1 CUDA 11.7")
         if os.name == 'nt':
             # On windows
             subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu118', 'torchvision==0.14.1+cu118',
+                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu117', 'torchvision==0.14.1+cu117',
                  'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
         else:
             # On linux
             subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu118', 'torchvision==0.14.1+cu118',
+                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu117', 'torchvision==0.14.1+cu117',
                  'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
 
     # Check ffmpeg
