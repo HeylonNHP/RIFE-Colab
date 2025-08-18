@@ -37,7 +37,7 @@ def download_rife(install_path, on_windows, force_download_models=False):
         # 3.1
         # download_file_from_google_drive('1xn4R3TQyFhtMXN2pa3lRB8cd4E1zckQe', 'RIFE_trained_model_new.zip')
         # 4.5
-        download_file_from_google_drive('17Bl_IhTBexogI9BV817kTjf7eTuJEDc0', 'RIFE_trained_model_new.zip')
+        download_file_from_google_drive('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
 
         seven_zip = "7z"
         if on_windows:
