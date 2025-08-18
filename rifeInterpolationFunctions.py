@@ -37,6 +37,9 @@ def setup_rife(install_path, gpu_id):
             print("WARNING: CUDA is not available, RIFE is running on CPU! [ff:nocuda-cpu]")
 
         model = Model()
+        # Ensure we have a version flag for compatibility with newer inference signature
+        if not hasattr(model, 'version'):
+            model.version = 0
         model.load_model(install_path + os.path.sep + 'arXiv2020RIFE' + os.path.sep + 'train_log', -1)
         model.eval()
         model.device()
@@ -56,7 +59,8 @@ def rife_interpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, 
     img0 = imgs[:-1]
     img1 = imgs[1:]
 
-    tmp = max(32, int(32 / scale))
+    # Align to 128x blocks as in newer reference implementation
+    tmp = max(128, int(128 / scale))
     ph = ((h - 1) // tmp + 1) * tmp
     pw = ((w - 1) // tmp + 1) * tmp
     padding = (0, pw - w, 0, ph - h)
@@ -72,7 +76,11 @@ def rife_interpolate(device, model, img0frame: FrameFile, img1frame: FrameFile, 
     if p > scenechange_sensitivity:
         mid = img0
     else:
-        mid = model.inference(img0, img1, scale)
+        # Newer models (version >= 3.9) accept timestep t; use t=0.5 for middle frame
+        if hasattr(model, 'version') and model.version >= 3.9:
+            mid = model.inference(img0, img1, 0.5, scale)
+        else:
+            mid = model.inference(img0, img1, scale)
 
     item = (mid[:, :, :h, :w] * 255.).byte().cpu().detach().numpy().transpose(0, 2, 3, 1)[0]
     output_frame.setImageData(item)
