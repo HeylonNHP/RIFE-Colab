@@ -39,7 +39,7 @@ print('INSTALL:', installPath)
 # Get and initialise RIFE
 from rifeFunctions import download_rife
 
-download_rife(installPath, IS_WINDOWS)
+download_rife(IS_WINDOWS)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 

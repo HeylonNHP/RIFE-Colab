@@ -3,11 +3,13 @@ import shutil
 import glob
 import os
 from Globals.BuildConfig import BuildConfig
+from Globals.GlobalValues import ROOT_DIR
 
 RIFEPATH = 'arXiv2020RIFE'
 
 
-def download_rife(install_path, on_windows, force_download_models=False):
+def download_rife(on_windows, force_download_models=False):
+    install_path = ROOT_DIR
     # Run if not previously setup
     os.chdir(install_path)
     if not BuildConfig().isPyInstallerBuild():
