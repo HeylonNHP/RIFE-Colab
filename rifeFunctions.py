@@ -1,4 +1,4 @@
-from googleDriveDownloader import *
+from services.GoogleDriveDownloaderService import GoogleDriveDownloaderService
 import shutil
 import glob
 import os
@@ -31,17 +31,18 @@ def download_rife(force_download_models=False):
 
     # If they are missing, grab them
     if model_files_missing:
+        downloader = GoogleDriveDownloaderService()
         # download_file_from_google_drive('11l8zknO1V5hapv2-Ke4DG9mHyBomS0Fc', 'RIFE_trained_model_new.zip')
         # download_file_from_google_drive('1wsQIhHZ3Eg4_AfCXItFKqqyDMB4NS0Yd', 'RIFE_trained_model_new.zip')
 
         # 3.8
-        # download_file_from_google_drive('1O5KfS3KzZCY3imeCr2LCsntLhutKuAqj', 'RIFE_trained_model_new.zip')
+        # downloader.download_file('1O5KfS3KzZCY3imeCr2LCsntLhutKuAqj', 'RIFE_trained_model_new.zip')
         # 3.1
-        # download_file_from_google_drive('1xn4R3TQyFhtMXN2pa3lRB8cd4E1zckQe', 'RIFE_trained_model_new.zip')
+        # downloader.download_file('1xn4R3TQyFhtMXN2pa3lRB8cd4E1zckQe', 'RIFE_trained_model_new.zip')
         # 4.25
-        download_file_from_google_drive('1ZKjcbmt1hypiFprJPIKW0Tt0lr_2i7bg', 'RIFE_trained_model_new.zip')
+        downloader.download_file('1ZKjcbmt1hypiFprJPIKW0Tt0lr_2i7bg', 'RIFE_trained_model_new.zip')
         # 4.5
-        # download_file_from_google_drive('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
+        # downloader.download_file('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
 
         if IS_WINDOWS:
             seven_zip = r"C:\Program Files\7-Zip\7z.exe"
