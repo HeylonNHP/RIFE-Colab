@@ -12,6 +12,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 
 import mainGuiUi
+from Globals.GlobalValues import GlobalValues, IS_WINDOWS
 from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
@@ -133,8 +134,32 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
             self.mode3_extra_options_enable(False)
 
     def input_box_text_changed(self):
+        normalized_path = self.normalize_input_path(str(self.inputFilePathText.text()))
+        if normalized_path != str(self.inputFilePathText.text()):
+            self.inputFilePathText.blockSignals(True)
+            self.inputFilePathText.setText(normalized_path)
+            self.inputFilePathText.blockSignals(False)
+
         if not self.batchProcessingMode:
             self.update_video_fps_stats()
+
+    def normalize_input_path(self, path: str) -> str:
+        normalized_path = str(path).strip()
+
+        # Some drag-and-drop providers include surrounding quotes in text payloads.
+        if len(normalized_path) > 1 and normalized_path[0] == normalized_path[-1] and normalized_path[0] in ('"', "'"):
+            normalized_path = normalized_path[1:-1]
+
+        if not IS_WINDOWS:
+            normalized_path = os.path.expanduser(normalized_path)
+
+            # On Linux, drag-and-drop can provide absolute paths without the leading '/'.
+            if normalized_path and not os.path.isabs(normalized_path):
+                with_leading_separator = os.path.sep + normalized_path
+                if not os.path.exists(normalized_path) and os.path.exists(with_leading_separator):
+                    normalized_path = with_leading_separator
+
+        return normalized_path
 
     def browse_input_file(self):
         file = None
@@ -153,7 +178,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
     lastVideoFPS: float = None
 
     def update_video_fps_stats(self):
-        file = str(self.inputFilePathText.text())
+        file = self.normalize_input_path(str(self.inputFilePathText.text()))
         if not os.path.exists(file):
             return
         if not os.path.isfile(file):
@@ -165,7 +190,7 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
         video_fps = None
         mode = int(str(self.modeSelect.currentText()))
         current_mpdecimate = str(self.mpdecimateText.text())
-        current_video_path = str(self.inputFilePathText.text())
+        current_video_path = file
         if (mode == 3 or mode == 4) and account_for_duplicates_in_fps:
             if self.lastVideoFPS is not None and self.lastMPdecimate == current_mpdecimate and current_video_path == self.lastVideoPath:
                 video_fps = self.lastVideoFPS
@@ -211,8 +236,8 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
         setGPUinterpolationOptions(int(self.batchthreadsNumber.value()), selected_gpus)
 
-        input_file = str(self.inputFilePathText.text())
-        if os.name == 'nt':
+        input_file = self.normalize_input_path(str(self.inputFilePathText.text()))
+        if IS_WINDOWS:
             input_file = input_file.replace('/', '\\')
 
         if self.batchProcessingMode:
