@@ -38,14 +38,18 @@ def download_rife(force_download_models=False):
         # download_file_from_google_drive('1O5KfS3KzZCY3imeCr2LCsntLhutKuAqj', 'RIFE_trained_model_new.zip')
         # 3.1
         # download_file_from_google_drive('1xn4R3TQyFhtMXN2pa3lRB8cd4E1zckQe', 'RIFE_trained_model_new.zip')
+        # 4.25
+        download_file_from_google_drive('1ZKjcbmt1hypiFprJPIKW0Tt0lr_2i7bg', 'RIFE_trained_model_new.zip')
         # 4.5
-        download_file_from_google_drive('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
+        # download_file_from_google_drive('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
 
-        seven_zip = "7z"
         if IS_WINDOWS:
             seven_zip = r"C:\Program Files\7-Zip\7z.exe"
-
-        os.system('"' + seven_zip + '"' + r' e RIFE_trained_model_new.zip -aoa')
+            os.system('"' + seven_zip + '"' + r' e RIFE_trained_model_new.zip -aoa')
+        else:
+            # -j (junk paths) is equivalent to 7z 'e' (extract without directory structure)
+            # -o (overwrite) is equivalent to 7z '-aoa'
+            os.system('unzip -jo RIFE_trained_model_new.zip')
 
         if not os.path.exists(install_path + '/arXiv2020RIFE'):
             os.mkdir(install_path + '/arXiv2020RIFE')
