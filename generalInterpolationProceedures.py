@@ -19,7 +19,7 @@ import autoEncoding
 from runAndPrintOutput import run_and_print_output
 from FFmpegFunctions import *
 from frameChooser import choose_frames
-from Globals.GlobalValues import GlobalValues
+from Globals.GlobalValues import GlobalValues, ROOT_DIR, IS_WINDOWS
 from Globals.EncoderConfig import EncoderConfig
 from Globals.InterpolatorConfig import InterpolatorConfig
 from EventHandling import Event
@@ -33,20 +33,13 @@ warnings.filterwarnings("ignore")
 FFMPEG4 = GlobalValues().getFFmpegPath()
 GPUID = 0
 nvencPreset = 'p7'
-installPath = os.getcwd()
+installPath = ROOT_DIR
 print('INSTALL:', installPath)
-
-# Check if running on Windows or not
-onWindows = None
-if os.name == 'nt':
-    onWindows = True
-else:
-    onWindows = False
 
 # Get and initialise RIFE
 from rifeFunctions import download_rife
 
-download_rife(installPath, onWindows)
+download_rife(installPath, IS_WINDOWS)
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 

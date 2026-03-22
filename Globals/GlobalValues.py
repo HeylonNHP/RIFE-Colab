@@ -1,5 +1,9 @@
 import os
 import subprocess
+from pathlib import Path
+
+ROOT_DIR = str(Path(__file__).resolve().parent.parent)
+IS_WINDOWS = os.name == 'nt'
 
 class GlobalValues:
     timebase = 100000

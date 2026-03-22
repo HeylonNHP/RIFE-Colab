@@ -1,11 +1,11 @@
 # https://raevskymichail.medium.com/python-gui-building-a-simple-application-with-pyqt-and-qt-designer-e9f8cda76246
 import glob
 import json
-# from PyQt5 import uic
 import os
 import sys
+import threading
+import traceback
 
-# from PyQt5 import QtWidgets
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 
 import mainGuiUi
 from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
+from Globals.GlobalValues import ROOT_DIR, IS_WINDOWS
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
@@ -21,7 +22,7 @@ from generalInterpolationProceedures import *
 
 
 def grab_latest_rife_model():
-    download_rife(installPath, onWindows, force_download_models=True)
+    download_rife(ROOT_DIR, IS_WINDOWS, force_download_models=True)
 
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
@@ -488,17 +489,21 @@ class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):
 
     def save_settings_file(self, filename: str):
         settings_dict = self.get_current_ui_settings()
-        out_file = open(filename, 'w')
-        out_file.write(json.dumps(settings_dict))
-        out_file.close()
+        try:
+            with open(filename, 'w') as out_file:
+                json.dump(settings_dict, out_file)
+        except (IOError, OSError) as e:
+            QMessageBox.warning(self, "Save Error", f"Failed to save settings to {filename}:\n{str(e)}")
 
     def load_settings_file(self, filename: str):
         if not os.path.isfile(filename):
             return
-        in_file = open(filename, 'r')
-        settings_dict: dict = json.loads(in_file.read())
-        in_file.close()
-        self.set_current_ui_settings(settings_dict)
+        try:
+            with open(filename, 'r') as in_file:
+                settings_dict: dict = json.loads(in_file.read())
+                self.set_current_ui_settings(settings_dict)
+        except (json.JSONDecodeError, IOError, OSError) as e:
+            QMessageBox.warning(self, "Load Error", f"Failed to load settings from {filename}:\n{str(e)}")
 
     def on_save_gui_state_check_change(self):
         # Remove preset file if user chooses not to save GUI state
