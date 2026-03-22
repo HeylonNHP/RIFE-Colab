@@ -96,12 +96,16 @@ def extractFrames(inputFile, projectFolder, mode, interpolatorConfig: Interpolat
         if interpolatorConfig.getMpdecimatedEnabled():
             hi, lo, frac = mpdecimateSensitivity.split(",")
             mpdecimate = "mpdecimate=hi={}:lo={}:frac={}".format(hi, lo, frac)
-            mpdecimateOptions += ['-vf']
-            mpdecimateOptions += [mpdecimate]
+            mpdecimateOptions += ['-vf', mpdecimate]
+        # -enc_time_base sets the encoder/output timebase to 1/timebase so that
+        # -frame_pts true produces filenames equal to time_in_seconds * timebase,
+        # replacing the old -r {timebase} -vsync 0 combination that FFmpeg 8+ rejects.
         run_and_print_output(
-            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts', '-r',
-             str(GlobalValues.timebase), '-vsync',
-             '0', '-frame_pts', 'true'] + mpdecimateOptions + ['-qscale:v', '1', 'original_frames/%15d.png'])
+            [FFMPEG4, '-i', inputFile, '-map_metadata', '-1', '-pix_fmt', 'rgb24', '-copyts',
+             '-fps_mode', 'passthrough', '-frame_pts', 'true',
+             '-enc_time_base', '1/{}'.format(GlobalValues.timebase)]
+            + mpdecimateOptions +
+            ['-qscale:v', '1', 'original_frames/%15d.png'])
 
 
 def runInterpolator(projectFolder, interpolatorConfig: InterpolatorConfig, outputFPS):
