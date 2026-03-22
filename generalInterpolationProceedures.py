@@ -19,7 +19,7 @@ import autoEncoding
 from runAndPrintOutput import run_and_print_output
 from FFmpegFunctions import *
 from frameChooser import choose_frames
-from Globals.GlobalValues import GlobalValues, ROOT_DIR, IS_WINDOWS
+from Globals.GlobalValues import GlobalValues, ROOT_DIR
 from Globals.EncoderConfig import EncoderConfig
 from Globals.InterpolatorConfig import InterpolatorConfig
 from EventHandling import Event
@@ -39,7 +39,7 @@ print('INSTALL:', installPath)
 # Get and initialise RIFE
 from rifeFunctions import download_rife
 
-download_rife(IS_WINDOWS)
+download_rife()
 os.chdir(installPath)
 from rifeInterpolationFunctions import *
 

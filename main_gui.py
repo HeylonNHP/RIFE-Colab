@@ -13,7 +13,6 @@ from PyQt5.QtWidgets import *
 
 import mainGuiUi
 from Globals.MachinePowerStatesHandler import MachinePowerStatesHandler
-from Globals.GlobalValues import IS_WINDOWS
 
 sys.path.insert(0, os.getcwd() + os.path.sep + 'arXiv2020RIFE')
 print(sys.path)
@@ -22,7 +21,7 @@ from generalInterpolationProceedures import *
 
 
 def grab_latest_rife_model():
-    download_rife(IS_WINDOWS, force_download_models=True)
+    download_rife(force_download_models=True)
 
 
 class RIFEGUIMAINWINDOW(QMainWindow, mainGuiUi.Ui_MainWindow):

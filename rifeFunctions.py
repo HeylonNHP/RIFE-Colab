@@ -3,12 +3,12 @@ import shutil
 import glob
 import os
 from Globals.BuildConfig import BuildConfig
-from Globals.GlobalValues import ROOT_DIR
+from Globals.GlobalValues import ROOT_DIR, IS_WINDOWS
 
 RIFEPATH = 'arXiv2020RIFE'
 
 
-def download_rife(on_windows, force_download_models=False):
+def download_rife(force_download_models=False):
     install_path = ROOT_DIR
     # Run if not previously setup
     os.chdir(install_path)
@@ -42,7 +42,7 @@ def download_rife(on_windows, force_download_models=False):
         download_file_from_google_drive('1gViYvvQrtETBgU1w8axZSsr7YUuw31uy', 'RIFE_trained_model_new.zip')
 
         seven_zip = "7z"
-        if on_windows:
+        if IS_WINDOWS:
             seven_zip = r"C:\Program Files\7-Zip\7z.exe"
 
         os.system('"' + seven_zip + '"' + r' e RIFE_trained_model_new.zip -aoa')
