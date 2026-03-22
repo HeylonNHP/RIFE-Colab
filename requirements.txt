@@ -1,2 +1,12 @@
+# Use CUDA-capable torch build for your GPU (CUDA 13.1 / driver 590.48.01)
+--extra-index-url https://download.pytorch.org/whl/cu131
+
 requests>=2.32.3
 numpy<2
+PyQt5
+opencv-python
+tqdm
+moviepy
+torch==2.10.0
+torchvision==0.25.0
+sk-video
