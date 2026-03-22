@@ -72,7 +72,7 @@ def mode1AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, output
 
         encodingPreset = generateEncodingPreset(encoderConfig)
 
-        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-vsync', '1', '-r', str(outputFPS), '-f', 'concat',
+        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-fps_mode', 'cfr', '-r', str(outputFPS), '-f', 'concat',
                          '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
@@ -192,7 +192,7 @@ def mode34AutoEncoding_Thread(threadStart: list, projectFolder, inputFile, outpu
         # Build ffmpeg command and run ffmpeg
         encodingPreset = generateEncodingPreset(encoderConfig)
 
-        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-vsync', '1', '-r', str(outputFPS), '-f', 'concat',
+        ffmpegCommand = [ffmpegPath, '-y', '-loglevel', 'quiet', '-fps_mode', 'cfr', '-r', str(outputFPS), '-f', 'concat',
                          '-safe', '0', '-i', blockFramesFilePath]
         ffmpegCommand = ffmpegCommand + encodingPreset
         ffmpegCommand = ffmpegCommand + [projectFolder + os.path.sep + 'autoblock' + str(blockCount) + '.mkv']
