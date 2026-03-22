@@ -82,36 +82,13 @@ def main_install():
     if BuildConfig().isPyInstallerBuild():
         return
 
-    for package in REQUIRED_PACKAGES:
-        install(package)
-
-    # Get torch
+    # Install dependencies from requirements.txt
+    print("Installing dependencies from requirements.txt")
     try:
-        import torch
-
-        version_string = torch.__version__
-        subversions = version_string.split('.')
-
-        if int(subversions[0]) < 1:
-            # Torch less than 1.0.0
-            raise Exception
-        if '+cpu' in subversions[2]:
-            # Torch CPU only version
-            raise Exception
-        print('Found torch', torch.__version__)
-    except:
-        # Install torch
-        print("Pytorch not found, getting 1.13.1 CUDA 11.7")
-        if os.name == 'nt':
-            # On windows
-            subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu117', 'torchvision==0.14.1+cu117',
-                 'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
-        else:
-            # On linux
-            subprocess.check_call(
-                [sys.executable, '-m', 'pip', 'install', 'torch==1.13.1+cu117', 'torchvision==0.14.1+cu117',
-                 'torchaudio==0.13.1', '-f', 'https://download.pytorch.org/whl/torch_stable.html'])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
+    except subprocess.CalledProcessError:
+        print("Failed to run 'pip' through the current python executable. Attempting to call 'pip' directly...")
+        subprocess.check_call(["pip", "install", "-r", "requirements.txt"])
 
     # Check ffmpeg
     ffmpeg_exists = False
