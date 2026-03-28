@@ -6,6 +6,15 @@ import sys
 import threading
 import traceback
 
+# Workaround for PyTorch 2.9+ on Windows: importing PyQt first can break torch DLL initialization.
+# Force torch to load first on Windows when available.
+if sys.platform.startswith("win"):
+    try:
+        import torch  # noqa: F401
+        print("Torch preloaded before PyQt on Windows.")
+    except Exception as e:
+        print("Warning: torch early import failed (continuing):", e)
+
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
